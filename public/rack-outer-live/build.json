@@ -1,0 +1,22 @@
+{
+  "api": 1,
+  "audited": false,
+  "profile": "rack-outer-gain16-pull-authority-v1",
+  "version": "da3f650bcbbc1394",
+  "source": "c4061f33419b713a09d77fc4bf52cb53f3dc9669b22e6afefb564352f2c0007f",
+  "wasm": "eb8e4dec9d01c4508b7853aa0b5bc2c9f5773c84325f36bc910c2a14498b0f9c",
+  "bytes": 36918,
+  "files": [
+    "tools/buildRackOuter.mjs",
+    "synth-engine/rack-outer-live/Cargo.toml",
+    "synth-engine/rack-outer-live/Cargo.lock",
+    "synth-engine/rack-outer-live/src/lib.rs",
+    "synth-engine/rack-outer-live/src/allocation.rs",
+    "synth-engine/rack-outer-live/CHROMIUM_PROFILE.json",
+    "synth-engine/rack-outer-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/ordered-send-live/src/lib.rs",
+    "src/modular-audio/rackOuterRust.js"
+  ],
+  "scope": "NEW two-physical-stage rack outer Gain/ordered mix. Unchanged accepted Timeline/Gain loop; independent observed Native frame versus explicit unpulled/params-only/audio activity. Fixed mono/stereo layout; actual source flags only, no zero-PCM inference. External stage limited to genuine owned declared always-true AWP or fixed-activity contract; opaque Native IIR/tail and arbitrary fan-in refuse. No existing app adoption."
+}

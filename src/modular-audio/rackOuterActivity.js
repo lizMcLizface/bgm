@@ -1,0 +1,13 @@
+/** Separate non-audible output. Exact integer words repeat sixteen times in one
+ *128-frame channel; no Float32 absolute-time ramp, checksum or clock fitting.
+ * Activity describes owned Native-Gain semantics, NOT a browser bus assertion.
+ * 0=unpulled, 1=active non-silent, 2=active silent. */
+export const RACK_ACTIVITY_PROFILE='owned-native-gain-activity-port-v1';
+export const RACK_ACTIVITY_MAGIC=12731277;
+const MAX_FRAME=1099511627648,MAX_PRODUCER=16777215;
+export function writeRackActivity(destination,producer,frame,channels,activity){if(!(destination instanceof Float32Array)||destination.length!==128||!Number.isInteger(producer)||producer<1||producer>MAX_PRODUCER||!Number.isSafeInteger(frame)||frame<0||frame>MAX_FRAME||frame%128||channels!==1&&channels!==2||!Number.isInteger(activity)||activity<0||activity>2)throw Error('Invalid owned logical activity header');const low=frame%65536,mid=Math.floor(frame/65536)%65536,high=Math.floor(frame/4294967296);for(let at=0;at<128;at+=8){destination[at]=RACK_ACTIVITY_MAGIC;destination[at+1]=1;destination[at+2]=producer;destination[at+3]=low;destination[at+4]=mid;destination[at+5]=high;destination[at+6]=channels;destination[at+7]=activity;}return destination;}
+export class RackActivityReader{
+ constructor(producer,channels){if(!Number.isInteger(producer)||producer<1||producer>MAX_PRODUCER||channels!==1&&channels!==2)throw Error('Explicit private producer/channel activity geometry required');this.producer=producer;this.channels=channels;this.frame=null;this.activity=0;this.calls=0;}
+ read(source,nativeFrame){if(!(source instanceof Float32Array)||source.length!==128||!Number.isSafeInteger(nativeFrame)||nativeFrame<0||nativeFrame>MAX_FRAME||nativeFrame%128)throw Error('Missing actual same-quantum logical activity header');for(let i=0;i<128;i++)if(!Number.isInteger(source[i])||source[i]<0||source[i]>MAX_PRODUCER)throw Error('Noninteger logical activity word');if(source[0]!==RACK_ACTIVITY_MAGIC||source[1]!==1||source[2]!==this.producer||source[3]>=65536||source[4]>=65536||source[5]>255||source[6]!==this.channels||source[7]>2)throw Error('Logical activity producer/layout differs');for(let at=8;at<128;at+=8)for(let word=0;word<8;word++)if(source[at+word]!==source[word])throw Error('Torn logical activity quantum');const frame=source[3]+source[4]*65536+source[5]*4294967296;if(frame!==nativeFrame)throw Error('Logical activity is not the actual Source7a quantum');if(this.frame!==null&&frame<=this.frame)throw Error('Logical activity quantum replay/backwards');this.frame=frame;this.activity=source[7];this.calls++;return this.activity;}
+ snapshot(){return{profile:RACK_ACTIVITY_PROFILE,producer:this.producer,channels:this.channels,frame:this.frame,activity:this.activity,calls:this.calls};}
+}
