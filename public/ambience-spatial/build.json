@@ -1,7 +1,7 @@
 {
   "api": 1,
   "profile": "complete-ambience-spatial-v1",
-  "source": "11c8dfe8357ecae34c01d255fa3541b7829df1eb2e90aba250961e1caaf6b685",
+  "source": "fc53b52553e02d0f1b940f0acf554000eca07498c587a77381d203c90e9ce262",
   "runtime": "49c54dc311ed9080087d70ffa196d8377b8f1ca8f58781e1251a33ec1321e403",
   "reference": "678ac57909e0f92ee4f9d76be08f8d0ba3d8bd2a68d862e5e7c396cea6d60f7d",
   "resources": {
@@ -12,5 +12,5 @@
   "wasm": "382cc1793fb37b8ab9740a9220cb956b2e394f20145337faa1b86863623dd1c3",
   "bytes": 208078,
   "audited": false,
-  "version": "85c84b970c9deb28"
+  "version": "46808706d2a9c92c"
 }

@@ -114,3 +114,10 @@ impl Engine {
  }
 }
 #[no_mangle]pub extern "C" fn ambience_spatial_live_activate_walk(p:&mut Engine,observed:f64,target:f64,birth:f64,period:f64,depth:f64,tau:f64,property:f64,bank:&mut LiveWalkBank)->f64{let(Some(t),Some(property))=(integer(target,6),integer(property,1))else{return -1.;};p.live_activate_walk(observed,t,birth,period,depth,tau,property!=0,bank).map_or(-1.,|n|n as f64)}
+
+impl LiveWalkBank {
+ /// Read actual retained knot fields back into transfer scratch. Incoming scratch
+ /// is not an authority for receiver identity after a write.
+ pub fn read(&mut self,offset:usize,n:usize)->bool{if n==0||n>256||offset.checked_add(n).is_none_or(|end|end>self.written){return false;}for i in 0..n{self.scratch[2*i]=self.points[offset+i][0];self.scratch[2*i+1]=self.points[offset+i][1];}true}
+}
+#[no_mangle]pub extern "C" fn ambience_spatial_live_walk_read(p:&mut LiveWalkBank,offset:f64,n:f64)->u32{let(Some(o),Some(n))=(integer(offset,256),integer(n,256))else{return 0;};p.read(o,n)as u32}
