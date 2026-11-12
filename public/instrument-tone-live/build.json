@@ -1,0 +1,28 @@
+{
+  "api": 1,
+  "profile": "original-instrument-tone-live-host-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "d1d152b4493cb684",
+  "kernelVersion": "1afe2ec923809c85",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "instrument-tone-d1d152b4493cb684",
+  "processor": "c363ae03b6b0e996ed2444f819c50675626452be28a3f005141f960c2b139ee2",
+  "source": "1589d19bec10dace2f3b2fb359c8373c8c35ba992f8652371aab05a1bdf0308f",
+  "files": [
+    "tools/buildInstrumentToneHost.mjs",
+    "src/nodes/instrumentToneRust.js",
+    "src/modular-audio/instrumentToneProcessor.js",
+    "src/modular-audio/instrumentToneWords.js",
+    "src/modular-audio/ownedInstrumentTone.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/clockedSourceRelease.js"
+  ],
+  "wasm": "10d118906e1abb8ddec84c308b5071094681846258ca012b3785703902a2acde",
+  "bytes": 85857,
+  "metadataDescriptors": 581,
+  "scope": "Explicit prepared immutable mono/stereo original Filter/EQ2/combined stages,32 acknowledged raw-F64 stamped rows, Source7a, isolated control-only service, physical demand/reconnect and actual terminal ACK. Running demand transitions remain unaccepted pending strict graph interleaving proof. No automatic Native Tail, external AudioParam connection, synchronous intrinsic getter, normal Instrument selection or physical deadline claim."
+}

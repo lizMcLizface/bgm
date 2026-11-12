@@ -1,0 +1,29 @@
+{
+  "api": 1,
+  "profile": "original-instrument-filter-eq-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "1afe2ec923809c85",
+  "source": "65175527f41aa2ecbf6a6ea915a39e9124a46abcc8a8b5612e21cf462d5692a3",
+  "wasm": "10d118906e1abb8ddec84c308b5071094681846258ca012b3785703902a2acde",
+  "bytes": 85857,
+  "files": [
+    "synth-engine/instrument-tone/Cargo.toml",
+    "synth-engine/instrument-tone/Cargo.lock",
+    "synth-engine/instrument-tone/src/lib.rs",
+    "synth-engine/instrument-tone/src/allocation.rs",
+    "synth-engine/instrument-tone/src/biquad.rs",
+    "synth-engine/instrument-tone/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-tone/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/nodes/filter.js",
+    "src/nodes/eq2.js",
+    "src/modular-audio/ownedInstrumentTone.js",
+    "tools/buildInstrumentTone.mjs"
+  ],
+  "scope": "Original single seven-type Nodes.Filter and low->mid->high Nodes.EQ2, including default/property/scheduled histories, Float32 detune division and unchanged pinned Biquad coefficients/state. Captured Native insertion frames; fixed logical mono/stereo, declared pull. No synchronous AudioParam getters, external LFO, automatic tail/layout or normal Instrument selection claim.",
+  "profileSha256": "d1e0d407d501a527b95af167ffef508dc3f66ab7f2e4eef867cea7d01fc96f6a",
+  "notices": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71"
+}

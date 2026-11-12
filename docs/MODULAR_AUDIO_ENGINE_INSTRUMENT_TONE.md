@@ -63,3 +63,41 @@ connections, synchronous intrinsic getters, normal Instrument adoption or
 physical-device deadline guarantees. The next implementation task is the
 bounded live facade and its actual preparation, graph-transition, independent
 instance and terminal-ownership checks before explicit factory integration.
+
+## Owned AudioWorklet numerical checkpoint
+
+The separate host d1d152b4493cb684 keeps kernel 1afe2ec923809c85 and its exact
+Wasm bytes. It provides one owned Filter, EQ2 or combined actor, immutable
+mono/stereo layout, 32 acknowledged raw-F64 rows and an eight-owner quota.
+Source7a supplies the actual render clock; raw global worklet time is not its
+authority. Empty preparation requires a fresh consumer callback, and the
+one-way terminal gate precedes owned Native edge removal. A failed terminal
+write retains remaining edges until actual SourceACK or context close. Typed
+requests, exact owner identities and request/reply kinds are validated.
+
+Actual browser verification passes 72 cases across the same six rates. Two
+independent Rust AudioWorklets give 144 Native comparisons /216 compared
+channels. All 216 strict captures begin at frame zero and include every block.
+Every input stream is word-exact, independent output streams are word-exact,
+and the maximum original-reference errors remain 8.463859558105469e-6 absolute
+and 2.2315727016576927e-5 relative RMS. All 144 natural-end sources release
+healthy with their actual clock leases; no lateness, rejected rows or timeline
+clamps are reported. These are explicitly Offline terminal closures, not
+running-context teardown proofs.
+
+The twelve-case complete owned scene is saved, the HTML document is actually
+reloaded, and fresh Native/owned/independent actors reconstruct every complete
+recipe and all four sets of plane hashes exactly at 192 kHz. The ignored
+instrument-tone-live-d1d1-independent-audit.json records exact receipts and
+source archives. The earlier 1b25 pilot and low-rate receipt remain separate;
+its successor tightens request/reply validation without changing the processor
+source or numerical kernel.
+
+The running graph transition is deliberately unaccepted at this checkpoint.
+A separate original BitCrusher test demonstrated that an already pulled input
+block can coexist with a newly visible inactive request. This host currently
+retains the strict refusal for that state. The next task is the shared atomic
+route-tag / observed-physical-input transition contract, including actual
+active draining, empty-input acknowledgement and adversarial live checks.
+No normal Instrument selection, synchronous AudioParam getter, automatic Native
+Tail behavior, external LFO AudioParam bridge or default change is implied.

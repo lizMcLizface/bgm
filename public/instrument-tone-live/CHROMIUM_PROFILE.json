@@ -1,0 +1,31 @@
+{
+  "api": 1,
+  "profile": "original-instrument-filter-eq-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "textEncoding": "utf-8-normalized-LF",
+  "scope": "Original single seven-type Nodes.Filter and low->mid->high Nodes.EQ2, including default/property/scheduled histories, Float32 detune division and unchanged pinned Biquad coefficients/state. Captured Native insertion frames; fixed logical mono/stereo, declared pull. No synchronous AudioParam getters, external LFO, automatic tail/layout or normal Instrument selection claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "synth-engine/rack-native/src/biquad.rs",
+      "sha256": "cc2396878e3f13a7b452270291a84139129e077d9ee01b47ae27cf55612e0d6c"
+    },
+    {
+      "path": "synth-engine/rack-native/src/tail.rs",
+      "sha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/filter.js",
+    "src/nodes/eq2.js"
+  ],
+  "normalization": {
+    "source": "third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+    "sha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95",
+    "formula": "double frequency/nyquist; multiply by exp2(float(detune/1200)) when detune!=0",
+    "fork": "Identical accepted Biquad helper except explicit pre-normalized frequency input avoids multiply/divide refitting."
+  }
+}
