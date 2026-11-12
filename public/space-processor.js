@@ -1,3 +1,5 @@
+// Terminal ownership only: future JS DSP/controls stop; retained buffers are not manually freed.
+function terminalSpaceProcessor(unit,request){unit.stopped=true;let error=null;try{unit.port.onmessage=null;}catch(reason){error=String(reason);}const receipt={type:'disposed',version:1,released:true,clean:error===null,heapFreed:false,scope:'javascript-processor-terminal-quiescence-v1',request,...(error?{error}:{})};unit.terminalReceipt=receipt;unit.port.postMessage(receipt);}
 // Shimmer and freeze for the calmbgm synth's effects (src/nodes/shimmer.js, freeze.js).
 // Both add their sound to the dry signal, which passes unchanged. Settings arrive as port
 // messages ({type:'set', ...}); {type:'clear'} drops what they are ringing with.
@@ -9,7 +11,7 @@ const TINY = 1e-18;
 // each line, with a two-tap pitch shifter between the network's output and its input.
 class Shimmer extends AudioWorkletProcessor {
     constructor() {
-        super();
+        super();this.stopped=false;
         const sr = sampleRate;
         this.lengths = [47.3, 59.9, 71.1, 83.3].map((ms) => Math.round(ms * sr / 1000));
         this.lines = this.lengths.map((n) => new Float32Array(n));
@@ -25,6 +27,7 @@ class Shimmer extends AudioWorkletProcessor {
         this.energy = 0;
         this.set({ mix: 0, decay: 6, semitones: 12, climb: 0.5, tone: 7000 });
         this.port.onmessage = ({ data }) => {
+            if(data.type==='dispose'){terminalSpaceProcessor(this,data.request);return;}if(this.stopped)return;
             if (data.type === 'set') this.set(data);
             else if (data.type === 'clear') this.clear();
         };
@@ -56,6 +59,7 @@ class Shimmer extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs) {
+        if(this.stopped){for(const channel of outputs[0]??[])channel.fill(0);return false;}
         const input = inputs[0], out = outputs[0];
         const inL = input[0], inR = input[1] ?? input[0];
         const n = out[0].length;
@@ -121,7 +125,7 @@ const GRAINS = 4;
 const MAX_SECONDS = 4;
 class Freeze extends AudioWorkletProcessor {
     constructor() {
-        super();
+        super();this.stopped=false;
         const sr = sampleRate;
         this.ring = [new Float32Array(Math.ceil((MAX_SECONDS + 0.5) * sr)), new Float32Array(Math.ceil((MAX_SECONDS + 0.5) * sr))];
         this.write = 0;
@@ -131,6 +135,7 @@ class Freeze extends AudioWorkletProcessor {
         this.retry = 0;
         this.mix = 0; this.hold = false; this.length = 2; this.fade = 1;
         this.port.onmessage = ({ data }) => {
+            if(data.type==='dispose'){terminalSpaceProcessor(this,data.request);return;}if(this.stopped)return;
             if (data.type === 'set') this.set(data);
             else if (data.type === 'clear') { for (const c of this.clouds) { c.level = c.target = 0; c.length = 0; } this.current = null; this.waiting = this.hold; }
         };
@@ -170,6 +175,7 @@ class Freeze extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs) {
+        if(this.stopped){for(const channel of outputs[0]??[])channel.fill(0);return false;}
         const input = inputs[0], out = outputs[0];
         const inL = input[0], inR = input[1] ?? input[0];
         const n = out[0].length, size = this.ring[0].length;

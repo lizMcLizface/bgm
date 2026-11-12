@@ -6,9 +6,9 @@
   ],
   "source": "db2aac863a8b44cc4d4b18fe80229f4137d9bfe050885049d88603c395c098ca",
   "runtime": "3933068f57ea0bdd8c3cbd302eacdcf8d78a3b1d137fa4516f953aa4195693b0",
-  "reference": "663ab85724b367afdecf00d8eec92ebd567c44fcefc7b5a75c3f4f6b42fe53bf",
+  "reference": "bf5b8e8d19ec26341a6a464aed78fb78fff5bc6ed56506979e4d68e3a4d50106",
   "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
   "bytes": 253652,
   "audited": false,
-  "version": "6184d9588e03ab5e"
+  "version": "c0b806958b63b748"
 }

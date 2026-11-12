@@ -238,11 +238,12 @@
       "reset": "replay original captured configuration"
     }
   },
-  "referenceSourceSha256": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0",
+  "referenceSourceSha256": "2b302dbdcfa93cb49994f69784d08fbad15f4274b53342b518b58ac0e53c0d5b",
   "audited": false,
   "source": "0e7789e8110d46af81a553d7c6b838b044dca348f30ab2933d64a921e5e81dfc",
   "runtime": "e5f7d42422142050a1277cf6295ec78580ae2fdf5978425d0adde1d1662d7f6c",
   "wasm": "dc897c474f14305341f43732104cd73e58893694b2d7663b91acb0867446d59a",
   "bytes": 76641,
-  "version": "5a21904607c19428"
+  "version": "5a21904607c19428",
+  "referenceNormalization": "normalized-lf-source-v1"
 }

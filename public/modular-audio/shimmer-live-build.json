@@ -1,8 +1,8 @@
 {
   "api": 1,
   "profile": "original-shimmer-live-message-v1",
-  "source": "695d45b42665c139f6a15207899803357e17463aecebb8f4fc212ef7dd348c62",
+  "source": "6beb5148f71b281c1a3966e2738919cf5f58fb00d6d7fe2d45f932a0dff14430",
   "kernelVersion": "7b490244eb5cd194",
   "wasm": "3f52f16c9ce26e4fe37907f22b984625c6e71d04bec054cab7d3dc52363085b5",
-  "version": "6ffe9530fc98757f"
+  "version": "31dccbc2dd27ffeb"
 }

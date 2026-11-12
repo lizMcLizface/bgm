@@ -2,7 +2,7 @@
   "api": 1,
   "profile": "native-clock-physical-buffer-live-v1",
   "clockVersion": "7a0838a735108706",
-  "baseVersion": "6184d9588e03ab5e",
+  "baseVersion": "c0b806958b63b748",
   "basePredecessor": {
     "version": "10cf4444a452d47e",
     "sourceUnchanged": true,
@@ -10,17 +10,17 @@
     "wasmUnchanged": true,
     "delta": "Explicit source-reference-only successor; no predecessor version alias"
   },
-  "source": "95e834789be291bf14a55de825b42e6dc9dac5e13c0cff0021556fe8d7d42ad8",
+  "source": "6e00b75277cf064f8fac5fcb44743865ae1f18388e6bc68c3328bb130ae6d199",
   "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
   "bytes": 253652,
-  "version": "6105a049d64fc2e3",
+  "version": "c45406eea3398bb0",
   "files": {
     "src/modular-audio/physicalClockedProfile.js": "8daa0e3e3f5f1ee749650db48da68248bce0cec566663cbf5be5c599151ecbf2",
     "src/modular-audio/physicalClockedAssets.js": "4726e023a00d88ed0c83ba2b42cb384479c4478c153c1c3c3aedff923a8a4dae",
     "src/modular-audio/physicalClockedOwnership.js": "097616453a45fbaf1d931a9e1bd1d0d7443d55c0131427f8b75f438f47405eeb",
     "src/modular-audio/physicalClockedSources.js": "27b07c753863673b08d78facf7ca3e60d23dca053ce5457b614033bbef72c5a8",
     "src/audio/instrumentConstruction.js": "9f91abb9a7cc57b6cc55c6b19e5c0fcb5925caaadb7c3c2293ad2e57bdfa22ca",
-    "src/app/engine/instrumentOwnedParts.js": "ee8373602dc5047b4f0d1011fb9d4f018c2b86a2251397aadccc0c60f68006a6",
+    "src/app/engine/instrumentOwnedParts.js": "3631f3e93ac45c0d760e060f5c5774fca0f26090fbedf0269bbc7d8f569a31b8",
     "src/modular-audio/physicalInstrumentAdmission.js": "9ef13d03596aa90189580c462c57293a4aac05b80cccec1d255adbc21ab9ceb7",
     "src/app/engine/physicalBufferClockedSource.js": "7c938e4587ee16ab81b2c51797f34118939456538299bba4e1769102d947e6ea",
     "src/app/engine/physicalBufferClockedProcessor.js": "c10813c26610b07e1cf948e1393fc57192f6a8ce030d5e0bba91b26a31c1269b",
@@ -38,7 +38,7 @@
     "src/app/engine/pianoLivePreparation.js": "159b392a34a60f521e721e352b2b4a0063aca7216f1c70755af7edd4cd1d0153",
     "src/modular-audio/ownedPhysicalBufferLive.js": "7f892b08fab52c8db5c32fd4dace6ae07d0b2407e39e23dc328342b9bce990ae",
     "src/modular-audio/ownedPluckedString.js": "bd196dcd3a5c6ac7d74e4287212ca122d2fb6762ec1d4c217e02d68ff4f4f80d",
-    "public/physical-buffer-live/build.json": "783a29aca64aa0c10f5a475af99e5da6c5aabc38651fd9ef507aa2ab899089e1",
+    "public/physical-buffer-live/build.json": "848dfe5e1604353fb37cf7db0b838011657c28d6db5988124d8f01d84086348e",
     "public/native-context-clock/build.json": "da2f31c4fce4ae87c5e4bceeeff693d26a2ff700de7a83200d8f9b2a1c3e9109"
   }
 }
