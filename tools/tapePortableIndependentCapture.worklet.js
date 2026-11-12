@@ -1,0 +1,5 @@
+class TapeIndependentMatchedCapture extends AudioWorkletProcessor{
+ constructor({processorOptions:p}){super();if(![1,2].includes(p.channels)||!Number.isInteger(p.length)||p.length<128||p.length>65536||p.length%128)throw Error('Invalid matched Tape capture bound');this.channels=p.channels;this.length=p.length;this.frame=0;this.done=false;this.bits=Array.from({length:p.channels},()=>new Uint32Array(p.length));}
+ process(inputs,outputs){for(const plane of outputs[0])plane.fill(0);if(this.done)return false;const input=inputs[0]??[];if(input.length!==this.channels||input.some(p=>p.length!==128)){this.done=true;this.port.postMessage({kind:'capture-error',error:'Matched Tape logical capture layout differs',channels:input.length});return false;}for(let c=0;c<this.channels;c++)this.bits[c].set(new Uint32Array(input[c].buffer,input[c].byteOffset,128),this.frame);this.frame+=128;if(this.frame===this.length){this.done=true;this.port.postMessage({kind:'captured-bits',frames:this.frame,channels:this.channels,bits:this.bits},this.bits.map(p=>p.buffer));return false;}return true;}
+}
+registerProcessor('tape-independent-matched-capture-v1',TapeIndependentMatchedCapture);

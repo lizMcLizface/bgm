@@ -1,18 +1,11 @@
+import{TAPE_MATCHED_CAPTURE_AUTHORITY}from'./tapePortableIndependentMeasurement.js';
 const KINDS=['continuous','explicit-gap','portable-retirement'],SHA=/^[a-f0-9]{64}$/;
 export const TAPE_COMPOSED_SCENE_KEY='pianote.tape.composed.scene.v1';
-/** Only explicit passing fixtures become replay authority; Native PCM hashes are not compared. */
+/** Exact replay uses matched capture outputs, not position-dependent Native merger publication. */
 export function portableTapeScene(report){
- if(report?.kind!=='tape.actual-composed-offline-reference'||report.version!==2||!report.complete||!report.checksPassed||report.cases?.length!==6||!report.preset)throw Error('A complete passing composed Tape fixture is required');
+ if(report?.kind!=='tape.actual-composed-offline-reference'||report.version!==3||report.independenceAuthority!==TAPE_MATCHED_CAPTURE_AUTHORITY||!report.complete||!report.checksPassed||report.cases?.length!==6||!report.preset)throw Error('A complete passing matched-capture Tape fixture is required');
  const cases=[];let index=0;
- for(const kind of KINDS)for(const channels of [1,2]){
-  const row=report.cases[index++];
-  if(row.kind!==kind||row.channels!==channels||row.rate!==report.rate||!row.checksPassed||!row.components||row.ownedHashes?.length!==2||row.ownedHashes.some(pair=>pair.length!==2||pair.some(hash=>!SHA.test(hash))))throw Error('Composed Tape scene case/hash authority differs');
-  cases.push({kind,channels,rate:row.rate,length:row.length,retirementPlan:row.retirementPlan,components:row.components,ownedHashes:row.ownedHashes});
- }
- return JSON.parse(JSON.stringify({kind:'tape.composed.cold-scene',version:1,fixtureVersion:report.version,rate:report.rate,preset:report.preset,cases}));
+ for(const kind of KINDS)for(const channels of[1,2]){const row=report.cases[index++];if(row.kind!==kind||row.channels!==channels||row.rate!==report.rate||!row.checksPassed||!row.components||row.independentCapture?.authority!==TAPE_MATCHED_CAPTURE_AUTHORITY||row.independentCapture.channels!==channels||row.independentCapture.frames?.length!==2||row.independentCapture.frames.some(n=>n!==row.length)||row.independentOwnedHashes?.length!==2||row.independentOwnedHashes.some(pair=>pair.length!==channels||pair.some(hash=>!SHA.test(hash))))throw Error('Matched Tape scene case/hash authority differs');cases.push({kind,channels,rate:row.rate,length:row.length,retirementPlan:row.retirementPlan,components:row.components,independentCapture:row.independentCapture,independentOwnedHashes:row.independentOwnedHashes});}
+ return JSON.parse(JSON.stringify({kind:'tape.composed.cold-scene',version:2,fixtureVersion:report.version,independenceAuthority:TAPE_MATCHED_CAPTURE_AUTHORITY,rate:report.rate,preset:report.preset,cases}));
 }
-export function comparePortableTapeScene(report,saved){
- const actual=portableTapeScene(report);
- if(saved?.kind!=='tape.composed.cold-scene'||saved.version!==1)throw Error('Saved composed Tape scene is unsupported');
- return{checksPassed:JSON.stringify(actual)===JSON.stringify(saved),scope:'Exact fixed fixture/settings/components and both independent owned PCM hashes after document reload. Native PCM remains checked by its declared numerical bounds.'};
-}
+export function comparePortableTapeScene(report,saved){const actual=portableTapeScene(report);if(saved?.kind!=='tape.composed.cold-scene'||saved.version!==2||saved.independenceAuthority!==TAPE_MATCHED_CAPTURE_AUTHORITY)throw Error('Saved Tape scene uses unsupported capture authority');return{checksPassed:JSON.stringify(actual)===JSON.stringify(saved),scope:'Exact fixed fixture/settings/components and both matched logical-layout owned PCM hashes after document reload. Native comparisons retain their bounds; original merged-publication hashes/differences remain separate diagnostics.'};}
