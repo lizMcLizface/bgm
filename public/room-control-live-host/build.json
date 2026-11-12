@@ -1,0 +1,29 @@
+{
+  "api": 1,
+  "profile": "original-room-output-clock-controller-host-v1",
+  "version": "c7405046a5686fc5",
+  "source": "47fb45546addfeb714db1dab4b2fec73cbfd3f7d0b36077e85328e6c1cc79e6c",
+  "processor": "21069d0f53e29e7de376072129399ec9c4f406524cdc3d3a21e5a31ce695aa5d",
+  "processorName": "original-room-live-gains-c7405046a5686fc5",
+  "kernelVersion": "fcaa051b59881695",
+  "wasm": "4a685c9a1c3ba1eba148eb713349c25266c065e4edd81f23cf3497392c782ed8",
+  "clockVersion": "7a0838a735108706",
+  "files": [
+    "public/native-context-clock/build.json",
+    "public/room-control-live/build.json",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/ownedRoomControlLive.js",
+    "src/modular-audio/roomAmountWords.js",
+    "src/modular-audio/roomControlCore.js",
+    "src/modular-audio/roomControlNode.js",
+    "src/modular-audio/roomControlProcessor.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "tools/buildRoomControlLiveHost.mjs"
+  ],
+  "textEncoding": "utf-8-normalized-LF",
+  "descriptors": 643,
+  "scope": "New output-clock controller;32raw16word slots,16complete live calls, atomic complete future booking plus reserved sequential live leaves. No normal/default/shared Room adoption."
+}

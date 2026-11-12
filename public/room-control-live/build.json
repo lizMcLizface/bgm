@@ -1,0 +1,28 @@
+{
+  "api": 1,
+  "profile": "original-room-output-clock-live-gains-v1",
+  "textEncoding": "utf-8-normalized-LF",
+  "audited": false,
+  "version": "fcaa051b59881695",
+  "source": "fea5d0abed0d7061f2587f01da5e769092eab5b3dce1b4c148ea8b5f9ba68254",
+  "wasm": "4a685c9a1c3ba1eba148eb713349c25266c065e4edd81f23cf3497392c782ed8",
+  "bytes": 39367,
+  "files": [
+    "tools/buildRoomControlLive.mjs",
+    "synth-engine/room-control-live/Cargo.toml",
+    "synth-engine/room-control-live/Cargo.lock",
+    "synth-engine/room-control-live/src/lib.rs",
+    "synth-engine/room-control-live/src/allocation.rs",
+    "synth-engine/room-control-live/CHROMIUM_PROFILE.json",
+    "synth-engine/room-control-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/room-complete-mix/src/timeline.rs",
+    "src/modular-audio/ownedRoomControlLive.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "src/nodes/reverb.js",
+    "src/nodes/gain.js"
+  ],
+  "timelineSha256": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020",
+  "profileSha256": "cc11ab333cbc9cee5a0f9f2d2d093ddbdf810f7bb129f81ebcc8a6c038509ea2",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "scope": "Absolute output-time original Room gain law, atomic complete pairs and reserved sequential live leaves. RawFloat64 amounts/times, Native insertion pruning and render-new-event clamp. No automatic demand or normal adoption."
+}

@@ -1,0 +1,10 @@
+import{validateRoomConvolutionSpec,loadRoomConvolutionSpec,saveRoomConvolutionSpec}from'./ownedRoomConvolver.js';
+export const ROOM_SPLIT_PROFILE='room-split-worker-output-clock-controller-v1';
+export function validateRoomSplitProgram(p){
+ if(!p||Object.keys(p).length!==6||p.version!==1||p.profile!==ROOM_SPLIT_PROFILE)throw Error('Invalid split Room program');validateRoomConvolutionSpec(p.room);const rate=p.room.convolver.sampleRate,c=p.room.colour;if(c?.version!==3||!Number.isSafeInteger(p.frames)||p.frames<128||p.frames%128||p.frames>rate*3600||!Number.isInteger(p.blockFrames)||p.blockFrames<128||p.blockFrames>2048||p.blockFrames%128||c.activity[0]?.frame!==0||c.activity.some(e=>e.frame>=p.frames||e.inputChannels!==c.channels||e.delayProcessing!=='audio'||e.filterProcessing!=='audio')||c.events.some(e=>e.frame>=p.frames))throw Error('Split Room requires prepared known-layout framed source');
+ if(p.latencyFrames!==Math.max(2*p.blockFrames,Math.ceil(rate*.5/128)*128))throw Error('Split Room exact final latency differs');return p;
+}
+export function roomSplitProgram(room,{frames,blockFrames=2048}={}){const rate=room.convolver.sampleRate;return validateRoomSplitProgram({version:1,profile:ROOM_SPLIT_PROFILE,room:loadRoomConvolutionSpec(saveRoomConvolutionSpec(room)),frames,blockFrames,latencyFrames:Math.max(2*blockFrames,Math.ceil(rate*.5/128)*128)});}
+export const saveRoomSplitProgram=p=>JSON.stringify(validateRoomSplitProgram(p))+'\n';
+export const loadRoomSplitProgram=s=>validateRoomSplitProgram(JSON.parse(s));
+export function roomSplitGeometry(p){validateRoomSplitProgram(p);const inputChannels=p.room.colour.channels,wetChannels=Math.max(p.room.convolver.inputChannels,p.room.convolver.ir.length),packetPlanes=inputChannels+wetChannels,poolBlocks=Math.ceil(p.latencyFrames/p.blockFrames)+4;if(poolBlocks>192)throw Error('Split Room credit bound');return Object.freeze({sampleRate:p.room.convolver.sampleRate,inputChannels,wetChannels,outputChannels:Math.max(inputChannels,wetChannels),packetPlanes,poolBlocks,blockFrames:p.blockFrames,frames:p.frames,latencyFrames:p.latencyFrames,poolBytes:poolBlocks*packetPlanes*p.blockFrames*4});}

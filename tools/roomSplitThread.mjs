@@ -1,0 +1,1 @@
+import{parentPort}from'node:worker_threads';import{RoomSplitWorker}from'../src/modular-audio/roomSplitWorker.js';let unit;parentPort.on('message',d=>{if(!unit&&d.kind==='init')unit=new RoomSplitWorker(d,p=>parentPort.postMessage(p));else unit?.receive(d);});

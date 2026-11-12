@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "profile": "original-room-output-clock-live-gains-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/room-complete-mix/src/timeline.rs",
+  "timelineSha256": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020",
+  "sourceReferences": [
+    "src/nodes/reverb.js",
+    "src/nodes/gain.js"
+  ],
+  "audioParamHandler": {
+    "url": "https://chromium.googlesource.com/chromium/src/+/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+    "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+  },
+  "law": "Original f64 amount; both Gain intrinsics1; explicit constructor steps; repeated stable step events, main-time clamp before insertion pruning, render-time clamp of new past events; f32 branch products then dry-first sum.",
+  "bounds": {
+    "sourceChannels": [
+      1,
+      2
+    ],
+    "wetChannels": [
+      1,
+      2
+    ],
+    "eventCapacityPerLane": 256,
+    "pendingLivePairs": 16,
+    "quantumFrames": 128
+  },
+  "nativeDefaultChanged": false
+}

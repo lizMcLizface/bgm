@@ -1,0 +1,38 @@
+import OriginalReverb from'../src/nodes/reverb.js';
+import{createRoomControlNode}from'../src/modular-audio/roomControlNode.js';
+import{prepareNativeContextClock}from'../src/modular-audio/nativeContextClock.js';
+import{liveRoomCompare,liveRoomSpeakerPair,LIVE_ROOM_NATIVE_LIMITS}from'./liveRoomCompleteCompare.js';
+const align=n=>Math.ceil(n/128)*128,base=()=>import.meta.env?.BASE_URL??'/',sha=async b=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(x=>x.toString(16).padStart(2,'0')).join(''),assert=(x,m)=>{if(!x)throw Error(m);};
+function bounded(p,label,ms=10000){let timer;return Promise.race([p,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error(label+' timed out')),ms))]).finally(()=>clearTimeout(timer));}
+class ReadyReference extends OriginalReverb{ensureImpulse(){}}
+function pcm(n,channels,wet=false){return Array.from({length:channels},(_,c)=>Float32Array.from({length:n},(_,i)=>Math.fround((wet?.04:.06)*Math.sin(i*(wet?.023:.031)+c*.4))));}
+function source(ctx,planes,target){const s=ctx.createBufferSource(),b=ctx.createBuffer(planes.length,planes[0].length,ctx.sampleRate);planes.forEach((p,c)=>b.copyToChannel(p,c));s.buffer=b;s.connect(target);s.start(0);return s;}
+async function native(rate,dry,wet,events){
+ const ctx=new OfflineAudioContext(2,dry[0].length,rate),times=[],ledger=[],clock={createGain:()=>ctx.createGain(),createDelay:n=>ctx.createDelay(n),createBiquadFilter:()=>ctx.createBiquadFilter(),createConvolver:()=>ctx.createConvolver(),get currentTime(){const t=times.length?times.shift():0;ledger.push(t);return t;}},node=new ReadyReference(clock);
+ times.push(0,0);node.setAmount(.35);for(const e of events){times.push(e.dry,e.wet);node.setAmount(e.amount);assert(!times.length,'Original two-currentTime law changed');}
+ node.connect(ctx.destination);const sources=[source(ctx,dry,node.dryGain.node),source(ctx,wet,node.wetGain.node)];
+ try{const b=await ctx.startRendering();return{channels:[b.getChannelData(0).slice(),b.getChannelData(1).slice()],ledger};}finally{for(const s of sources)s.disconnect();for(const n of[node.dryGain.node,node.wetGain.node,node.node,node.colour.input,node.colour.delay,node.colour.filter])n.disconnect();}
+}
+async function capturer(ctx,clock,frames,channels){
+ const m=await(await fetch(base()+'room-complete-live-review/build.json',{cache:'no-store'})).json(),r=await fetch(base()+'room-complete-live-review/processor.js?v='+m.version,{cache:'no-store'});assert(r.ok&&await sha(await r.arrayBuffer())===m.processor,'Capture bytes differ');await ctx.audioWorklet.addModule(base()+'room-complete-live-review/processor.js?v='+m.version);
+ const n=new AudioWorkletNode(ctx,m.processorName,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[channels],channelCount:channels,channelCountMode:'explicit',channelInterpretation:'discrete',processorOptions:{epoch:0,frames,channels}}),quiet=ctx.createGain();quiet.gain.value=0;n.connect(quiet);quiet.connect(ctx.destination);
+ let resolve,reject,boundResolve;const result=new Promise((a,b)=>{resolve=a;reject=b;}),bound=new Promise(a=>boundResolve=a);result.catch(()=>{});n.port.onmessage=({data})=>{if(data.kind==='clock-bound')boundResolve(data);else if(data.kind==='captured')resolve(data);else if(data.kind==='error')reject(Error(data.error));};const lease=clock.connect(n,{onError:reject});await bounded(bound,'Controller capture clock fence');return{node:n,result,dispose:async()=>{n.disconnect();quiet.disconnect();n.port.postMessage({kind:'dispose'});n.port.close();await lease.release();}};
+}
+async function trial(rate,dryChannels,wetChannels){
+ const frames=align(rate*.4),dry=pcm(frames,dryChannels),wet=pcm(frames,wetChannels,true),at=align(rate*.1),events=[{amount:.8,dry:13/rate,wet:41/rate},{amount:.2,dry:at/rate,wet:at/rate},{amount:.2,dry:at/rate,wet:at/rate},{amount:.75,dry:at/rate,wet:at/rate},{amount:0,dry:(at+128)/rate,wet:(at+256)/rate}],ctx=new OfflineAudioContext(2,frames,rate),owners=[],captures=[],sources=[];let row,primary;
+ try{
+  for(let i=0;i<2;i++){const o=await createRoomControlNode(ctx,{sourceChannels:dryChannels,wetChannels,initialDemand:true});o.setAmount(.35);owners.push(o);}
+  const clock=await prepareNativeContextClock(ctx,{offlineSuspension:'offline-freeze-v1'});
+  for(const o of owners){const c=await capturer(ctx,clock,frames,Math.max(dryChannels,wetChannels));o.output.connect(c.node);captures.push(c);sources.push(source(ctx,dry,o.inputDry),source(ctx,wet,o.inputWet));}
+  const pending=owners.map(o=>Promise.all(events.map(e=>o.schedulePair(e.amount,e.dry,e.wet))));
+  const fences=await Promise.all(owners.map(o=>o.stats()));assert(fences.every(s=>s.clock?.generation===s.clockOwner?.spec.generation&&s.clock.calls===0&&s.core.unit.audioFrames===0),'Pre-render clock fence or zero-state missing');
+  await bounded(ctx.startRendering(),'Direct Gain Offline render');const[actual,bookings,reference]=await Promise.all([bounded(Promise.all(captures.map(c=>c.result)),'Direct Gain output capture'),Promise.all(pending),native(rate,dry,wet,events)]),comparisons=actual.map(a=>liveRoomCompare(liveRoomSpeakerPair(a.channels),reference.channels)),independence=liveRoomCompare(actual[0].channels,actual[1].channels,{exact:true});
+  row={rate,dryChannels,wetChannels,frames,events,identity:owners[0].identity,fences,bookings,reference:{ledger:reference.ledger,scope:'Actual original Reverb/Gain methods, literal two-read controller steps. All future original times authored before cold Offline rendering; no live main-task equivalence claim.'},comparisons,independence,checksPassed:comparisons.every(p=>p.checksPassed)&&independence.checksPassed};return row;
+ }catch(e){primary=e;e.diagnostics={rate,dryChannels,wetChannels,owners:owners.map(o=>({identity:o.identity,error:o.error,failure:o.failureDiagnostics??null}))};throw e;}
+ finally{const issues=[];for(const s of sources)try{s.disconnect();}catch(e){issues.push(e);}const r=await Promise.allSettled(owners.map(o=>o.dispose()));issues.push(...r.filter(p=>p.status==='rejected').map(p=>p.reason));for(const c of captures)try{await c.dispose();}catch(e){issues.push(e);}if(row){row.cleanup={releases:r.map(p=>p.status==='fulfilled'?p.value:String(p.reason)),allReleased:owners.every(o=>o.released&&o.output===null)};row.checksPassed&&=row.cleanup.allReleased&&!issues.length;}if(issues.length){if(primary)primary.cleanupErrors=issues.map(String);else throw new AggregateError(issues,'Standalone gain cleanup');}}
+}
+export async function runRoomControlReview({rate=48000,progress=()=>{}}={}){
+ const report={kind:'room.original-dual-clock-controller-direct-native',version:1,rate,muted:true,limits:LIVE_ROOM_NATIVE_LIMITS,cases:[],checksPassed:false,complete:false};
+ try{for(const[d,w]of[[1,1],[1,2],[2,1],[2,2]]){progress('Native direct gain layout '+d+'/'+w+' '+rate+'Hz');const row=await trial(rate,d,w);report.cases.push(row);if(!row.checksPassed)return report;}report.complete=report.checksPassed=true;}catch(e){report.error=String(e);report.stack=e.stack;report.diagnostics=e.diagnostics;report.cleanupErrors=e.cleanupErrors;}return report;
+}
+if(typeof document!=='undefined'){const $=id=>document.getElementById(id);$('run').onclick=async()=>{$('run').disabled=true;try{const r=await runRoomControlReview({rate:Number($('rate').value),progress:t=>$('status').textContent=t});$('report').value=JSON.stringify(r,null,2);$('summary').textContent=JSON.stringify({complete:r.complete,checksPassed:r.checksPassed,cases:r.cases.length,error:r.error},null,2);$('status').textContent=r.checksPassed?'Checks passed':'Stopped at first failure';}finally{$('run').disabled=false;}};}
