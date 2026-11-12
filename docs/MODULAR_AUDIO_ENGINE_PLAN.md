@@ -64,6 +64,12 @@ The current accepted control and ownership boundaries are:
   pull/clock release. Its99 focused checks pass. This is a separate live-only
   factory; whole Instrument/Main admission and other-rate live acceptance remain open.
 
+The separate [Main cold constructor record](MODULAR_AUDIO_ENGINE_MAIN_COLD_BOOTSTRAP.md)
+now passes 48 exact Native constructor/prelude comparisons and actual two-owner
+48 kHz preparation before the user gesture, followed by real first-frame-zero
+receipts and clean teardown. The inside-gesture construction refusal remains
+negative evidence. This does not yet admit a cold six-role group or Generator.
+
 Next implementation: introduce an explicit cold six-role Rust control root
 before the first prepared Main publication, preserving original authoring
 order, whole-group capacity admission and exact source destinations. Complete
