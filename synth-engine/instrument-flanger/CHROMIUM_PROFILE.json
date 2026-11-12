@@ -1,0 +1,80 @@
+{
+  "api": 1,
+  "profile": "original-flanger-explicit-cycle-traversals-numerical-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Literal Flanger graph with REQUIRED immutable cycle entry input|delay. Source-derived recursion cache choices, never one silent universal Native parity policy. Fresh whole-case Native attribution required; old original-original .519/.611 negatives retained. No Flanger getter, automatic idle/tails/layout, live/app/default claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "synth-engine/rack-native-normal/src/oscillator.rs",
+      "sha256": "45351f6e5ce03bcd79076b7b34e45dceeb5515dd76d763d819c8207c990c3f29"
+    },
+    {
+      "path": "synth-engine/instrument-delay/src/lib.rs",
+      "sha256": "2237a4b52599f1e911d4714f2fc9e206510894a4b2cb5cc3b0afd9456dccb518"
+    }
+  ],
+  "resources": [
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+      "sha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4"
+    },
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+      "sha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68"
+    },
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-16384.f32",
+      "sha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/flanger.js",
+    "src/nodes/lfo.js",
+    "src/nodes/oscillator.js",
+    "src/nodes/gain.js"
+  ],
+  "bounds": {
+    "handlesPerWasm": 8,
+    "bytesPerHandleUpperBound": 4194304,
+    "lanes": 6,
+    "eventsPerLane": 256,
+    "maximumDelaySeconds": 1,
+    "quantum": 128,
+    "channels": 2,
+    "inputMaximumAbsolute": 4,
+    "cycleEntryRequired": [
+      "input",
+      "delay"
+    ]
+  },
+  "cycleAuthority": [
+    {
+      "path": "pinned Chromium source: audio_handler.cc",
+      "sha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b"
+    },
+    {
+      "path": "pinned Chromium source: audio_node_input.cc",
+      "sha256": "5f9b7a1fb0303142eee45db402aa362a1c8926a77fc25a5a29703e264f8b67cb"
+    },
+    {
+      "path": "pinned Chromium source: audio_node_output.cc",
+      "sha256": "18497939a5fe50a7e49353de19a4984cd86d3d57618041842b21f9dc3add1d74"
+    },
+    {
+      "path": "pinned Chromium source: tape-native-audio_summing_junction.h",
+      "sha256": "e4f5cd641a9d8042ad134dd99707e7329a28c0a6a05911aa65a3310b0d53bb55"
+    },
+    {
+      "path": "pinned Chromium source: tape-native-audio_summing_junction.cc",
+      "sha256": "2c23e3ff380b74e92d738a34dd4cbe157044d6cf825fd85e29004c5ce7ae5eb8"
+    },
+    {
+      "path": "pinned Chromium source: tape-live-delay_handler.cc",
+      "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+    }
+  ]
+}

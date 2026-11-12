@@ -1,0 +1,31 @@
+{
+  "api": 1,
+  "profile": "original-flanger-explicit-cycle-traversals-numerical-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "522df7eb02ed6717",
+  "source": "b124323d80c1cf68dde8a99521bb14bf75be0d943883594787aa60e10b8722b4",
+  "wasm": "598e95cdd2e3317ddd204d26857eca8ed1c1691d29c8b687537b619abc1eda38",
+  "bytes": 136443,
+  "files": [
+    "synth-engine/instrument-flanger/Cargo.toml",
+    "synth-engine/instrument-flanger/Cargo.lock",
+    "synth-engine/instrument-flanger/src/lib.rs",
+    "synth-engine/instrument-flanger/src/allocation.rs",
+    "synth-engine/instrument-flanger/src/delay.rs",
+    "synth-engine/instrument-flanger/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-flanger/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/rack-native-normal/src/oscillator.rs",
+    "synth-engine/instrument-delay/src/lib.rs",
+    "src/nodes/flanger.js",
+    "src/nodes/lfo.js",
+    "src/nodes/oscillator.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentFlanger.js",
+    "tools/buildInstrumentFlanger.mjs"
+  ],
+  "scope": "Literal Flanger graph with REQUIRED immutable cycle entry input|delay. Source-derived recursion cache choices, never one silent universal Native parity policy. Fresh whole-case Native attribution required; old original-original .519/.611 negatives retained. No Flanger getter, automatic idle/tails/layout, live/app/default claim.",
+  "profileSha256": "262094e7158a9e5a2b8649c784749cc7971d610d48cf1cbe98ef96455db6dfa7",
+  "notices": "eb62b1fdfdad44091f77ff36439a8817a312e043d06260f478f749cbb325a3ed"
+}
