@@ -1,0 +1,65 @@
+{
+  "api": 1,
+  "profile": "room-split-worker-prepared-output-controller-v2",
+  "version": "664ffad7162e4a71",
+  "source": "8291260087f829df4b5afbb1045c3ff95de5514ceec01717912a53ea3fee720b",
+  "kernelVersion": "e323611d27ec3a36",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "room-reserved-split-live-664ffad7162e4a71",
+  "processor": "a0cb1118727fcd8ab1e92ab3d362407a662804b5f86dcc4e28b2658e04e98702",
+  "worker": "3d620f0e761f8bccc0c6b88a76221e66383028229ef30d62f767b6daa8506582",
+  "components": {
+    "colour": {
+      "version": "7725ec44e5572cf0",
+      "profile": "chromium-room-colour-f32-128-target-v1",
+      "wasm": "87ce5dd8576f1703de406f3248f574a445dbaeff0151619ab433a26d5f8f1244",
+      "bytes": 75718
+    },
+    "convolver": {
+      "version": "c5dbde0540bfdf83",
+      "profile": "static-f64-nonuniform-128-8192-v1",
+      "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+      "bytes": 40857
+    },
+    "control": {
+      "version": "e323611d27ec3a36",
+      "profile": "original-room-output-clock-reserved-gains-v2",
+      "wasm": "8a2a7eff63bd9bd9689d4e62d4e5510eb036c9eb9814949d725f761e6c32cae2",
+      "bytes": 43214
+    }
+  },
+  "files": [
+    "public/convolver/build.json",
+    "public/native-context-clock/build.json",
+    "public/room-colour/build.json",
+    "public/room-control-reserved/build.json",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/ownedConvolver.js",
+    "src/modular-audio/ownedRoomColour.js",
+    "src/modular-audio/ownedRoomColourActivity.js",
+    "src/modular-audio/ownedRoomColourFramed.js",
+    "src/modular-audio/ownedRoomControlLive.js",
+    "src/modular-audio/ownedRoomConvolver.js",
+    "src/modular-audio/ownedRoomReservedControl.js",
+    "src/modular-audio/roomAmountWords.js",
+    "src/modular-audio/roomReservedCore.js",
+    "src/modular-audio/roomReservedProcessor.js",
+    "src/modular-audio/roomReservedSplitNode.js",
+    "src/modular-audio/roomReservedSplitTransport.js",
+    "src/modular-audio/roomSplitProgram.js",
+    "src/modular-audio/roomSplitWorker.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "tools/buildRoomReservedSplitHost.mjs"
+  ],
+  "notices": "9d6c3e1f0466d961a18c3745eb336cf8100dc854d0498a8b22617f3da7d1b563",
+  "textEncoding": "utf-8-normalized-LF",
+  "descriptors": 643,
+  "quota": 2,
+  "latency": "One final L=max(2B,ceil(rate*.5/128)*128); dry/wet packet planes share the same L",
+  "controlDomains": "Native absolute output-time amount; explicitly future source-local colour; immutable READY IR",
+  "normalDefault": false,
+  "scope": "Unchanged Worker RoomColour/convolution; raw dry+wet<=4planes; new Rust output-thread gain/sum; no GUI IR swap/shared Hub/normal adoption or device deadline claim"
+}
