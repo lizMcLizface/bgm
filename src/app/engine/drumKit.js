@@ -1,3 +1,5 @@
+import{fdnFrontendConstruction}from'./fdnFrontendConstruction.js';
+import{retireAudioActions}from'../../audio/retireAudio.js';
 // A small synthesised percussion kit (docs/DESIGN.md §9 C4): soft sounds
 // to sit under calm music - a felt kick, a brush tap, a shaker, a rim click,
 // a quiet closed hat, a brush swish, a felt tom, a soft clap, a soft
@@ -320,23 +322,26 @@ const HITS = {
 const HIT_SECONDS = 8.1;
 
 class DrumKit {
-    constructor({ context = audioContext, reverbHub = null, externalEffects = false, sourceOnly = false } = {}) {
+    constructor({ context = audioContext, reverbHub = null, externalEffects = false, sourceOnly = false, fdnRoomFactory = null } = {}) {
+        if(fdnRoomFactory!==null&&typeof fdnRoomFactory!=='function')throw Error('Invalid prepared FDN factory');
+        this.fdnRoomFactory=fdnRoomFactory;this.fdnConstruction=fdnRoomFactory?fdnFrontendConstruction(context,{capacity:64,label:'Prepared FDN kit construction'}):null;const ctorContext=this.fdnConstruction?.context??context;
+        try{
         this.AC = context;
         this.polyphony = 0;
-        this.bus = this.AC.createGain();
+        this.bus = ctorContext.createGain();
         // per drum: its level, then its place in the stereo field
         this.drumOut = Object.fromEntries((sourceOnly ? [] : DRUMS).map((name) => {
-            const level = this.AC.createGain();
-            const pan = this.AC.createStereoPanner();
+            const level = ctorContext.createGain();
+            const pan = ctorContext.createStereoPanner();
             pan.pan.value = PAN[name];
             level.connect(pan).connect(this.bus);
             return [name, level];
         }));
-        this.output = this.AC.createGain();
+        this.output = ctorContext.createGain();
         this.reverb = null;
         if(externalEffects)this.bus.connect(this.output);
         else {
-            this.reverb = makeDrumRoom(this.AC, reverbHub);
+            this.reverb = this.fdnConstruction?this.fdnConstruction.createOwner('kit FDN room',()=>makeDrumRoom(this.AC,reverbHub,fdnRoomFactory,{onError:error=>{this.error??=error;}}),room=>room.dispose()):makeDrumRoom(this.AC, reverbHub);
             this.reverb.defer(); // until the drums play (Generator.warmRoles, wake)
             this.reverb.setType('reverb3');
             [].concat(this.reverb.getNode()).forEach((node) => this.bus.connect(node));
@@ -356,10 +361,12 @@ class DrumKit {
         // A derived persistent source supplies its own level controls.
         if (sourceOnly) this.kit = defaultDrumKit();
         else this.setKit(defaultDrumKit());
+        }catch(error){if(this.fdnConstruction)throw this.fdnConstruction.failure(error);throw error;}
     }
 
     /** The kit's sound (percussion.js defaultDrumKit): room, and per drum on / level / tone / decay. */
     setKit(kit) {
+        if(this.fdnRoomFactory){if(this.disposed)throw Error('Prepared FDN kit disposed');this.reverb?.preflightPreset?.({reverbAmount:kit.room},['reverbAmount']);}
         const retone = this.voicePreset && this.kit && DRUMS.some(name => this.kit[name].tone !== kit[name].tone || this.kit[name].decay !== kit[name].decay);
         this.kit = kit;
         const now = this.AC.currentTime;
@@ -421,6 +428,7 @@ class DrumKit {
      *   a swish's sign is its direction
      */
     scheduleNote(drum, time, duration = 0.25, velocity = 0.7, vary = 0) {
+        if(this.fdnRoomFactory&&(this.disposed||this.error))throw this.error??Error('Prepared FDN kit disposed');
         const requestedDrum = drum;
         drum = drumForVoice(drum,this.voicePreset);
         const name = DRUMS[drum];
@@ -494,11 +502,14 @@ class DrumKit {
         }, Math.max(50, (at - this.AC.currentTime) * 1000));
     }
 
+    async armRuntime(){if(!this.fdnRoomFactory)return;if(this.disposed||this.error)throw this.error??Error('Prepared FDN kit disposed');await this.reverb?.arm?.();if(this.error)throw this.error;}
+
     effectsAwake() {
         return this.awake;
     }
 
     dispose() {
+        if(this.fdnConstruction){if(this.disposal)return this.disposal;this.disposed=true;this.disposal=retireAudioActions([()=>clearTimeout(this.sleepTimer),()=>this.silence(),()=>this.reverb?.setAwake?.(false),()=>this.fdnConstruction.close()],'Prepared FDN kit cleanup failed');this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;}
         this.disposed = true;
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.silence();

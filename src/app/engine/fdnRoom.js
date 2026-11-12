@@ -1,3 +1,4 @@
+import{fdnFrontendConstruction}from'./fdnFrontendConstruction.js';
 import {retireAudioActions,finishAudioRetirement}from'../../audio/retireAudio';
 // The Wasm engine's rooms for the native (JS) voices: the effects kernel's FDN room (synth-lab/effects.js)
 // instead of a convolver on a recorded impulse, so nothing is fetched and no multi-megabyte impulse is held.
@@ -39,13 +40,16 @@ const TAIL_EXTRA = 0.5;
 export const fdnRoomSupported = (context) => Boolean(context?.audioWorklet) && typeof WebAssembly === 'object';
 
 /** What a drum kit's room is: the FDN where the kernel runs, the convolver (shared through the hub, if any) where not. */
-export function makeDrumRoom(context, reverbHub = null) {
+export function makeDrumRoom(context, reverbHub = null, fdnRoomFactory = null, options = {}) {
+    if(fdnRoomFactory!==null){if(typeof fdnRoomFactory!=='function')throw Error('Invalid prepared FDN factory');return fdnRoomFactory(context,'reverb3',options);}
     if (fdnRoomSupported(context)) return new FdnRoom(context);
     return reverbHub ? new SendReverb(context, reverbHub) : new Nodes.Reverb(context);
 }
 
 export default class FdnRoom {
-    constructor(AC, type = 'reverb3') {
+    constructor(AC, type = 'reverb3', {busFactory=null,onError=()=>{}} = {}) {
+        if(busFactory!==null&&typeof busFactory!=='function'||typeof onError!=='function')throw Error('Invalid prepared FDN options');
+        this.busFactory=busFactory;this.strictOwned=busFactory!==null;this.onError=onError;this.failure=null;this.backend=this.strictOwned?'owned-rust-fdn-with-original-native-frontend':'legacy-rust-fdn';
         this.AC = AC;
         this.type = type;
         this.amount = 0;
@@ -56,6 +60,26 @@ export default class FdnRoom {
         this.bus = null;
         this.starting = null;
         this.fallback = null;this.retirements=new Set();this.retirementFailure=null;
+        if(this.strictOwned){
+            this.frontendConstruction=fdnFrontendConstruction(AC);const view=this.frontendConstruction.context;
+            try{
+        this.dryGain = view.createGain();
+        this.sendGain = view.createGain();
+        this.colour = new RoomColour(view);
+        this.highpass = view.createBiquadFilter();
+        this.highpass.type = 'highpass';
+        this.highpass.Q.value = Math.SQRT1_2;
+        this.lowpass = view.createBiquadFilter();
+        this.lowpass.type = 'lowpass';
+        this.lowpass.Q.value = Math.SQRT1_2;
+        this.out = view.createGain();
+        this.sendGain.connect(this.colour.input);
+        this.colour.connect(this.highpass);
+        this.highpass.connect(this.lowpass);
+        this.setAmount(0);
+        this.patch();
+            }catch(error){throw this.frontendConstruction.failure(error);}
+        }else{
         this.dryGain = AC.createGain();
         this.sendGain = AC.createGain();
         this.colour = new RoomColour(AC);
@@ -71,7 +95,13 @@ export default class FdnRoom {
         this.highpass.connect(this.lowpass);
         this.setAmount(0);
         this.patch();
+        }
     }
+
+    assertAvailable(){if(this.strictOwned&&(this.disposed||this.failure))throw this.failure??Error('Prepared FDN disposed');}
+    preflightPreset(){this.assertAvailable();}
+    get ready(){return this.strictOwned?(this.starting??Promise.resolve()):undefined;}
+    async arm(){if(!this.strictOwned)return;if(this.failure)throw this.failure;this.hear();this.ensureRoom();await this.ready;if(this.failure)throw this.failure;if(this.AC.state==='running')await this.bus?.flush?.();}
 
     get room() {
         return FDN_ROOMS[this.type] ?? FDN_ROOMS.reverb3;
@@ -106,6 +136,7 @@ export default class FdnRoom {
 
     // The same dry / wet law as Reverb.setAmount.
     setAmount = (val) => {
+        this.assertAvailable();
         this.amount = val;
         this.dryGain.gain.value = val < 0.5 ? 1 : 1 - (val - 0.5) * 2;
         this.sendGain.gain.value = val < 0.5 ? val * 2 : 1;
@@ -113,6 +144,7 @@ export default class FdnRoom {
     };
 
     setType = (val) => {
+        this.assertAvailable();
         if (!FDN_ROOMS[val] || val === this.type) return;
         this.type = val;
         this.fallback?.setType(val);
@@ -120,17 +152,20 @@ export default class FdnRoom {
     };
 
     setDecay = (seconds) => {
+        this.assertAvailable();
         this.decay = Math.max(0.3, seconds);
         this.fallback?.setDecay(this.decay);
         this.patch();
     };
 
     setPredelay = (seconds) => {
+        this.assertAvailable();
         this.colour.setPredelay(seconds);
         this.fallback?.setPredelay(seconds);
     };
 
     setDamping = (hz) => {
+        this.assertAvailable();
         this.colour.setDamping(hz);
         this.fallback?.setDamping(hz);
     };
@@ -176,21 +211,24 @@ export default class FdnRoom {
 
     ensureRoom() {
         if (!this.wanted || this.bus || this.starting || this.failed || this.disposed) return;
-        this.starting = createEffectsBus(this.AC, this.settings(), { onError: (error) => this.fail(error) })
+        const settings=this.settings(),options={onError:(error)=>this.fail(error)};
+        this.starting = (this.strictOwned?Promise.resolve().then(()=>this.busFactory(this.AC,settings,options)):createEffectsBus(this.AC,settings,options))
             .then((bus) => {
                 if (this.disposed || this.failed) return this.retireBus(bus);
                 this.bus = bus;
+                if(this.strictOwned&&(bus?.backend!=='owned-rust'||bus.disposalStatus?.().capability!==true||bus.node?.context!==this.AC))throw Error('Prepared FDN returned an invalid owned bus');
                 this.lowpass.connect(bus.node, 0, 1);
                 bus.node.connect(this.out);
                 return undefined;
             })
-            .catch((error) => {if(this.disposed)throw error;return this.fail(error);});
+            .catch((error) => {if(this.disposed)throw error;this.fail(error);if(this.strictOwned)throw error;});
         this.starting.catch(()=>{});
     }
 
     // The kernel failed: the recorded room, from now on.
     fail(error) {
         if (this.failed || this.disposed) return;
+        if(this.strictOwned){this.failed=true;this.failure=error instanceof Error?error:Error(String(error));this.retireBus(this.bus);this.bus=null;try{this.lowpass.disconnect();}catch(cleanup){this.failure.cleanupError=cleanup;}try{this.onError(this.failure);}catch(callback){this.callbackError=String(callback);}return;}
         this.failed = true;
         console.warn('Wasm room unavailable; using the recorded room.', error);
         this.retireBus(this.bus);
@@ -206,13 +244,13 @@ export default class FdnRoom {
         this.fallback = room;
     }
 
-    get disposalCapability(){return !this.bus&&!this.starting&&!this.failed||this.bus?.disposalCapability===true;}
-    async awaitDisposalCapability(){await this.starting;if(this.failed)throw Error('Legacy FDN fallback has no prepared ownership authority');await this.bus?.lifecycleReady;if(this.bus&&this.bus.disposalCapability!==true)throw Error('FDN effects processor lacks disposal ACK capability');return true;}
-    retireBus(bus){if(!bus)return Promise.resolve();let result;try{result=bus.dispose();}catch(error){result=Promise.reject(error);}const pending=Promise.resolve(result);this.retirements.add(pending);pending.catch(error=>{this.retirementFailure??=error;}).finally(()=>this.retirements.delete(pending));return pending;}
+    get disposalCapability(){return !this.bus&&!this.starting&&!this.failed||this.bus?.disposalCapability===true||this.strictOwned&&this.bus?.disposalStatus?.().capability===true;}
+    async awaitDisposalCapability(){await this.starting;if(this.failed)throw Error('Legacy FDN fallback has no prepared ownership authority');await this.bus?.lifecycleReady;if(this.bus&&this.bus.disposalCapability!==true&&!(this.strictOwned&&this.bus.disposalStatus?.().capability===true))throw Error('FDN effects processor lacks disposal ACK capability');return true;}
+    retireBus(bus){if(!bus)return Promise.resolve();let result;try{result=bus.dispose();}catch(error){result=Promise.reject(error);}const pending=Promise.resolve(result).then(receipt=>{if(this.strictOwned){const proof=bus.disposalStatus?.();if(!proof?.released||proof.quarantined||proof.receipt?.clean!==true)throw Error('Prepared FDN lacks clean terminal bus proof');return{clean:true,backend:bus.backend,proof};}return receipt;});this.retirements.add(pending);pending.catch(error=>{this.retirementFailure??=error;}).finally(()=>this.retirements.delete(pending));return pending;}
     dispose() {
         if(this.disposal)return this.disposal;
         this.disposed=true;const bus=this.bus;this.bus=null;
-        const initial=retireAudioActions([()=>this.retireBus(bus),()=>this.starting,()=>this.lowpass.disconnect(),()=>this.sendGain.disconnect(),()=>this.dryGain.disconnect(),()=>this.out.disconnect(),()=>this.fallback?.disconnect?.()],'FDN room disposal failed');
+        const initial=retireAudioActions([()=>this.retireBus(bus),()=>this.starting,...(this.frontendConstruction?[()=>this.frontendConstruction.close()]:[()=>this.lowpass.disconnect(),()=>this.sendGain.disconnect(),()=>this.dryGain.disconnect(),()=>this.out.disconnect()]),()=>this.fallback?.disconnect?.()],'FDN room disposal failed');
         this.disposal=finishAudioRetirement(initial,()=>this.retirements,()=>this.retirementFailure,'FDN room retirement failed');this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;
     }
 }

@@ -195,10 +195,12 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, pluckedSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null, motionFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, pluckedSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null, motionFactory = null, fdnRoomFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
         if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
         if (pluckedSourceFactory !== null && typeof pluckedSourceFactory !== 'function') throw Error('Invalid plucked source factory');
+        if (fdnRoomFactory !== null && typeof fdnRoomFactory !== 'function') throw Error('Invalid FDN room factory');
+        this.fdnRoomFactory=fdnRoom?fdnRoomFactory:null;
         if (motionFactory !== null && typeof motionFactory !== 'function') throw Error('Invalid Motion factory');
         motionFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateMotionPreset=motionFactory?.validatePreset;
@@ -229,7 +231,7 @@ class Instrument {
         this.pingPong = this.construction.nested('pingPong',()=>new Nodes.PingPongDelay(this.AC),retireInstrumentPart);
         // one shared with the other voices, or its own (nodes/sharedReverb.js)
         // or, for a voice the Wasm engine runs natively, the kernel's room (engine/fdnRoom.js)
-        this.reverb = this.construction.nested('reverb',()=>fdnRoom && fdnRoomSupported(this.AC) ? new FdnRoom(this.AC, 'reverb1')
+        this.reverb = this.construction.nested('reverb',()=>fdnRoom && (fdnRoomFactory || fdnRoomSupported(this.AC)) ? fdnRoomFactory ? fdnRoomFactory(this.AC,'reverb1',{onError:error=>{this.effectFailure??=error instanceof Error?error:Error(String(error));}}) : new FdnRoom(this.AC, 'reverb1')
             : reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC),retireInstrumentPart);
         if (deferReverb) this.reverb.defer();
         this.eq = this.construction.nested('eq',()=>new Nodes.EQ2(this.AC),retireInstrumentPart);
@@ -409,18 +411,20 @@ class Instrument {
     prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
     async armRuntime(){
         if(this.effectFailure)throw this.effectFailure;
-        if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm&&!this.motion?.arm)return;
+        if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm&&!this.motion?.arm&&!(this.fdnRoomFactory&&this.reverb?.arm))return;
         await this.effectsReady;
         if(this.AC.state==='running'){
             if(this.ordinaryDynamicsOwned){this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});await this.ordinaryArm;}
             await this.shimmer?.arm?.();
             await this.motion?.arm?.();
+            if(this.fdnRoomFactory)await this.reverb?.arm?.();
         }
     }
     updateOrdinaryDemand(){
         if(this.disposed)return;
         const on=!!this.chainAwake&&this.destinations?.length>0;
         this.motion?.setHostAwake?.(on&&!!this.motionInChain);
+        if(this.fdnRoomFactory)this.reverb?.setHostAwake?.(on&&!!this.fdnRoomInChain);
         if(!this.ordinaryDynamicsOwned)return;
         this.synthMix.setHostAwake?.(on);this.limiter.setHostAwake?.(on);
     }
@@ -453,8 +457,10 @@ class Instrument {
      * defaults. Only keys whose value differs from the current one touch
      * the audio graph (some setters rebuild waveforms on every voice).
      */
+    preflightRoomPreset(next,keys){if(this.fdnRoomFactory){this.fdnRoomFactory.validatePreset?.(next);this.reverb?.preflightPreset?.(next,keys);}}
     applyPreset(preset) {
         const next = { ...PRESET_DEFAULTS, ...preset };
+        this.preflightRoomPreset(next,['reverbAmount','reverbType','reverbDecay','reverbDamping','reverbPredelay'].filter(key=>this.preset?.[key]!==next[key]));
         this.validateShimmerPreset?.(next);
         this.validateMotionPreset?.(next);
         this.motion?.preflightPreset?.(next,Object.keys(FX_STAGES.motion.setters).filter(key=>this.preset?.[key]!==next[key]));
@@ -471,6 +477,7 @@ class Instrument {
      */
     morphTo(preset, seconds) {
         const to = { ...PRESET_DEFAULTS, ...preset };
+        this.preflightRoomPreset(to,['reverbAmount','reverbType','reverbDecay','reverbDamping','reverbPredelay'].filter(key=>this.preset?.[key]!==to[key]));
         this.validateShimmerPreset?.(to);
         this.validateMotionPreset?.(to);
         assertOwnedMaterial(this, to.stringModel);
@@ -492,6 +499,7 @@ class Instrument {
                 return;
             }
             const blended = blendPresets(from, to, t);
+            this.preflightRoomPreset(blended,changing.filter(key=>['reverbAmount','reverbType','reverbDecay','reverbDamping','reverbPredelay'].includes(key)&&this.preset?.[key]!==blended[key]));
             this.motion?.preflightPreset?.(blended,Object.keys(FX_STAGES.motion.setters).filter(key=>changing.includes(key)&&this.preset?.[key]!==blended[key]));
             morph.stepping = true;
             changing.forEach((key) => this.set(key, blended[key]));
@@ -514,6 +522,8 @@ class Instrument {
      */
     setDrift(values) {
         const keys = new Set([...Object.keys(this.drift ?? {}), ...Object.keys(values ?? {})]);
+        const roomKeys=[...keys].filter(key=>['reverbAmount','reverbType','reverbDecay','reverbDamping','reverbPredelay'].includes(key));
+        if(roomKeys.length)this.preflightRoomPreset({...PRESET_DEFAULTS,...this.preset,...values},roomKeys);
         const motionKeys=[...keys].filter(key=>key in FX_STAGES.motion.setters);
         if(motionKeys.length){const next={...PRESET_DEFAULTS,...this.preset,...values};this.validateMotionPreset?.(next);this.motion?.preflightPreset?.(next,motionKeys);}
         for (const key of keys) {
@@ -527,6 +537,7 @@ class Instrument {
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
         const next={...PRESET_DEFAULTS,...this.preset,[key]:value};
+        if(['reverbAmount','reverbType','reverbDecay','reverbDamping','reverbPredelay'].includes(key)&&this.preset?.[key]!==value)this.preflightRoomPreset(next,[key]);
         this.validateShimmerPreset?.(next);
         this.validateMotionPreset?.(next);
         if(key in FX_STAGES.motion.setters&&this.preset?.[key]!==value)this.motion?.preflightPreset?.(next,[key]);
@@ -551,6 +562,7 @@ class Instrument {
         const p = { ...PRESET_DEFAULTS, ...this.preset };
         const active = this.stages.filter((stage) => this[stage.key]?.managedBypass === true || stage.active(p));
         this.motionInChain=active.some(stage=>stage.key==='motion');
+        if(this.fdnRoomFactory)this.fdnRoomInChain=active.some(stage=>stage.key==='reverb');
         const signature = active.map((stage) => stage.key).join();
         if (signature === this.chainSignature) return;
         this.chainSignature = signature;

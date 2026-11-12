@@ -20,10 +20,11 @@ export function percussionModule() {
  * Native remains the default; loading errors are surfaced before playback.
  */
 export default class WasmDrumKit extends DrumKit {
-    constructor({context = audioContext, reverbHub = null, externalEffects = false, model = 'wasm'} = {}) {
+    constructor({context = audioContext, reverbHub = null, externalEffects = false, model = 'wasm', fdnRoomFactory = null} = {}) {
         // Reuse the lifecycle methods, without constructing the native kit's
         // 14 strips, sources or a second convolution bus.
-        super({context, externalEffects:true, sourceOnly:true});
+        super({context, externalEffects:true, sourceOnly:true, fdnRoomFactory});
+        try{
         this.model = model === '808' ? '808' : 'wasm';
         this.kind = 'percussion';
         this.pending = [];
@@ -35,16 +36,17 @@ export default class WasmDrumKit extends DrumKit {
         this.polyphony = 64;
         if (!externalEffects) {
             this.bus.disconnect();
-            this.reverb = makeDrumRoom(context, reverbHub);
+            this.reverb = this.fdnConstruction?this.fdnConstruction.createOwner('kit FDN room',()=>makeDrumRoom(context,reverbHub,fdnRoomFactory,{onError:error=>{this.error??=error;}}),room=>room.dispose()):makeDrumRoom(context, reverbHub);
             this.reverb.defer();
             this.reverb.setType('reverb3');
             [].concat(this.reverb.getNode()).forEach(node => this.bus.connect(node));
             this.reverb.connect(this.output);
         }
         this.setKit(defaultDrumKit());
-        this.ready = this.init();
+        this.ready = this.fdnConstruction?this.init().catch(error=>{error.cleanupReady=this.dispose();error.cleanupReady.catch(()=>{});throw error;}):this.init();
         // Prevent unhandled rejection if a page is opened without pressing Play.
         this.ready.catch(error => {this.error = error;});
+        }catch(error){if(this.fdnConstruction){const primary=this.fdnConstruction.failure(error);if(this.lifecycle){const outer=primary.cleanupReady;primary.cleanupReady=Promise.allSettled([outer,this.lifecycle.close()]).then(results=>{const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason);if(errors.length)throw new AggregateError(errors,'Prepared kit constructor cleanup failed');return{clean:true,profile:'prepared-fdn-kit-constructor-v1'};});primary.cleanupReady.catch(()=>{});}throw primary;}throw error;}
     }
     async init() {
         const module = await percussionModule();
@@ -83,6 +85,7 @@ export default class WasmDrumKit extends DrumKit {
         else if (this.pending) this.pending.push(message);
     }
     setKit(kit) {
+        if(this.fdnRoomFactory){if(this.disposed||this.error)throw this.error??Error('Prepared FDN kit disposed');this.reverb?.preflightPreset?.({reverbAmount:kit.room},['reverbAmount']);}
         this.kit = kit;
         this.send({type:'kit',values:DRUMS.map(name => [kit[name].on ? kit[name].level : 0,kit[name].tone,kit[name].decay])});
         if (this.reverb && this.reverb.amount !== kit.room) this.reverb.setAmount(kit.room);
@@ -115,8 +118,8 @@ export default class WasmDrumKit extends DrumKit {
         this.disposed = true;
         clearTimeout(this.sleepTimer);this.sleepTimer=null;this.pending=[];
         const errors=[],pending=[],clean=action=>{try{const result=action();if(result?.then)pending.push(result);}catch(error){errors.push(error);}};
-        clean(()=>this.node?.disconnect());clean(()=>this.output.disconnect());clean(()=>this.bus.disconnect());
-        clean(()=>this.reverb?.setAwake?.(false));clean(()=>this.reverb?.dispose?.());clean(()=>this.reverb?.disconnect?.());
+        clean(()=>this.node?.disconnect());if(!this.fdnConstruction){clean(()=>this.output.disconnect());clean(()=>this.bus.disconnect());}
+        clean(()=>this.reverb?.setAwake?.(false));if(this.fdnConstruction)clean(()=>this.fdnConstruction.close());else{clean(()=>this.reverb?.dispose?.());clean(()=>this.reverb?.disconnect?.());}
         this.destinations=[];this.awake=false;
         const sourceClosing=this.lifecycle.close();this.disposal=Promise.allSettled([sourceClosing,...pending]).then(results=>{for(const r of results)if(r.status==='rejected')errors.push(r.reason);if(errors.length)throw new AggregateError(errors,'Percussion source/routing cleanup failed');return results[0].value;});
         this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;
