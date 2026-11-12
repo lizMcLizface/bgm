@@ -1,0 +1,6 @@
+/** Control-only preparation demand. Never copies input to the destination. */
+class StoppedRuntimeControlPump extends AudioWorkletProcessor{
+ constructor(){super();this.frames=0;this.first=null;this.last=null;this.inputPeak=0;this.stopped=false;this.port.onmessage=({data})=>{if(!data||!Number.isInteger(data.request)||data.request<1||data.request>4294967295)return;if(data.type==='stats')this.port.postMessage({type:'stats',request:data.request,frames:this.frames,firstGlobalFrame:this.first,lastGlobalFrame:this.last,inputPeak:this.inputPeak});else if(data.type==='dispose'){this.stopped=true;this.port.postMessage({type:'disposed',version:1,request:data.request,released:true,clean:true,frames:this.frames,inputPeak:this.inputPeak});}};this.port.postMessage({type:'ready',version:1});}
+ process(inputs,outputs){for(const bus of outputs)for(const channel of bus)channel.fill(0);if(this.stopped)return false;const n=outputs[0]?.[0]?.length??0;if(this.first===null)this.first=currentFrame;this.last=currentFrame;this.frames+=n;const input=inputs[0];if(input)for(let ch=0;ch<input.length;ch++)for(let i=0;i<input[ch].length;i++){const value=Math.abs(input[ch][i]);if(value>this.inputPeak)this.inputPeak=value;}return true;}
+}
+registerProcessor('calmbgm-stopped-runtime-control-pump-v1',StoppedRuntimeControlPump);
