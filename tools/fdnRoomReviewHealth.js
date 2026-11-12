@@ -1,0 +1,10 @@
+import{fdnReviewErrorTree}from'./fdnRoomReviewErrors.js';
+/** Read-only logical/terminal owner fields. Never reads Native AudioParams or books controls. */
+export function fdnParentHealth(owner,{kind,index,afterDispose=false}={}){
+ const fields=['error','effectFailure','sourceFailure','failure','disposalError','cleanupError'],failures=[];
+ for(const field of fields)if(owner?.[field])failures.push({field,error:fdnReviewErrorTree(owner[field])});
+ if(owner?.reverb?.failure)failures.push({field:'reverb.failure',error:fdnReviewErrorTree(owner.reverb.failure)});
+ let source=null,journal=null;try{source=owner?.lifecycle?.status?.()??null;}catch(error){failures.push({field:'source.status',error:fdnReviewErrorTree(error)});}try{journal=owner?.fdnConstruction?.status?.()??null;}catch(error){failures.push({field:'constructor.status',error:fdnReviewErrorTree(error)});}
+ const wasm=kind==='wasm-kit',kit=wasm||kind==='native-kit',sourceErrors=source?[...(source.errors??[]),...(source.processorErrors??[])]:[],sourceHealthy=!wasm||source?.capability===true&&sourceErrors.length===0&&(!afterDispose||source.nodeRetained===false&&source.ack?.released===true&&source.ack?.clean===true),stats=owner?.stats??null,sourceCountersHealthy=!wasm||!stats||['late','dropped','overflow','rejected'].every(key=>stats[key]===undefined||stats[key]===0),hitsHealthy=!kit||owner.hitCount===4;
+ return{kind,index,phase:afterDispose?'after-disposal':'after-render',parentType:owner?.constructor?.name??null,sourceBackend:owner?.sourceBackend??(wasm?'original-wasm-percussion':kind==='native-kit'?'original-native-percussion':null),model:owner?.model??null,hitCount:owner?.hitCount??null,failures,sourceStatus:source,sourceStats:stats,sourceCountersScope:stats?'All available original source late/drop/overflow/rejection counters checked':'Original source exposes no offline stats; no late/drop counter measurement claimed',constructorJournal:journal,sourceHealthy,sourceCountersHealthy,hitsHealthy,disposed:!!owner?.disposed,checksPassed:!failures.length&&sourceHealthy&&sourceCountersHealthy&&hitsHealthy&&(!afterDispose||owner?.disposed===true)};
+}

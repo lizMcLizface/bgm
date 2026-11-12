@@ -1,0 +1,50 @@
+{
+  "api": 1,
+  "profile": "original-fdn-room-live-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Original dry/send RoomColour+HP/LP frontend, unchanged owned effects FDN. Canonical128, zero added latency. Logical pull authority explicit. Native automatic frontend tail retirement unassessed.",
+  "sources": [
+    {
+      "path": "synth-engine/effects/src/lib.rs",
+      "sha256": "68979428bc29249c6b61561d66cfed2944f9185765954278da1dafe9d961ce37"
+    },
+    {
+      "path": "synth-engine/effects/Cargo.toml",
+      "sha256": "8ea4146fd408b570a8913d73e720ff8079aa3f7e22ced8190d1db5af71215f47"
+    },
+    {
+      "path": "synth-engine/common/denormal.rs",
+      "sha256": "69c770e5378534671bfec1abaadeea626db6a355e99b479bffa0f661783a4c2e"
+    },
+    {
+      "path": "synth-engine/common/headroom.rs",
+      "sha256": "fb1cc6a35794afad014b9e0372b62816a10212778022d19c181b476eea168677"
+    },
+    {
+      "path": "synth-engine/room-colour/src/delay.rs",
+      "sha256": "0fd705a926109f3b1b74bd452dd2b5a95c56d4d449e062ba9a30ba24f15aaa02"
+    },
+    {
+      "path": "synth-engine/tape-fx/src/tone.rs",
+      "sha256": "fd03fb3945e9a5c552503d8dcc97fb3679321de49022cb2079e82f27892d5ace"
+    },
+    {
+      "path": "synth-engine/rack-native/src/biquad.rs",
+      "sha256": "cc2396878e3f13a7b452270291a84139129e077d9ee01b47ae27cf55612e0d6c"
+    },
+    {
+      "path": "synth-engine/rack-native/src/tail.rs",
+      "sha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    },
+    {
+      "path": "synth-engine/rack-filter-normal/src/timeline.rs",
+      "sha256": "3db396ee0e1fffa1f325a59f247fbf479e0238fcc2e3beb41ff72fd5040813c3"
+    }
+  ],
+  "nativeReferences": [
+    "src/app/engine/fdnRoom.js",
+    "src/nodes/reverb.js",
+    "src/synth-lab/effectsConfig.js"
+  ],
+  "textEncoding": "utf-8-normalized-LF"
+}
