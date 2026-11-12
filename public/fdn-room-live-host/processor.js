@@ -349,6 +349,7 @@
     constructor({ processorOptions: p }) {
       super();
       this.identity = p.identity;
+      this.disposeRefusals = 0;
       this.terminalGateSeen = false;
       this.terminalQuanta = 0;
       this.disposed = false;
@@ -369,7 +370,7 @@
       this.codec = new FdnRoomWordCodec();
       this.port.onmessage = ({ data }) => this.message(data);
       try {
-        if (p.version !== "f803ba7a02f2d50e" || p.identity.hostVersion !== p.version || p.identity.kernelVersion !== "772275c02c140294" || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1) throw Error("FDN host identity differs");
+        if (p.version !== "fdade6744c6ecfe7" || p.identity.hostVersion !== p.version || p.identity.kernelVersion !== "772275c02c140294" || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1) throw Error("FDN host identity differs");
         this.origin = p.originFrame;
         this.endFrame = p.endFrame ?? null;
         this.clock = new NativeContextClockCodec(p.clockSpec);
@@ -393,7 +394,7 @@
       }
     }
     snapshot() {
-      return { identity: this.identity, terminalGateSeen: this.terminalGateSeen, terminalQuanta: this.terminalQuanta, kernel: this.core?.stats() ?? this.lastStats ?? null, clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, resumeGeneration: this.lastResumeSeen, lastPulledResumeGeneration: this.lastPulledResume, hasPulled: this.hasPulled, firstPulledFrame: this.firstPulledFrame, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, disposed: this.disposed, error: this.error };
+      return { identity: this.identity, disposeRefusals: this.disposeRefusals, terminalGateSeen: this.terminalGateSeen, terminalQuanta: this.terminalQuanta, kernel: this.core?.stats() ?? this.lastStats ?? null, clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, resumeGeneration: this.lastResumeSeen, lastPulledResumeGeneration: this.lastPulledResume, hasPulled: this.hasPulled, firstPulledFrame: this.firstPulledFrame, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, disposed: this.disposed, error: this.error };
     }
     receipt(reason) {
       if (this.disposed) return;
@@ -424,6 +425,12 @@
     }
     message(d) {
       if (d?.kind === "dispose") {
+        const id = d.identity, expected = this.identity, valid = id && expected && typeof id === "object" && !Array.isArray(id) && Object.keys(id).length === Object.keys(expected).length && Object.keys(expected).every((k) => id[k] === expected[k]);
+        if (!valid) {
+          this.disposeRefusals = Math.min(4294967295, this.disposeRefusals + 1);
+          this.port.postMessage({ kind: "dispose-refused", identity: this.identity, error: "FDN terminal request identity differs" });
+          return;
+        }
         this.receipt("dispose");
         return;
       }
@@ -567,5 +574,5 @@
       }
     }
   };
-  registerProcessor("fdn-room-live-f803ba7a02f2d50e", FdnRoomLiveProcessor);
+  registerProcessor("fdn-room-live-fdade6744c6ecfe7", FdnRoomLiveProcessor);
 })();
