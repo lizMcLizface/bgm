@@ -1,10 +1,15 @@
 {
   "api": 1,
-  "source": "9918a3547173c050a65ae58f41e7e3ce353839836fefac117cfd6531e5a8af2c",
+  "source": "84e5e758853daff031cfe69157e60c48d243b4d4c234605758979b611d42ace7",
   "wasm": "3c2700933e385c2a30c32c4a4a688651b0624a8f06993cb39afffc454dd3c6dd",
   "bytes": 87806,
-  "version": "f899dafde5634b94",
+  "version": "e2168438994ed61d",
   "files": [
+    "src/modular-audio/generatorOrderedMixPlan.js",
+    "src/modular-audio/generatorOrderedMixAuthor.js",
+    "src/modular-audio/generatorOrderedMixSources.js",
+    "src/modular-audio/generatorOrderedMixRoot.js",
+    "public/ordered-send-live/host.json",
     "src/modular-audio/generatorPreparedSweep.js",
     "src/modular-audio/generatorPreparedSweepSession.js",
     "src/modular-audio/generatorMasterOutputBirth.js",
@@ -92,18 +97,21 @@
     "scope": "Declared constructor/failure-join references only; original mixer numerical bytes unchanged"
   },
   "preparedReferenceDelta": {
-    "predecessor": "d52e6974dbf46342",
+    "predecessor": "f899dafde5634b94",
     "changed": [
-      "src/modular-audio/generatorMasterOutputBirth.js",
-      "src/modular-audio/generatorMasterOutputRoot.js",
-      "src/modular-audio/generatorRustMasterSession.js",
-      "src/modular-audio/generatorSweepCell.js",
+      "src/modular-audio/generatorStoppedRuntime.js",
+      "src/modular-audio/stoppedRuntimeOwners.js",
+      "src/modular-audio/mainStoppedRuntimeBinding.js",
+      "src/modular-audio/ownedRoleWanderNode.js",
       "src/app/Generator.js"
     ],
     "added": [
-      "src/modular-audio/generatorPreparedSweep.js",
-      "src/modular-audio/generatorPreparedSweepSession.js"
+      "src/modular-audio/generatorOrderedMixPlan.js",
+      "src/modular-audio/generatorOrderedMixAuthor.js",
+      "src/modular-audio/generatorOrderedMixSources.js",
+      "src/modular-audio/generatorOrderedMixRoot.js",
+      "public/ordered-send-live/host.json"
     ],
-    "scope": "Explicit cold Main/output/scalar bootstrap and optional privately owned prepared Sweep first-use route, raw stop/resume plans, timer lifetime guards, ordered dependent retirement and stable source/runtime borrows; original mixer numerical bytes unchanged"
+    "scope": "Explicit cold Main/output/scalar bootstrap, privately prepared Sweep and first four-cohort partial Generator send/sum join with actual RoleWander output borrows, fixed rack policy and whole-successor preflight refusal; ordered retirement and original mixer numerical bytes unchanged"
   }
 }

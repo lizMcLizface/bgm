@@ -1,3 +1,4 @@
+import{generatorOrderedMixAuthor}from'../modular-audio/generatorOrderedMixRoot.js';
 import{acquireGeneratorSweepCell}from'../modular-audio/generatorSweepCell.js';
 import{rememberGeneratorMasterOutputBirth,invalidateGeneratorMasterOutputBirth}from'../modular-audio/generatorMasterOutputBirth.js';
 import{generatorMasterOutputRoot,disposeGeneratorMasterOutput}from'../modular-audio/generatorMasterOutputRoot.js';
@@ -730,6 +731,7 @@ class Generator {
 
     assertRuntimeSettingEdit(patch){if(!hasPublishedMainRuntime(this))return;assertMainRuntimeSettings(this,{...this.settings,...patch});if('generation'in patch&&patch.generation!==this.settings.generation&&Object.values(this.roles).some(r=>r.stringPatchBase))assertMainRuntimeSourceEdit(this,'physical generation replacement');if(patch.drums&&!this.roles.perc.machine&&percussionVoice(patch.drums.kit).wasmOnly&&this.percussionEngine!=='wasm')assertMainRuntimeSourceEdit(this,'percussion engine replacement');}
     set(key, value) {
+        /* ordered-mix:set */ const ordered=generatorOrderedMixAuthor(this);if(ordered&&key==='bus'&&!ordered.settingsDispatching)return ordered.withSettings({[key]:value},()=>this.set(key,value)); /* /ordered-mix:set */
         this.assertRuntimeSettingEdit({[key]:value});
         const main=generatorMainControlAuthor(this);if(main&&(key==='volumes'||key==='muted'))return main.applySettingsMix({[key]:value},ROLE_VOLUMES);
         const master=generatorMasterScalarAuthor(this);if(master&&key==='ambienceVolume')return master.applySettingsAmbienceVolume(value);
@@ -798,6 +800,7 @@ class Generator {
      * settings, "keep this"). A meter change restarts playback as in set().
      */
     setMany(patch) {
+        /* ordered-mix:setMany */ const ordered=generatorOrderedMixAuthor(this);if(ordered&&Object.hasOwn(patch,'bus')&&!ordered.settingsDispatching)return ordered.withSettings(patch,()=>this.setMany(patch)); /* /ordered-mix:setMany */
         this.assertRuntimeSettingEdit(patch);
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         const soundOnlyDrums = patch.drums && Object.keys(patch.drums).every(k => k === 'kit' || patch.drums[k] === this.settings.drums[k]);
@@ -895,6 +898,7 @@ class Generator {
 
     /** The sequencer's moves (effects opening, closing, sweeping across a chord) at this beat, through the effects bus. */
     applyMoves(bar, beatInBar) {
+        /* ordered-mix:applyMoves */ const ordered=generatorOrderedMixAuthor(this);if(ordered&&!ordered.settingsDispatching){const seq=this.settings.sequencer,motion=this.plan.get(bar)?.seqMotion,moves=motion&&seq?.on?moveValues(seq,motion.stage,(bar-motion.start+beatInBar/this.transport.beatsPerBar)/Math.max(1,motion.bars)):null;return ordered.withControls({moves,writeBus:!!moves||!!this.moveState},()=>this.applyMoves(bar,beatInBar));} /* /ordered-mix:applyMoves */
         const seq = this.settings.sequencer, motion = this.plan.get(bar)?.seqMotion;
         const active = motion && seq?.on ? moveValues(seq, motion.stage, (bar - motion.start + beatInBar / this.transport.beatsPerBar) / Math.max(1, motion.bars)) : null;
         if (!active && !this.moveState) return;
@@ -975,6 +979,7 @@ class Generator {
     }
 
     applyBus() {
+        /* ordered-mix:applyBus */ const ordered=generatorOrderedMixAuthor(this);if(ordered)return ordered.applyBus(); /* /ordered-mix:applyBus */
         if (this.sharedEffectsClosed) return;
         const bus = this.settings.bus, moves = this.moveState ?? {}, wantsMoves = this.settings.sequencer?.on && Object.keys(this.settings.sequencer.moves ?? {}).length > 0;
         if (!this.busRack) {
@@ -1016,6 +1021,7 @@ class Generator {
     // The section space (composition/sectionSpace.js): built on first use, then each role's send
     // follows the bar's section, gliding over about two bars.
     applySpace(level, time, barSeconds) {
+        /* ordered-mix:applySpace */ const ordered=generatorOrderedMixAuthor(this);if(ordered)return ordered.applySpace(level,time,barSeconds); /* /ordered-mix:applySpace */
         if (this.sharedEffectsClosed) return;
         if (!this.spaceRack) {
             if (!(level > 0) || this.spaceLoading) return;assertMainRuntimeLazyReturn(this,'space');
@@ -2422,6 +2428,17 @@ class Generator {
 
     // Books this beat's slice of the plan at exact audio times.
     onBeat({ bar, beatInBar, time, secondsPerBeat }) {
+        /* ordered-mix:onBeat */
+        const ordered=generatorOrderedMixAuthor(this);if(ordered&&!ordered.settingsDispatching){
+            if(this.pendingChange||this.pendingVoices?.length)throw Object.assign(Error('Finish pending voice/plan changes before ordered beat admission'),{code:'GENERATOR_ORDERED_MIX_REFUSED'});
+            const planned=this.plan.get(bar);if(!planned)throw Object.assign(Error('Actual planned bar required before ordered beat admission'),{code:'GENERATOR_ORDERED_MIX_REFUSED'});
+            const ending=beatInBar===0&&this.endBar!==null&&bar>=this.endBar+ENDING_RING_BARS;
+            const seq=this.settings.sequencer,motion=planned.seqMotion,moves=motion&&seq?.on?moveValues(seq,motion.stage,(bar-motion.start+beatInBar/this.transport.beatsPerBar)/Math.max(1,motion.bars)):null;
+            const scale=planned.rubato?.[beatInBar]??1,bpm=beatInBar===0&&this.meterTempo?.bar===bar?this.meterTempo.bpm:this.transport.bpm;
+            const seconds=scale!==this.transport.tempoScale||beatInBar===0&&this.meterTempo?.bar===bar?60/(bpm*scale):secondsPerBeat;
+            return ordered.withControls({moves,writeBus:!ending&&(!!moves||!!this.moveState),...!ending&&beatInBar===0?{space:{level:planned.space??0,seconds:time,barSeconds:seconds*this.transport.beatsPerBar}}:{}},()=>this.onBeat({bar,beatInBar,time,secondsPerBeat}));
+        }
+        /* /ordered-mix:onBeat */
         // a new meter's tempo starts on its downbeat: its units are not the length of the old bar's last one
         if (beatInBar === 0 && this.meterTempo?.bar === bar) {
             this.transport.setBpm(this.meterTempo.bpm);

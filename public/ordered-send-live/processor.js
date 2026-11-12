@@ -450,7 +450,7 @@
       this.terminalCallbacks = 0;
       port.onmessage = ({ data }) => this.message(data);
       try {
-        if (!cohortIdentity(p.identity, p.identity) || !Number.isInteger(p.identity.generation) || p.identity.generation < 1 || p.identity.generation > 4294967295 || p.identity?.hostVersion !== "aa39783ca72f4bcf" || p.identity?.kernelVersion !== "b4ebfc029ac9b939" || p.identity?.clockVersion !== "7a0838a735108706" || p.configuration?.sampleRate !== rate) throw Error("Ordered send identity differs");
+        if (!cohortIdentity(p.identity, p.identity) || !Number.isInteger(p.identity.generation) || p.identity.generation < 1 || p.identity.generation > 4294967295 || p.identity?.hostVersion !== "5fd0b70532696b82" || p.identity?.kernelVersion !== "b4ebfc029ac9b939" || p.identity?.clockVersion !== "7a0838a735108706" || p.configuration?.sampleRate !== rate) throw Error("Ordered send identity differs");
         this.core = new OrderedSendCore(p.module, p.configuration, { emit: (d) => this.emit(d) });
         this.emit({ kind: "ready" });
       } catch (e) {
@@ -592,5 +592,5 @@
       return this.unit.process(a, b, c);
     }
   };
-  registerProcessor("ordered-send-aa39783ca72f4bcf", Cohort);
+  registerProcessor("ordered-send-5fd0b70532696b82", Cohort);
 })();
