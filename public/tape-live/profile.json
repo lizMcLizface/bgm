@@ -1,0 +1,41 @@
+{
+  "kind": "tape.original-live-source-profile",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "NEW isolated original Native Tape live kernel. Accepted captured Tape unchanged. JS Math.tanh Float32 curves are explicit host-prepared resources; no runtime Native coefficient bridge. Native comparison required separately.",
+  "upstream": [
+    {
+      "file": "synth-engine/tape-fx/src/lib.rs",
+      "normalizedLfSha256": "d28cb57c81b5456a59bc4282e34c6b791e92f3d93a448a14911856f279c0d5aa"
+    },
+    {
+      "file": "synth-engine/tape-fx/src/tone.rs",
+      "normalizedLfSha256": "fd03fb3945e9a5c552503d8dcc97fb3679321de49022cb2079e82f27892d5ace"
+    },
+    {
+      "file": "synth-engine/tape-fx/src/delay.rs",
+      "normalizedLfSha256": "261e303ad7356b8fcff589aa5097d6b7d6f64388c7cea4f7000811357475ca56"
+    },
+    {
+      "file": "synth-engine/motion-live/src/timeline.rs",
+      "normalizedLfSha256": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020"
+    },
+    {
+      "file": "synth-engine/motion-live/src/oscillator.rs",
+      "normalizedLfSha256": "45351f6e5ce03bcd79076b7b34e45dceeb5515dd76d763d819c8207c990c3f29"
+    },
+    {
+      "file": "src/nodes/tape.js",
+      "normalizedLfSha256": "8818b6d2a8fac120728ef6be553b679d59a9e07d98c231291c547acff0a5bdfe"
+    }
+  ],
+  "timelineDifferences": [
+    "Literal source f64 past-event convergence threshold versus f32 ProcessSetTarget threshold",
+    "Nominal output clamp and final intrinsic carry for tone frequency"
+  ],
+  "resources": [
+    "../tape-fx/resources/chromium-sine-2048.f32",
+    "../tape-fx/resources/chromium-sine-4096.f32",
+    "../tape-fx/resources/chromium-sine-16384.f32"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "api": 1,
+  "profile": "original-tape-independent-live-e14de735-v1",
+  "version": "7e165c5616e8d55a",
+  "source": "30b12ba06f461f8b48047ff019bff1de7451a37c16fc708caeab7ada0128dd2a",
+  "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
+  "bytes": 178186,
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "sources": [
+    "tools/buildTapeLive.mjs",
+    "synth-engine/tape-live/Cargo.toml",
+    "synth-engine/tape-live/Cargo.lock",
+    "synth-engine/tape-live/CHROMIUM_PROFILE.json",
+    "synth-engine/tape-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/tape-live/src/lib.rs",
+    "synth-engine/tape-live/src/resources.rs",
+    "synth-engine/tape-live/src/shaper.rs",
+    "synth-engine/tape-live/src/tone.rs",
+    "synth-engine/tape-live/src/delay.rs",
+    "synth-engine/tape-live/src/timeline.rs",
+    "synth-engine/tape-live/src/oscillator.rs",
+    "synth-engine/tape-live/src/allocation.rs",
+    "src/nodes/tape.js",
+    "src/modular-audio/ownedTapeLive.js",
+    "src/modular-audio/tapeLiveBrowser.js",
+    "synth-engine/tape-fx/resources/manifest.json"
+  ],
+  "resources": [
+    "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-16384.f32"
+  ],
+  "curveSlots": 32,
+  "curvePoints": 2049,
+  "uploadFloatsPerService": 1024,
+  "orderedControls": 32,
+  "reference": "8818b6d2a8fac120728ef6be553b679d59a9e07d98c231291c547acff0a5bdfe",
+  "notices": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71",
+  "profileSha256": "719b79609d7ebd91ceae8b40cc15d5e9d7b7e66c82b712094950a94b1c41f0d8",
+  "scope": "NEW standalone explicit Tape live kernel; exact host JS Math.tanh curve resources, original independent timeline/start clocks, explicit per-node activity; Native/default/capturedTape unchanged"
+}
