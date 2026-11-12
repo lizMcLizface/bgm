@@ -1,3 +1,4 @@
+import{attachSourceDisposalFence}from'../modular-audio/sourceDisposalFence.js';
 import {kernelAsset} from './kernelAssets';
 import {loadFMModule} from './fmModule';
 import {FM_BANK_LINK,makeFMBankNode} from './fmBank';
@@ -16,7 +17,7 @@ export async function makeFMNode(context,patch,{auditStats=false,offline=false,p
  if(optionalSpeedup(FM_BANK_LINK)){try{return await makeFMBankNode(context,patch,{auditStats,offline,patches,events,stopFrame,onStats,onError});}catch{/* Optional prototype failure retains the independent source path. */}}
  const {module,simd}=await loadFMModule();if(!registrations.has(context))registrations.set(context,context.audioWorklet.addModule(kernelAsset('fm','fm-processor.js')));await registrations.get(context);
  const node=new AudioWorkletNode(context,'calmbgm-fm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,simd,patch:fmPacket(patch),offline,events,stopFrame,auditStats,performance:sanitizeNoteBehavior(patch.performance),patches:patches.map(p=>({...p,patch:fmPacket(p.patch),performance:sanitizeNoteBehavior(p.patch.performance)}))}});
- node.port.onmessage=({data})=>{if(data.type==='stats')onStats(data);if(data.type==='error')onError(Error(data.message));};node.onprocessorerror=()=>onError(Error('FM processor stopped. Reload the instrument.'));return node;
+ node.port.onmessage=({data})=>{if(data.type==='stats')onStats(data);if(data.type==='error')onError(Error(data.message));};node.onprocessorerror=()=>onError(Error('FM processor stopped. Reload the instrument.'));attachSourceDisposalFence(context,node,{label:'FM source'});return node;
 }
 export class FMBackend extends WasmBackend {
  static async create(context,patch,options){const b=new FMBackend(context,await makeFMNode(context,patch,options));b.kind='fm';return b;}

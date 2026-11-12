@@ -121,6 +121,16 @@ partial owners, and paired cleanup failures remain visible. New stopped bundle
 transactions remain separate from normal Generator selection. See
 MODULAR_AUDIO_ENGINE_LEGACY_LIFECYCLE.md for scope.
 
+Known source/bus terminal fences now cover twelve normal/prepared paths,
+including both Core/FM generations, inserts/FDN, Native/owned CLASSIC and Iowa,
+and role motion. Actual desktop audio and typed release proof pass all twelve;
+159 focused checks pass and ten pinned original processor bodies prove that
+only terminal handling changed. Missing receipts/processor errors reject and
+retain quarantine rather than resolve on timeout; cleanup errors aggregate.
+Optional shared FM-bank prototypes remain explicitly unacknowledged. See
+MODULAR_AUDIO_ENGINE_SOURCE_TERMINAL_LIFECYCLE.md. Whole application publication
+and old-owner retirement are the next separate gate.
+
 Next: finish stopped owner-bundle integration in selected application hosts;
 close Ambience input-topology/demand and queued Tape lifecycle ownership; then
 adopt the accepted profiles and finish remaining Filter activity, shared-room

@@ -1,3 +1,4 @@
+import{createSourceDisposalFence}from'../../modular-audio/sourceDisposalFence.js';
 // Live AudioWorklet host for the classic-synth kernel. The synths pages use their
 // own AudioContext with an interactive latency hint: playing a piano through it
 // needs a short output buffer more than the generator's dropout insurance.
@@ -39,12 +40,13 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
   const savedParams=new Map(params.map(([id,value])=>[id,value])),savedControls=new Map();
   let savedWaves=waves?Float32Array.from(waves):null,revision=0,sequenced=false,futureControl=false;
   node=sourceNodeFactory?await sourceNodeFactory(context,{model,params,waves:savedWaves,polyphony}):new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves:savedWaves,polyphony}});
+  if(!sourceNodeFactory){const fence=createSourceDisposalFence(context,node,{label:'CLASSIC source'});node.sourceDisposalStatus=fence.status;node.disposeOwned=fence.dispose;node.sourceReleaseFence=fence;}
   await new Promise((resolve,reject)=>{if(sourceNodeFactory){if(!node?.port||typeof node.connect!=='function'||!node.ready||typeof node.ready.then!=='function'){reject(Error('Prepared classic source factory must return an actual ready AudioWorkletNode'));return;}node.ready.then(resolve,reject);}node.port.onmessage=({data})=>{
-   node.handleOwnedMessage?.(data);
+   node.sourceReleaseFence?.receive(data);node.handleOwnedMessage?.(data);
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
    else if(data.type==='stats'){stats=data;onStats({...data,peak:outputPeak,reduction:outboard?.reduction??0});}
-  };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');node.handleOwnedMessage?.({type:'error',message:error.message});reject(error);onError(error);};});
+  };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');node.sourceReleaseFence?.fail(error);node.handleOwnedMessage?.({type:'error',message:error.message});reject(error);onError(error);};});
   outboard=await createRack(context,rack,{pluginFactory:rackPluginFactory,dynamicsFactory:rackDynamicsFactory,nativeFactory:rackNativeFactory,onError});
   monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
   // Both paths already contain the native BBD/space/output stage. Inject before
@@ -56,9 +58,9 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
   let events=[],edits=[],steps=[],queued=false;
   const flush=()=>{queued=false;if(edits.length){node.port.postMessage({type:'params',values:edits});edits=[];}if(steps.length){node.port.postMessage({type:'seq',values:steps});steps=[];}if(events.length){node.port.postMessage({type:'events',values:events});events=[];}};
   const queue=()=>{if(!queued){queued=true;queueMicrotask(flush);}};
-  let closed=false,holds=0;
+  let closed=false,holds=0,closing;
   return {
-   context,node,sourceInput,
+   context,node,sourceInput,disposalStatus:()=>node.sourceDisposalStatus?.()??{capability:false},
    armRuntime:()=>context.state==='running'?Promise.all([node.armRuntime?.(),outboard.armRuntime?.()]):Promise.resolve(),
    captureSource(){if(closed||sequenced||futureControl)throw Error('Classic source is closed or has unsupported scheduled controls/sequencing');return {revision,version:1,model,parameters:Array.from(savedParams,([id,value])=>[id,value]),...(savedWaves?{waves:Array.from(savedWaves)}:{}),polyphony:Math.max(1,Math.min(32,polyphony??32)),controls:Array.from(savedControls,([id,value])=>[id,value])};},
    get sourceRevision(){return revision;},
@@ -79,7 +81,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
    requestScope:monitor.requestScope,
    setRack(values){revision++;outboard.patch(values);},clearRack:()=>outboard.clear(),
    panic(){revision++;flush();node.port.postMessage({type:'panic'});outboard.clear();},
-   async close(){if(closed)return;closed=true;flush();const stopped=node.disposeOwned?node.disposeOwned():(node.port.postMessage({type:'dispose'}),Promise.resolve());node.disconnect();nativeGate.disconnect();sourceInput.disconnect();const effectsStopped=outboard.dispose();monitor.dispose();try{await Promise.all([stopped,effectsStopped]);}finally{if(!sharedContext)await context.close().catch(()=>{});}},
+   close(){if(closing)return closing;closed=true;const errors=[],jobs=[];const attempt=fn=>{try{const result=fn();if(result?.then)jobs.push(result);}catch(error){errors.push(error);}};attempt(flush);attempt(()=>node.disposeOwned());for(const part of[node,nativeGate,sourceInput])attempt(()=>part.disconnect());attempt(()=>outboard.dispose());attempt(()=>monitor.dispose());closing=Promise.allSettled(jobs).then(async results=>{for(const r of results)if(r.status==='rejected')errors.push(r.reason);if(!sharedContext)try{await context.close();}catch(error){errors.push(error);}if(errors.length)throw new AggregateError(errors,'CLASSIC source/rack disposal failed');});closing.catch(()=>{});return closing;},
   };
- })().catch(async error=>{if(node?.disposeOwned)await node.disposeOwned();else node?.port.postMessage({type:'dispose'});node?.disconnect();nativeGate?.disconnect();sourceInput?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
+ })().catch(async error=>{const errors=[],jobs=[];for(const action of[()=>node?.disposeOwned?.(),()=>node?.disconnect(),()=>nativeGate?.disconnect(),()=>sourceInput?.disconnect(),()=>outboard?.dispose(),()=>monitor?.dispose()])try{const result=action();if(result?.then)jobs.push(result);}catch(cleanup){errors.push(cleanup);}for(const result of await Promise.allSettled(jobs))if(result.status==='rejected')errors.push(result.reason);if(!sharedContext)try{await context.close();}catch(cleanup){errors.push(cleanup);}if(errors.length)error.cleanupError=new AggregateError(errors,'CLASSIC startup cleanup failed');throw error;});
 }

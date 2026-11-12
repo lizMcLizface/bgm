@@ -8,7 +8,7 @@ it('prepares a restored instrument while its host context is suspended without w
  const gains=[],resume=vi.fn(()=>new Promise(()=>{})),context={state:'suspended',audioWorklet:{addModule:vi.fn(async()=>{})},resume,close:vi.fn(),createGain:()=>{const node={gain:{value:1},connect:vi.fn(),disconnect:vi.fn()};gains.push(node);return node;}},destination={};
  vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,arrayBuffer:async()=>new Uint8Array([0,97,115,109,1,0,0,0]).buffer})));
  vi.stubGlobal('AudioWorkletNode',class{
-  constructor(){this.port={postMessage:vi.fn()};this.connect=vi.fn();this.disconnect=vi.fn();queueMicrotask(()=>this.port.onmessage({data:{type:'ready'}}));}
+  constructor(){this.port={close:vi.fn(),postMessage:vi.fn(d=>{if(d.type==='dispose')queueMicrotask(()=>this.port.onmessage?.({data:{type:'disposed',version:1,released:true,clean:true}}));})};this.connect=vi.fn();this.disconnect=vi.fn();queueMicrotask(()=>this.port.onmessage({data:{type:'ready'}}));}
  });
  try{
   const waves=new Float32Array([.25,.5]),params=[[0,3]],live=await startLiveSynth({context,destination,model:7,params,waves,polyphony:8});

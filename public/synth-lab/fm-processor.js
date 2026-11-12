@@ -23,7 +23,7 @@ class FmProcessor extends AudioWorkletProcessor {
   }catch(e){this.fail(e);}};
   }catch(e){this.fail(e);}
  }
- stop(){this.failed=true;this.port.onmessage=null;this.port.close();this.fm=null;this.transition?.clear();this.transition=null;this.output=this.views=null;}
+ stop(){this.failed=true;this.fm=null;this.transition?.clear();this.transition=null;this.output=this.views=null;this.port.postMessage({type:'disposed',version:1,released:true,clean:true});this.port.onmessage=null;this.port.close();}
  configure(p){for(const pair of p.globals)this.fm.fm_param(...pair);for(const triple of p.operators)this.fm.fm_op(...triple);for(const triple of p.routes)this.fm.fm_route(...triple);for(const pair of p.carriers)this.fm.fm_carrier(...pair);}
  fail(e){this.port.postMessage({type:'error',message:String(e)});this.stop();}
  process(_input,outputs){

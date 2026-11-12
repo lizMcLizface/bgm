@@ -15,7 +15,7 @@ class RoleWanderProcessor extends AudioWorkletProcessor {
  }
  message(data) {
   try {
-   if(data.type==='dispose'){this.unit.dispose();this.stopped=true;this.port.postMessage({type:'disposed'});return;}
+   if(data.type==='dispose'){this.unit.dispose();this.stopped=true;this.port.postMessage({type:'disposed',version:1,released:true,clean:true});return;}
    if(this.stopped)throw Error('Role motion disposed');
    if(data.type==='settings') {
     if(this.epoch===null){if(this.startup.length>=64)throw Error('Role-motion startup capacity exceeded');this.startup.push(data);}else this.settings(data);

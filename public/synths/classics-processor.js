@@ -46,7 +46,7 @@ class ClassicsProcessor extends AudioWorkletProcessor {
   for(let i=0;i<n;i++)out[i]=this.ring[(this.rw-n+i+RING)&(RING-1)];
   this.port.postMessage({type:'scope',end:this.total,rate:sampleRate,samples:out},[out.buffer]);
  }
- stop(){this.failed=true;this.port.onmessage=null;this.port.close();this.k=null;this.left=this.right=null;}
+ stop(){this.failed=true;this.k=null;this.buffer=null;this.left=this.right=this.ring=null;this.pending=[];this.held.clear();this.port.postMessage({type:'disposed',version:1,released:true,clean:true});this.port.onmessage=null;this.port.close();}
  fail(error){this.port.postMessage({type:'error',message:String(error?.message??error)});this.stop();}
  process(_inputs,outputs){
   if(this.failed)return false;

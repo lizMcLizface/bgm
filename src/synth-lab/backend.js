@@ -1,3 +1,4 @@
+import{attachSourceDisposalFence}from'../modular-audio/sourceDisposalFence.js';
 import {kernelAsset} from './kernelAssets';
 import {sanitizeNoteBehavior} from './noteBehavior';
 import {parameterTriples,legacyPreset} from './patch';
@@ -13,7 +14,7 @@ export async function makeWasmNode(context,patch,{auditStats=false,patches=[],ev
  const values=parameterTriples(patch);if(dry)values.find(([scope,index])=>scope===0&&index===8)[2]=0;
  const node=new AudioWorkletNode(context,'calmbgm-subtractive',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,parameters:values,events,offline,stopFrame,auditStats,performance:sanitizeNoteBehavior(patch.performance),patches:patches.map(p=>({...p,values:parameterTriples(p.patch),performance:sanitizeNoteBehavior(p.patch.performance)}))}});
  node.port.onmessage=({data})=>{if(data.type==='stats')onStats(data);if(data.type==='error')onError(Error(data.message));};node.onprocessorerror=()=>onError(Error('Audio worklet stopped after an error. Reload the engine.'));
- return node;
+ attachSourceDisposalFence(context,node,{label:'Core source'});return node;
 }
 export class WasmBackend {
  constructor(context,node){this.context=context;this.node=node;this.kind='wasm';this.nextId=1;this.starts=new Map();}
@@ -27,7 +28,8 @@ export class WasmBackend {
  pressure(value,id=0){this.events([[3,id,Math.round((this.context.currentTime+.01)*this.context.sampleRate),value,0]]);}
  retune(id,midi,seconds=.8,time=this.context.currentTime+.025){this.events([[5,id,Math.round(time*this.context.sampleRate),midi,seconds]]);}
  panic(){this.starts.clear();this.node.port.postMessage({type:'panic'});}
- dispose(){this.node.port.postMessage({type:'dispose'});this.node.disconnect();this.node.port.onmessage=null;const port=this.node.port;setTimeout(()=>port.close(),250);}
+ disposalStatus(){return this.node.sourceDisposalStatus?.()??{version:1,capability:false,profile:'legacy-unacknowledged-source'};}
+ dispose(){if(this.disposal)return this.disposal;if(this.node.disposeOwned){const errors=[];try{this.node.disconnect();}catch(error){errors.push(error);}this.disposal=Promise.allSettled([this.node.disposeOwned()]).then(results=>{if(results[0].status==='rejected')errors.push(results[0].reason);if(errors.length)throw new AggregateError(errors,'Source disposal failed');});this.disposal.catch(()=>{});return this.disposal;}this.node.port.postMessage({type:'dispose'});this.node.disconnect();this.node.port.onmessage=null;const port=this.node.port;setTimeout(()=>port.close(),250);}
 }
 const settled=async inst=>{await Promise.all([noiseReady(inst.AC),bitCrusherReady(inst.AC),spaceReady(inst.AC)]);};
 export class CurrentBackend {

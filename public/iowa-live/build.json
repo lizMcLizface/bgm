@@ -1,10 +1,10 @@
 {
   "api": 1,
   "source": "0e83e7ffe29575e9b87ac12f7604d05291bb4892a3266f4567ee5e9a8ab18296",
-  "runtime": "c21a96a0fb796628dbd4e85400ce255c63161af605e768bfff38bd26a5a5fd8f",
-  "reference": "9558be1711662694d4cd6056f1d7fa3e698d394934e8d504353c9a31a21dd596",
+  "runtime": "650964a9b3819b3b7b3f2f76975df2e11b2f3aaa96e6b3dc509bf2a685b8cc1d",
+  "reference": "859bc8b8258a40d08de4dec4bd0933622960f9ea4003c2e85ba642ff3106966e",
   "wasm": "2fe17b3ab7ebb6edc6ddf3836a80f007bf1f841899332e7a18685547b3fae8ac",
   "bytes": 88541,
   "audited": false,
-  "version": "015c3a0f75d7b469"
+  "version": "d48b065cf3809f1e"
 }

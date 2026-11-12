@@ -1,7 +1,7 @@
 {
   "api": 1,
-  "source": "a266b7a4e76ae3ee768eff39930fbbdca424224ce02b0cf5dd9f0e70741164ef",
+  "source": "b9854c452b2df43524ba8680cf502e32d2252aae7d0871bb20e86c646897957b",
   "graphWasm": "a88ac8e012a902fb66b9475e2d5fa134075b671b7155ae5f62da84c4d9a3349b",
-  "version": "ec87f3ce37eabf40",
+  "version": "1f61f03366424596",
   "scope": "Existing original Core/FM kernels with owned state; prepared explicit host, no default change"
 }

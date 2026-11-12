@@ -16,6 +16,8 @@ class IowaVoices extends AudioWorkletProcessor {
         for (const message of options?.processorOptions?.messages ?? []) this.receive(message);
     }
     receive(data) {
+        if(data.dispose){this.voices.clear();this.stored.clear();this.booked.length=0;this.disposed=true;this.port.postMessage({type:'disposed',version:1,released:true,clean:true});return;}
+        if(this.disposed)return;
         if (data.store) {
             if (this.stored.size >= MAX_STORED) this.stored.delete(this.stored.keys().next().value);
             this.stored.set(data.key, data.spec);
@@ -41,6 +43,7 @@ class IowaVoices extends AudioWorkletProcessor {
         if (voice && (!voice.ring || voice instanceof RollVoice)) voice.release();
     }
     process(_inputs, outputs) {
+        if(this.disposed){for(const bus of outputs)for(const plane of bus)plane.fill(0);return false;}
         const out = outputs[0][0], until = currentTime + out.length / sampleRate;
         out.fill(0);
         if (this.booked.length) {

@@ -1,3 +1,4 @@
+import{createSourceDisposalFence}from'../../../modular-audio/sourceDisposalFence.js';
 // Plays the Iowa instruments (docs/IOWA_INSTRUMENTS.md) in a worklet, held notes from wavetables and struck notes as decaying partials, everything into
 // one room. A note's numbers are built here once and handed over; nothing is rendered ahead, so a key sounds at once.
 import workletUrl from './iowa.worklet.js?worker&url';
@@ -63,16 +64,17 @@ export default class IowaPlayer {
                 this.backendInfo = { backend, voiceVersion: code.version, preparationVersion: preparation.version, room: this.limiterStage ? 'original native complete convolver; owned bare-native limiter' : 'original native complete convolver and limiter' };
                 await context.audioWorklet.addModule(ownedWorkletUrl);
             })).then(() => { if (!this.pending && !this.disposed) this.makeNode(); }),
-            roomFor(context).then((buffer) => { this.convolver.buffer = buffer; }),
+            roomFor(context).then((buffer) => { if(!this.disposed)this.convolver.buffer = buffer; }),
             this.limiterStage?.ready,
         ]);
     }
     makeNode(messages) {
         this.node = new AudioWorkletNode(this.context, this.backend === 'owned-rust' ? 'iowa-owned-voices' : 'iowa-voices', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1], ...((messages || this.ownedModule) ? { processorOptions: { ...(messages ? { messages } : {}), ...(this.ownedModule ? { module: this.ownedModule } : {}) } } : {}) });
+        this.sourceFence=createSourceDisposalFence(this.context,this.node,{label:'Iowa source',message:{dispose:true}});this.node.sourceDisposalStatus=this.sourceFence.status;
         this.node.connect(this.bus);
-        if (this.backend === 'owned-rust') {
-            this.node.port.onmessage = ({ data }) => { if (data.type === 'error') this.failure = Error(data.error); else if (data.type === 'stats') this.onStats?.(data); };
-            this.node.onprocessorerror = () => { this.failure = Error('Owned Iowa source processor stopped'); };
+        {
+            this.node.port.onmessage = ({ data }) => { if(this.sourceFence.receive(data))return;if (data.type === 'error'){this.failure = Error(data.error);this.sourceFence.fail(this.failure);} else if (data.type === 'stats') this.onStats?.(data); };
+            this.node.onprocessorerror = () => { this.failure = Error('Iowa source processor stopped');this.sourceFence.fail(this.failure); };
         }
     }
     prepareOffline() {
@@ -166,20 +168,21 @@ export default class IowaPlayer {
         if (s?.version !== 1 || s.kind !== 'iowa.live-setup' || s.sampleRate !== context.sampleRate || !Array.isArray(s.tables) || s.tables.length > PATCHES.length || !Number.isFinite(s.room) || s.room < 0 || s.room > 1 || !Number.isFinite(s.vibrato) || s.vibrato < 0 || s.vibrato > 2) throw Error('Invalid Iowa live setup');
         const player = new IowaPlayer(context, { backend: 'owned-rust', ordinaryCompressorFactory });
         try { await player.ready; for (const raw of s.tables) { if (!raw || player.tables.has(raw.id)) throw Error('Duplicate or invalid Iowa table'); const table = player.preparation.createTable(raw); player.preparedTables.set(raw.id, table); player.rawTables.set(raw.id, structuredClone(raw)); player.tables.set(raw.id, settleLevels(structuredClone(raw))); } player.setRoom(s.room); player.setVibrato(s.vibrato); return player; }
-        catch (error) { player.dispose(); throw error; }
+        catch (error) { try{await player.dispose();}catch(cleanupError){error.cleanupError=cleanupError;}throw error; }
     }
+    disposalStatus(){return this.sourceFence?.status()??{version:1,profile:'source-terminal-receipt-v1',capability:true,released:!!this.readyCleanupSettled,quarantined:this.disposed&&!this.readyCleanupSettled,receipt:null};}
     dispose() {
-        if (this.disposed) return this.disposal; this.disposed = true; this.preparation?.dispose(); this.preparedTables.clear(); this.rawTables.clear();
-        const node=this.node;this.node=null;node?.disconnect();
-        if(node&&this.backend==='owned-rust')this.disposal=new Promise(resolve=>{let timer;const finish=()=>{clearTimeout(timer);node.port.onmessage=null;node.onprocessorerror=null;node.port.close();resolve();};node.port.onmessage=({data})=>{if(data.type==='disposed')finish();};node.onprocessorerror=finish;timer=setTimeout(finish,1000);node.port.postMessage({dispose:true});});
-        else if(node){node.port.onmessage=null;node.onprocessorerror=null;node.port.close();}
-        this.pending = null; this.stored.clear(); this.tables.clear();
-        for (const part of [this.bus, this.dry, this.wet, this.convolver, this.limiter, this.master]) part.disconnect();
-        if (this.limiterStage) {
-            let cleanup; try { cleanup = this.limiterStage.dispose(); } catch (error) { cleanup = Promise.reject(error); }
-            const sourceDisposal = this.disposal; this.disposal = Promise.all([sourceDisposal, Promise.resolve(cleanup).catch(error => { this.limiterDisposalError = error; })]).then(() => undefined);
-        }
-        return this.disposal;
+        if(this.disposal)return this.disposal;this.disposed=true;const issues=[],pending=[];
+        const attempt=fn=>{try{return fn();}catch(error){issues.push(error);}};
+        attempt(()=>this.preparation?.dispose());this.preparedTables.clear();this.rawTables.clear();
+        const node=this.node;this.node=null;attempt(()=>node?.disconnect());
+        if(this.sourceFence)pending.push(this.sourceFence.dispose());
+        this.pending=null;this.stored.clear();this.tables.clear();
+        for(const part of[this.bus,this.dry,this.wet,this.convolver,this.limiter,this.master])attempt(()=>part?.disconnect());
+        if(this.limiterStage){const cleanup=attempt(()=>this.limiterStage.dispose());if(cleanup)pending.push(Promise.resolve(cleanup).catch(error=>{this.limiterDisposalError=error;throw error;}));}
+        // Late asset results see disposed before creating a source or installing a room.
+        pending.push(Promise.resolve(this.ready).then(()=>{},()=>{}).then(()=>{this.readyCleanupSettled=true;}));
+        this.disposal=Promise.allSettled(pending).then(results=>{for(const r of results)if(r.status==='rejected')issues.push(r.reason);if(issues.length)throw new AggregateError(issues,'Iowa source/limiter disposal failed');});this.disposal.catch(()=>{});return this.disposal;
     }
 
     /** The gain that brings a recorded note (for the page's A/B) to the level the model plays it at. */

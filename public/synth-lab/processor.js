@@ -27,7 +27,7 @@ class SynthProcessor extends AudioWorkletProcessor {
   this.report=0;this.port.postMessage({type:'ready'});
   }catch(error){this.fail(error);}
  }
- stop(){this.failed=true;this.port.onmessage=null;this.port.close();this.engine=null;this.transition?.clear();this.transition=null;this.left=this.right=this.left128=this.right128=null;}
+ stop(){this.failed=true;this.engine=null;this.transition?.clear();this.transition=null;this.left=this.right=this.left128=this.right128=null;this.port.postMessage({type:'disposed',version:1,released:true,clean:true});this.port.onmessage=null;this.port.close();}
  fail(error){this.port.postMessage({type:'error',message:String(error)});this.stop();}
  process(_inputs,outputs){
   if(this.failed)return false;
