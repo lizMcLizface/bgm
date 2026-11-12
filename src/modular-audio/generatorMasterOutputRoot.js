@@ -1,3 +1,4 @@
+import{verifyGeneratorPreparedSweepRoute,generatorPreparedSweepHasRoute,generatorPreparedSweepResources,isolateGeneratorPreparedSweep}from'./generatorPreparedSweep.js';
 import{prepareColdMainOutputRoot,planMainOutputOperation}from'./mainOutputColdRoot.js';
 import{isMainControlClockLease}from'./mainControlClockLease.js';
 import{generatorMainControlRoot}from'./generatorMainControlRoot.js';
@@ -25,12 +26,12 @@ export async function createGeneratorMasterOutputRoot(g,{clockLease,signal}={}){
  let mainBorrow=null,scalarBorrow=null,leafAttempted=false,sequence=0,closedRelease=null;const closedReleaseErrors=[];const borrows=new Set(),edits=[];
  const snapshot=()=>({profile:GENERATOR_MASTER_OUTPUT_PROFILE,state,error:error?String(error):null,borrows:borrows.size,mainBorrow:!!mainBorrow,scalarBorrow:!!scalarBorrow,leaf:leaf?.status()??null,contextClosedRelease:closedRelease!==null,contextClosedErrors:closedReleaseErrors.slice(),routing:edits.map(({add,done})=>({add,done}))});
  const remove=(from,to,issues)=>{try{from.disconnect(to);}catch(issue){if(issue?.name!=='InvalidAccessError')issues.push(issue);}};
- const isolate=()=>{const issues=[];if(output&&destination)remove(output,destination,issues);if(input)remove(birth.output,input,issues);if(destination)remove(birth.output,destination,issues);if(issues.length)error.isolationError=new AggregateError(issues,'Master-output isolation failed');};
+ const isolate=()=>{const issues=[];try{isolateGeneratorPreparedSweep(g,{outputRoot:root});}catch(issue){issues.push(issue);}if(output&&destination)remove(output,destination,issues);if(input)remove(birth.output,input,issues);if(destination)remove(birth.output,destination,issues);if(issues.length)error.isolationError=new AggregateError(issues,'Master-output isolation failed');};
  const fail=issue=>{if(!error)error=normalize(issue);if(state!=='disposed')state='quarantined';g.runtimeEnvironmentError??=error;isolate();for(const parent of[scalars,main])try{parent.quarantine(error);}catch(cleanupError){error.parentIsolationError??=cleanupError;}return error;};
  const parentCheck=()=>{main.check();scalars.check();main.verifyColdNativeClock(clockLease.value);const proof=scalars.verifyClock();verifyMainScalarClockCertificate(proof,{group:scalars.group,context,clock:clockLease.value});if(proof.state!=='active'||proof.firstFrame!==0||proof.scalars!==2)throw refuse('Actual active scalar clock certificate differs');};
  function check(){
   if(error)throw error;if(state!=='active')throw refuse('Master-output root is not active');
-  try{generatorMasterOutputBirth(g);if(context.state!=='running'||clockLease.status().closed||roots.get(g)!==root)throw refuse('Master-output context/session is retired');parentCheck();leaf.check();if(leaf.input!==input||leaf.output!==output||scalars.trimDestination()!==destination)throw refuse('Actual private master-output endpoints changed');mainBorrow.check();scalarBorrow.check();}catch(issue){throw fail(issue);}return true;
+  try{generatorMasterOutputBirth(g);if(context.state!=='running'||clockLease.status().closed||roots.get(g)!==root)throw refuse('Master-output context/session is retired');parentCheck();leaf.check();if(leaf.input!==input||leaf.output!==output||scalars.trimDestination()!==destination)throw refuse('Actual private master-output endpoints changed');mainBorrow.check();scalarBorrow.check();if(g.sweep||generatorPreparedSweepHasRoute(g))verifyGeneratorPreparedSweepRoute(g,{outputRoot:root,clock:clockLease.value,from:output,to:destination,sweep:g.sweep});}catch(issue){throw fail(issue);}return true;
  }
  function publish(){
   generatorMasterOutputBirth(g);if(g.runtimePublishedOwner||g.runtimeEnvironmentReady||g.isRunning||g.ambienceRunning||g.liveNotes?.size||g.sweep)throw refuse('Stopped master-output routing changed during preparation');
@@ -71,7 +72,7 @@ export async function createGeneratorMasterOutputRoot(g,{clockLease,signal}={}){
   reserve(commands){check();return leaf.reserve(commands);},commit(token,callbacks){check();try{return leaf.commit(token,callbacks);}catch(issue){if(leaf.status().error)throw fail(issue);throw issue;}},cancel(token){check();return leaf.cancel(token);},
   flush(){check();return leaf.flush();},stats(){check();return leaf.stats();},
   postFadeOutput(){check();return output;},
-  protectedResources(){check();return[root,leaf,birth.output,input,output,destination];},
+  protectedResources(){check();return[root,leaf,birth.output,input,output,destination,...generatorPreparedSweepResources(g)];},
   borrow(){check();if(borrows.size>=16||sequence===0xffffffff)throw refuse('Master-output borrow bound');const id=++sequence,key={};borrows.add(key);let released=false;return Object.freeze({root,context,id,check(){check();if(released)throw refuse('Released master-output borrow');},release(){if(!released){released=true;borrows.delete(key);}return Promise.resolve({released:true,clean:true});},status:()=>({id,released})});},
   dispose,status:snapshot
  });

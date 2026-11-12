@@ -1,3 +1,4 @@
+import{isGeneratorPreparedSweepFacade}from'./generatorPreparedSweep.js';
 const records=new WeakMap();
 const refuse=message=>Object.assign(Error(message),{code:'GENERATOR_MASTER_OUTPUT_BIRTH_REFUSED'});
 const node=(value,context)=>value?.context===context&&typeof value.connect==='function'&&typeof value.disconnect==='function';
@@ -12,6 +13,6 @@ export function rememberGeneratorMasterOutputBirth(g){
 export function invalidateGeneratorMasterOutputBirth(g,reason){const record=records.get(g);if(record){record.valid=false;record.reason??=reason;}}
 export function generatorMasterOutputBirth(g){
  const record=records.get(g),birth=record?.birth;if(!record?.valid)throw refuse('Original master-output constructor history is unavailable');
- if(g.AC!==birth.context||g.output!==birth.output||g.levelTrim!==birth.trim||g.sweep)throw refuse('Original unswept master-output identity changed');
+ if(g.AC!==birth.context||g.output!==birth.output||g.levelTrim!==birth.trim||g.sweep&&!isGeneratorPreparedSweepFacade(g,g.sweep))throw refuse('Original unswept master-output identity changed');
  return birth;
 }

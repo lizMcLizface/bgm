@@ -1,8 +1,9 @@
 // @vitest-environment node
 import{it,expect,vi,beforeEach}from'vitest';
-const h=vi.hoisted(()=>({parents:new WeakMap(),scalars:new WeakMap(),create:vi.fn()}));
+const h=vi.hoisted(()=>({parents:new WeakMap(),scalars:new WeakMap(),create:vi.fn(),sweepFactory:vi.fn()}));
+vi.mock('../nodes/sweepRust.js',()=>({prepareSweepLive:(...args)=>h.sweepFactory(...args)}));
 vi.mock('./generatorMainControlRoot.js',()=>({generatorMainControlRoot:g=>h.parents.get(g)??null}));
-vi.mock('./generatorMasterScalarRoot.js',()=>({generatorMasterScalarRoot:g=>h.scalars.get(g)??null}));
+vi.mock('./generatorMasterScalarRoot.js',()=>({generatorMasterScalarRoot:g=>h.scalars.get(g)??null,mainMasterTrimDestination:g=>h.scalars.get(g).trimDestination()}));
 vi.mock('./mainScalarColdGroup.js',()=>({verifyMainScalarClockCertificate:(proof,{group,clock})=>{if(proof!==group.lastProof||clock!==group.clock)throw Error('Private scalar clock differs');return proof;}}));
 vi.mock('./nativeContextClock.js',()=>({prepareNativeContextClock:async context=>{const clock={context,check(){if(context.state==='closed')throw Error('Clock closed');},dispose:vi.fn(async()=>{})};return clock;}}));
 vi.mock('./mainOutputColdRoot.js',async original=>({...await original(),prepareColdMainOutputRoot:(...args)=>h.create(...args)}));
@@ -11,7 +12,7 @@ import{contextPreparationStatus}from'./contextPreparationRegistry.js';
 import{rememberGeneratorMasterOutputBirth}from'./generatorMasterOutputBirth.js';
 import{createGeneratorMasterOutputRoot,generatorMasterOutputRoot,mainMasterOutputProtectedResources}from'./generatorMasterOutputRoot.js';
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
-beforeEach(()=>{h.create.mockReset();});
+beforeEach(()=>{h.create.mockReset();h.sweepFactory.mockReset();});
 async function fixture(){
  const calls=[],listeners=new Set(),context={state:'suspended',currentTime:0,sampleRate:48000,async resume(){context.state='running';},async suspend(){context.state='suspended';},addEventListener(_type,fn){listeners.add(fn);},removeEventListener(_type,fn){listeners.delete(fn);},close(){context.state='closed';for(const fn of[...listeners])fn();}};
  const node=()=>{const edges=new Set();return{context,edges,connect(to){edges.add(to);return to;},disconnect(to){if(to&&!edges.has(to))throw Object.assign(Error('Known edge absent'),{name:'InvalidAccessError'});if(to)edges.delete(to);else edges.clear();}};};
@@ -49,3 +50,13 @@ it('never cancels an already retired token after partial publication, and preser
 it('quarantines and retains both the primary and an uncertain reservation cleanup error',async()=>{const f=await fixture(),root=await f.create();await f.wake(root);const primary=Error('Admission error'),cleanup=Error('Actual token release uncertain');f.leaf.commit.mockImplementationOnce(()=>{throw primary;});f.leaf.cancel.mockImplementationOnce(()=>{throw cleanup;});expect(()=>root.applyOperation('stop')).toThrow(primary);expect(primary.cleanupError).toBe(cleanup);expect(root.status().error).toContain('Admission error');expect(f.output.edges.size).toBe(0);await root.dispose();});
 
 it.each(['stopFade','fadeTimer','endTimer'])('refuses destruction before the actual authored %s callback retires, without clearing it or closing actors',async key=>{vi.useFakeTimers();try{const f=await fixture(),root=await f.create();await f.wake(root);const callback=vi.fn();f.g[key]=setTimeout(callback,500);const actualTimer=f.g[key];expect(()=>root.dispose()).toThrow(/authored master timers/);expect(f.g[key]).toBe(actualTimer);expect(root.status().state).toBe('active');expect(f.leaf.dispose).not.toHaveBeenCalled();expect(f.main.status().borrows).toBe(1);expect(f.clock.status().closed).toBe(false);clearTimeout(actualTimer);f.g[key]=null;await root.dispose();vi.advanceTimersByTime(500);expect(callback).not.toHaveBeenCalled();}finally{vi.useRealTimers();}});
+
+it('recognizes only the actual privately prepared route, preserves the stable Root through scope borrows and waits for its SourceACK',async()=>{
+ const f=await fixture(),root=await f.create(),sweepClock=await f.clock.retain({cold:true}),input=f.node(),output=f.node(),processor={context:f.context},terminal=deferred();let released=false,commands=1,hold=false;
+ const actor={context:f.context,clock:sweepClock.value,identity:{hostVersion:'5d0df54e500f5e1a'},input,output,processor,edges:[],hostAwake:false,inputConnected:false,mode:0,ready:Promise.resolve(),getNode:()=>input,alive(){if(released)throw Error('Sweep actor disposed');},preflightSet:vi.fn(),set:vi.fn(()=>{commands++;}),connect(to){output.connect(to);actor.edges.push(to);},outputDisconnect:output.disconnect.bind(output),setHostAwake(value){actor.hostAwake=value;actor.inputConnected=value;actor.mode=+value;},arm:async()=>({actual:true}),requestStats:async()=>({}),snapshot:()=>({hostAwake:actor.hostAwake,inputConnected:actor.inputConnected,mode:actor.mode,cached:{kernel:{commands,calls:1,renderedFrames:0},observed:{values:[350,350,1,1]}}}),disposalStatus:()=>({source:{released,quarantined:false,receipt:released?{type:'disposed',version:1,released:true,clean:true}:null},clockReleased:released}),dispose:vi.fn(async()=>{if(hold)await terminal.promise;released=true;output.disconnect();input.disconnect();})};
+ h.sweepFactory.mockResolvedValue(Object.assign(()=>actor,{hostVersion:'5d0df54e500f5e1a'}));const{createGeneratorPreparedSweep}=await import('./generatorPreparedSweep.js'),{acquireGeneratorSweepCell}=await import('./generatorSweepCell.js');
+ const prepared=await createGeneratorPreparedSweep(f.g,{clockLease:sweepClock,outputRoot:root,scalarRoot:f.scalars});await f.wake(root);await prepared.arm();const cell=acquireGeneratorSweepCell(f.g),a=cell.borrow({isCurrent:()=>true}),scope={context:f.context,value:{sweepOwner:cell},snapshot:()=>({state:'published'})};a.bind(scope);
+ const values={lowpass:1300,highpass:40,resonance:2};const facade=a.activate(values,.03);expect(actor.set).toHaveBeenCalledOnce();expect(actor.set).toHaveBeenCalledWith(values,.03);expect(root.check()).toBe(true);expect(root.postFadeOutput()).toBe(f.output);expect(f.output.edges).toEqual(new Set([input]));expect(output.edges).toEqual(new Set([f.trimInput]));expect(root.protectedResources()).toContain(processor);expect(()=>root.dispose()).toThrow(/borrows/);
+ const sourceScope=root.borrow();expect(root.status().borrows).toBe(2);await sourceScope.release();expect(f.g.sweep).toBe(facade);expect(root.check()).toBe(true);await a.release();hold=true;const closing=cell.dispose();await Promise.resolve();expect(root.status().borrows).toBe(1);expect(sweepClock.status().closed).toBe(false);terminal.resolve();await closing;
+ expect(f.g.sweep).toBeUndefined();expect(root.status().borrows).toBe(0);expect(sweepClock.status().closed).toBe(true);expect(f.output.edges).toEqual(new Set([f.trimInput]));expect(root.check()).toBe(true);await root.dispose();
+});

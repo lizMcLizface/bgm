@@ -1,10 +1,12 @@
 {
   "api": 1,
-  "source": "fe8b300b002f763e3db76c89bc61e75a071b8303f864d2ced984a70e97c29dcd",
+  "source": "9918a3547173c050a65ae58f41e7e3ce353839836fefac117cfd6531e5a8af2c",
   "wasm": "3c2700933e385c2a30c32c4a4a688651b0624a8f06993cb39afffc454dd3c6dd",
   "bytes": 87806,
-  "version": "d52e6974dbf46342",
+  "version": "f899dafde5634b94",
   "files": [
+    "src/modular-audio/generatorPreparedSweep.js",
+    "src/modular-audio/generatorPreparedSweepSession.js",
     "src/modular-audio/generatorMasterOutputBirth.js",
     "src/modular-audio/generatorMasterOutputRoot.js",
     "src/modular-audio/generatorMasterOutputSession.js",
@@ -90,23 +92,18 @@
     "scope": "Declared constructor/failure-join references only; original mixer numerical bytes unchanged"
   },
   "preparedReferenceDelta": {
-    "predecessor": "b9eba74bfb16c3bc",
+    "predecessor": "d52e6974dbf46342",
     "changed": [
+      "src/modular-audio/generatorMasterOutputBirth.js",
+      "src/modular-audio/generatorMasterOutputRoot.js",
+      "src/modular-audio/generatorRustMasterSession.js",
       "src/modular-audio/generatorSweepCell.js",
-      "src/modular-audio/generatorStoppedRuntime.js",
-      "src/modular-audio/stoppedRuntimeSnapshot.js",
-      "src/modular-audio/stoppedRuntimeOwners.js",
       "src/app/Generator.js"
     ],
     "added": [
-      "src/modular-audio/generatorMasterOutputBirth.js",
-      "src/modular-audio/generatorMasterOutputRoot.js",
-      "src/modular-audio/generatorMasterOutputSession.js",
-      "src/modular-audio/generatorMasterOutputStop.js",
-      "src/modular-audio/generatorRustMasterSession.js",
-      "src/modular-audio/mainOutputColdOwner.js",
-      "src/modular-audio/mainOutputColdRoot.js"
+      "src/modular-audio/generatorPreparedSweep.js",
+      "src/modular-audio/generatorPreparedSweepSession.js"
     ],
-    "scope": "Explicit cold nine-control Main bootstrap and output/trim/ambience ownership, raw stop/resume plans, timer lifetime guards, ordered dependent retirement and stable source/runtime borrows; original mixer numerical bytes unchanged"
+    "scope": "Explicit cold Main/output/scalar bootstrap and optional privately owned prepared Sweep first-use route, raw stop/resume plans, timer lifetime guards, ordered dependent retirement and stable source/runtime borrows; original mixer numerical bytes unchanged"
   }
 }

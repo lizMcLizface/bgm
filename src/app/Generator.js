@@ -1,3 +1,4 @@
+import{acquireGeneratorSweepCell}from'../modular-audio/generatorSweepCell.js';
 import{rememberGeneratorMasterOutputBirth,invalidateGeneratorMasterOutputBirth}from'../modular-audio/generatorMasterOutputBirth.js';
 import{generatorMasterOutputRoot,disposeGeneratorMasterOutput}from'../modular-audio/generatorMasterOutputRoot.js';
 import{stopWithGeneratorMasterOutput,finishGeneratorMasterOutputStop}from'../modular-audio/generatorMasterOutputStop.js';
@@ -906,7 +907,7 @@ class Generator {
     applySweep(active, secondsPerBeat) {
         const wants = active && ['filter.lowpass', 'filter.highpass', 'filter.resonance'].some((key) => key in active);
         if (!wants && !this.sweep) return;
-        if(generatorMasterOutputRoot(this))throw Object.assign(Error('Prepare the Rust sweep path before activating a sweep on the selected Rust master'),{code:'GENERATOR_MASTER_SWEEP_UNPREPARED'});
+        if(generatorMasterOutputRoot(this)){this.sweep=acquireGeneratorSweepCell(this).apply({lowpass:active?.['filter.lowpass']??SWEEP_OPEN.lowpass,highpass:active?.['filter.highpass']??SWEEP_OPEN.highpass,resonance:active?.['filter.resonance']??SWEEP_OPEN.resonance},wants?secondsPerBeat/2:.05);return;}
         if (!this.sweep) {
             const returns=getPublishedMainRuntimeReturns(this);if(returns){this.sweep=returns.activateSweep();this.sweep.set({lowpass:active?.['filter.lowpass']??SWEEP_OPEN.lowpass,highpass:active?.['filter.highpass']??SWEEP_OPEN.highpass,resonance:active?.['filter.resonance']??SWEEP_OPEN.resonance},wants?secondsPerBeat/2:.05);return;}
             assertMainRuntimeSourceEdit(this,'a new master sweep');
