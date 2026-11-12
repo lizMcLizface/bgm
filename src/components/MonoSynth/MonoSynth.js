@@ -1,3 +1,5 @@
+import {retireNativeBufferSources} from '../../audio/nativeBufferRetirement.js';
+import {AudioConstructorJournal,settleAudioCleanup} from '../../audio/constructorJournal.js';
 import {BreathFormants,voiceColour} from '../../app/engine/breathFormants';
 import { Oscillator, Gain, Filter, NoiseGenerator, OscNoiseMixer, StereoPanner } from '../../nodes';
 import { clamp, minTime } from '../../util/util';
@@ -10,6 +12,8 @@ import { expressivePitchPoints } from '../../app/engine/noteExpression';
 // Monophonic Synth Class with Voice Spreading Support
 class MonoSynth {
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:64,label:'MonoSynth'});
+        try {
         this.AC = AC;
 
         // Voice spreading parameters
@@ -20,15 +24,15 @@ class MonoSynth {
         
         // Sub oscillator parameters - single always-connected sub oscillator
         this.subOscOctaveOffset = 0; // Range: -3 to +3 octaves
-        this.subOscillator = new Oscillator(this.AC);
-        this.subOscillatorPanner = new StereoPanner(this.AC);
-        this.subOscillatorGain = new Gain(this.AC); // Gain control for sub oscillator
+        this.subOscillator = this.ownership.create('Oscillator-0',()=>new Oscillator(this.AC),owner=>owner.dispose());
+        this.subOscillatorPanner = this.ownership.create('StereoPanner-3',()=>new StereoPanner(this.AC),owner=>settleAudioCleanup('MonoSynth panner',[()=>owner.getNode().disconnect(),()=>owner.gain.getNode().disconnect()]));
+        this.subOscillatorGain = this.ownership.create('Gain-5',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // Gain control for sub oscillator
         this.subOscillatorGain.setGain(0); // Initialize to 0 to prevent sound on startup
         
         // Second oscillator for monosynth  
-        this.osc2 = new Oscillator(this.AC);
-        this.osc2PhaseDelay = this.AC.createDelay(0.1); // Small delay for phase offset
-        this.osc2Gain = new Gain(this.AC);
+        this.osc2 = this.ownership.create('Oscillator-1',()=>new Oscillator(this.AC),owner=>owner.dispose());
+        this.osc2PhaseDelay = this.ownership.create('osc2-delay',()=>this.AC.createDelay(0.1),node=>node.disconnect()); // Small delay for phase offset
+        this.osc2Gain = this.ownership.create('Gain-6',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
         this.osc2Gain.setGain(0); // Initialize to 0 to prevent sound on startup
         this.osc2Detune = 0; // Detune in cents
         this.osc2Amount = 0; // Mix amount (0-1)
@@ -45,16 +49,16 @@ class MonoSynth {
         this.vibratoEnabled = true;
 
         // Primary voice oscillator (always active)
-        this.primaryOscillator = new Oscillator(this.AC);
-        this.primaryOscillatorPanner = new StereoPanner(this.AC);
+        this.primaryOscillator = this.ownership.create('Oscillator-2',()=>new Oscillator(this.AC),owner=>owner.dispose());
+        this.primaryOscillatorPanner = this.ownership.create('StereoPanner-4',()=>new StereoPanner(this.AC),owner=>settleAudioCleanup('MonoSynth panner',[()=>owner.getNode().disconnect(),()=>owner.gain.getNode().disconnect()]));
         
         // Additional voices for voice spreading
         this.additionalOscillators = [];
         this.additionalOscillatorPanners = [];
-        this.oscillatorMixer = new Gain(this.AC); // Mix all oscillators
+        this.oscillatorMixer = this.ownership.create('Gain-7',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // Mix all oscillators
         
         // Main oscillator mixer (combines main oscs, sub oscs, and osc2)
-        this.mainOscillatorMixer = new Gain(this.AC);
+        this.mainOscillatorMixer = this.ownership.create('Gain-8',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
         
         // Pre-create maximum number of additional oscillators for perfect phase alignment
         this.preCreateAdditionalOscillators(this.maxVoices - 1); // -1 because primary is separate
@@ -63,15 +67,15 @@ class MonoSynth {
         // Initialize with one voice active (just the primary)
         this.setActiveVoiceCount(1);
         
-        this.noiseGen = new NoiseGenerator(this.AC);
-        this.noiseFilter = new Filter(this.AC); // Bandpass filter for noise
-        this.noiseFilterBypassGain = new Gain(this.AC); // For true bypass
-        this.noiseFilterGain = new Gain(this.AC); // For filtered path
-        this.noiseMixerOutput = new Gain(this.AC); // Combines filtered and bypass paths
-        this.mixer = new OscNoiseMixer(this.AC);
-        this.gain = new Gain(this.AC); // AHDSR Gain
-        this.volume = new Gain(this.AC); // Volume
-        this.filter = new Filter(this.AC);
+        this.noiseGen = this.ownership.create('NoiseGenerator-16',()=>new NoiseGenerator(this.AC),owner=>owner.destroy());
+        this.noiseFilter = this.ownership.create('Filter-14',()=>new Filter(this.AC),owner=>owner.getNode().disconnect()); // Bandpass filter for noise
+        this.noiseFilterBypassGain = this.ownership.create('Gain-9',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // For true bypass
+        this.noiseFilterGain = this.ownership.create('Gain-10',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // For filtered path
+        this.noiseMixerOutput = this.ownership.create('Gain-11',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // Combines filtered and bypass paths
+        this.mixer = this.ownership.create('OscNoiseMixer-17',()=>new OscNoiseMixer(this.AC),owner=>settleAudioCleanup('MonoSynth mixer',[()=>owner.oscGain.disconnect(),()=>owner.noiseGain.disconnect(),()=>owner.outputGain.disconnect()]));
+        this.gain = this.ownership.create('Gain-12',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // AHDSR Gain
+        this.volume = this.ownership.create('Gain-13',()=>new Gain(this.AC),owner=>owner.getNode().disconnect()); // Volume
+        this.filter = this.ownership.create('Filter-15',()=>new Filter(this.AC),owner=>owner.getNode().disconnect());
 
         this.currentNote = null;
         this.currentNoteInfo = null; // Store full note info for microtonal updates
@@ -96,6 +100,7 @@ class MonoSynth {
         this.lastActivityTime = Date.now(); // Track last note activity
         this.autoResyncTimer = null; // Timer for auto-resync
         this.isAutoResyncing = false; // Prevent multiple simultaneous auto-resyncs
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     preCreateAdditionalOscillators(maxAdditionalVoices) {
@@ -104,8 +109,8 @@ class MonoSynth {
         this.additionalOscillatorPanners = [];
         
         for (let i = 0; i < maxAdditionalVoices; i++) {
-            const osc = new Oscillator(this.AC);
-            const panner = new StereoPanner(this.AC);
+            const osc = this.ownership.create('additional-oscillator',()=>new Oscillator(this.AC),owner=>owner.dispose());
+            const panner = this.ownership.create('additional-panner',()=>new StereoPanner(this.AC),owner=>settleAudioCleanup('MonoSynth panner',[()=>owner.getNode().disconnect(),()=>owner.gain.getNode().disconnect()]));
             
             this.additionalOscillators.push(osc);
             this.additionalOscillatorPanners.push(panner);
@@ -316,6 +321,7 @@ class MonoSynth {
     }
 
     init(startTime = null) {
+        try {
         console.log('MonoSynth init - connecting audio nodes');
         
         // Use provided start time or create one for synchronized oscillator startup
@@ -433,7 +439,7 @@ class MonoSynth {
         }
         
         // Connect mixer to gain and filter chain
-        this.modelGate = this.AC.createGain();
+        this.modelGate = this.ownership.create('model-gate',()=>this.AC.createGain(),node=>node.disconnect());
         // Closed until a note opens it (scheduleNote sets it per note): a fresh voice's oscillators run from the start, at 440 Hz,
         // and an open gate would let them out as a loud tone the moment the voice is woken (a preset swap rebuilds every voice).
         this.modelGate.gain.value = 0;
@@ -460,6 +466,7 @@ class MonoSynth {
         this.updateActivityTime();
         
         console.log('MonoSynth audio chain connected');
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     // Voice spreading methods
@@ -1863,72 +1870,21 @@ class MonoSynth {
         }
     }
     
-    // Cleanup method to properly dispose of resources
+    // Terminal-only cleanup: do not call noteStop(), which may rebook a hold
+    // timer. Logical shared-source slots remain owned by the Instrument.
     destroy() {
-        // Clear any running timeouts
-        this.clearTimeouts();
-        
-        // Stop any playing notes
-        this.stopStrings();
-        this.breathFormants?.destroy();
-        this.modelGate?.disconnect();
-        this.stringGain?.disconnect();
-        this.noteStop();
-        
-        // Destroy noise generator
-        if (this.noiseGen) {
-            this.noiseGen.destroy();
-        }
-        
-        // Clean up oscillators
-        try {
-            this.primaryOscillator.disconnect();
-        } catch (e) {
-            console.warn('Error disconnecting primary oscillator:', e);
-        }
-        
-        this.additionalOscillators.forEach(osc => {
-            try {
-                osc.disconnect();
-            } catch (e) {
-                console.warn('Error disconnecting additional oscillator:', e);
-            }
-        });
-        
-        // Clean up sub oscillator
-        try {
-            this.subOscillator.disconnect();
-        } catch (e) {
-            console.warn('Error disconnecting sub oscillator:', e);
-        }
-        
-        // Clean up audio nodes
-        try {
-            this.mixer.disconnect();
-            this.gain.disconnect();
-            this.filter.disconnect();
-            this.volume.disconnect();
-        } catch (e) {
-            console.warn('Error disconnecting audio nodes:', e);
-        }
+        if(this.disposal)return this.disposal;
+        this.autoResyncEnabled=false;this.isInitialized=false;clearTimeout(this.autoResyncTimer);this.autoResyncTimer=null;this.clearTimeouts();
+        this.currentNote=null;this.currentNoteInfo=null;this.voiceId=null;
+        this.disposal=settleAudioCleanup('MonoSynth terminal',[
+            ()=>retireNativeBufferSources(this.stringSources??new Set()),
+            ()=>this.breathFormants?.destroy(),()=>this.stringGain?.disconnect(),
+            ()=>{if(this.fmMod&&this.fmOn!==undefined)return settleAudioCleanup('MonoSynth FM',[()=>this.fmMod.stop(),()=>this.fmMod.disconnect()]);return this.fmMod?.disconnect();},
+            ()=>this.fmDepth?.disconnect(),()=>this.ownership.retire(),
+        ]);this.disposal.catch(error=>{this.cleanupError=error;});return this.disposal;
     }
+    cleanupStatus = () => ({...this.ownership.status(),scope:'Native private actors; no untyped Noise processor or arbitrary manual-resync certification',error:this.cleanupError?String(this.cleanupError):null});
 
-    // Cleanup method to properly dispose of resources
-    destroy() {
-        // Clear auto-resync timer
-        if (this.autoResyncTimer) {
-            clearTimeout(this.autoResyncTimer);
-            this.autoResyncTimer = null;
-        }
-        
-        // Clear any running timeouts
-        this.clearTimeouts();
-        
-        // Stop any playing notes
-        this.noteStop();
-        
-        console.log('MonoSynth destroyed and resources cleaned up');
-    }
 }
 
 export default MonoSynth;

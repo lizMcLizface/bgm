@@ -1,3 +1,4 @@
+import {AudioConstructorJournal,settleAudioCleanup} from '../audio/constructorJournal.js';
 import Gain from './gain';
 import LFO from './lfo';
 
@@ -10,24 +11,26 @@ const MAX_FEEDBACK = 0.75;
 
 class Phaser {
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:13,label:'Native phaser'});
+        try {
         this.AC = AC;
         
         // Input and output gains
-        this.inputGain = new Gain(this.AC);
-        this.dryGain = new Gain(this.AC);
-        this.wetGain = new Gain(this.AC);
-        this.outputGain = new Gain(this.AC);
-        this.feedbackGain = new Gain(this.AC);
+        this.inputGain = this.ownership.create('gain-0',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.dryGain = this.ownership.create('gain-1',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.wetGain = this.ownership.create('gain-2',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.outputGain = this.ownership.create('gain-3',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.feedbackGain = this.ownership.create('gain-4',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
         
         // Create a separate input node for the wet signal path
-        this.wetInputGain = new Gain(this.AC);
+        this.wetInputGain = this.ownership.create('gain-5',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
         
         // Number of all-pass filter stages (more stages = more pronounced effect)
         this.numStages = 6;
         this.allPassFilters = [];
         
         // LFO for modulation
-        this.lfo = new LFO(this.AC);
+        this.lfo = this.ownership.create('lfo-6',()=>new LFO(this.AC),owner=>owner.dispose());
         this.lfo.setType('sine');
         this.lfo.setRate(0.5); // Default rate
         this.lfo.setDepth(800); // Default depth
@@ -41,7 +44,7 @@ class Phaser {
         let previousNode = this.wetInputGain.getNode();
         
         for (let i = 0; i < this.numStages; i++) {
-            const allPassFilter = this.AC.createBiquadFilter();
+            const allPassFilter = this.ownership.create('filter-7',()=>this.AC.createBiquadFilter(),node=>node.disconnect());
             allPassFilter.type = 'allpass';
             allPassFilter.frequency.setValueAtTime(800, this.AC.currentTime); // Base frequency
             allPassFilter.Q.setValueAtTime(0.5, this.AC.currentTime);
@@ -77,6 +80,7 @@ class Phaser {
         this.setAmount(0);
         this.setFeedback(0.3);
         this.applySweep();
+        } catch(error) { throw this.ownership.failure(error); }
     }
     
     connect = (destination) => {
@@ -92,6 +96,9 @@ class Phaser {
     // Input connection point
     getNode = () => this.inputGain.getNode();
     
+    dispose = () => this.ownership.retire();
+    cleanupStatus = () => this.ownership.status();
+
     // Getters
     getAmount = () => this.amount;
     getRate = () => this.rate;

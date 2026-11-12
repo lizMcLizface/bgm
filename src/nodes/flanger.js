@@ -1,3 +1,4 @@
+import {AudioConstructorJournal,settleAudioCleanup} from '../audio/constructorJournal.js';
 import Gain from './gain';
 import LFO from './lfo';
 
@@ -5,14 +6,16 @@ const MAX_DELAY_TIME = 1;
 
 class Flanger {
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:6,label:'Native flanger'});
+        try {
         this.AC = AC;
-        this.dryGain = new Gain(this.AC);
-        this.wetGain = new Gain(this.AC);
+        this.dryGain = this.ownership.create('gain-0',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.wetGain = this.ownership.create('gain-1',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
 
-        this.inputGain = new Gain(this.AC);
-        this.delay = this.AC.createDelay();
-        this.feedback = new Gain(this.AC);
-        this.lfo = new LFO(this.AC);
+        this.inputGain = this.ownership.create('gain-2',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.delay = this.ownership.create('delay-5',()=>this.AC.createDelay(),node=>node.disconnect());
+        this.feedback = this.ownership.create('gain-3',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.lfo = this.ownership.create('lfo-4',()=>new LFO(this.AC),owner=>owner.dispose());
 
         this.inputGain.connect(this.delay);
         this.inputGain.connect(this.wetGain.getNode());
@@ -24,6 +27,7 @@ class Flanger {
 
         this.lfo.connect(this.delay.delayTime);
         this.lfo.start();
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = destination => {
@@ -37,6 +41,9 @@ class Flanger {
             this.wetGain.connect(destination);
         }
     }
+
+    dispose = () => this.ownership.retire();
+    cleanupStatus = () => this.ownership.status();
 
     // Getters
     getNode = () => [this.dryGain.getNode(), this.inputGain.getNode()];

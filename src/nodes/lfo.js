@@ -1,3 +1,4 @@
+import {AudioConstructorJournal,settleAudioCleanup} from '../audio/constructorJournal.js';
 import Gain from './gain';
 import Oscillator from './oscillator';
 import {ControlClock} from '../app/engine/controlSnapshot';
@@ -7,15 +8,18 @@ const MAX_DEPTH = 1000;
 
 class LFO {
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:2,label:'Native lfo'});
+        try {
         this.AC = AC;
 
-        this.depth = new Gain(this.AC);
-        this.osc = new Oscillator(this.AC);
+        this.depth = this.ownership.create('gain-0',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.osc = this.ownership.create('oscillator',()=>new Oscillator(this.AC),owner=>owner.dispose());
         this.osc.setType('sine');
         this.captureClock = new ControlClock(AC.currentTime,440,0,1);
         this.captureType = 'sine';
 
         this.osc.connect(this.depth.getNode());
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = (destination) => {
@@ -30,6 +34,9 @@ class LFO {
     captureControl = time => {if(this.captureType!=='sine')throw Error('Unsupported vibrato waveform');return this.captureClock.capture(time);};
 
     captureLiveControl = time => {if(this.captureType!=='sine')throw Error('Unsupported vibrato waveform');return this.captureClock.captureLive(time);};
+    dispose = () => this.ownership.retire();
+    cleanupStatus = () => this.ownership.status();
+
     getNode = () => this.osc.getNode();
     getDepthNode = () => this.depth.getNode();
     getRate = () => this.osc.getFreq();

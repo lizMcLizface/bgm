@@ -1,3 +1,4 @@
+import {AudioConstructorJournal,settleAudioCleanup} from '../audio/constructorJournal.js';
 import { dutyCycleCurve } from './pulseCurve';
 const MAX_FREQ = 44100;
 
@@ -27,9 +28,12 @@ function periodicWave(AC, type) {
 
 class Oscillator {
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:2,label:'Native Oscillator'});
+        try {
+        this.started = false;
         this.AC = AC;
         this.WAVEFORMS = ['off', 'sine', 'triangle', 'square', 'sawtooth', 'square_dc', ...Object.keys(PERIODIC_WAVES)];
-        this.node = this.AC.createOscillator();
+        this.node = this.ownership.create('oscillator',()=>this.AC.createOscillator(),node=>settleAudioCleanup('Native Oscillator',[()=>{if(this.started)node.stop();},()=>node.disconnect()]));
         // Detune only carries vibrato: once per 128-frame block is smooth
         // for a few-Hz LFO and costs half as much as per sample
         // (docs/DESIGN.md §5). Firefox lacks automationRate; harmless there.
@@ -37,7 +41,7 @@ class Oscillator {
         this.waveShaper = null;
         
         // Create a stable output buffer node that never changes
-        this.outputBuffer = this.AC.createGain();
+        this.outputBuffer = this.ownership.create('output',()=>this.AC.createGain(),node=>node.disconnect());
         this.outputBuffer.gain.value = 1.0; // Unity gain, just acts as a buffer
         
         this.currentType = 'sine';
@@ -45,6 +49,7 @@ class Oscillator {
         
         // Initially connect oscillator directly to output buffer
         this.node.connect(this.outputBuffer);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = (destination) => {
@@ -63,7 +68,10 @@ class Oscillator {
         }
     }
     
-    start = (when) => {console.log("Starting oscillator at:", when); this.node.start(when);}
+    start = (when) => {console.log("Starting oscillator at:", when); this.node.start(when);this.started=true;}
+
+    dispose = () => {if(!this.disposal)this.disposal=settleAudioCleanup('Native Oscillator',[()=>this.waveShaper?.disconnect(),()=>this.ownership.retire()]);return this.disposal;};
+    cleanupStatus = () => this.ownership.status();
 
     // Getters
     getNode = () => this.outputBuffer; // Always return the stable output buffer
