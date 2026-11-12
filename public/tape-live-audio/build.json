@@ -1,0 +1,25 @@
+{
+  "api": 1,
+  "profile": "original-tape-explicit-audio-candidate-v1",
+  "version": "67c4c16fb555b3f3",
+  "kernelVersion": "7e165c5616e8d55a",
+  "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
+  "runtime": "143f5162e36525f3bc8ce2f44e3b8597f378322ad0fffb6d9b12884421a416cb",
+  "processor": "b53c0d46584081b9773c806623077e1a9b1413084bd3b5c8fa3e4b0a132828ba",
+  "sources": [
+    "tools/buildTapeLiveAudioHost.mjs",
+    "src/modular-audio/tapeLiveAudioProcessor.js",
+    "src/modular-audio/ownedTapeLive.js",
+    "src/modular-audio/hostRenderClock.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js",
+    "src/modular-audio/tapeCurveUpload.js",
+    "src/nodes/tapeRust.js",
+    "src/modular-audio/tapeAudioCurveUpload.js"
+  ],
+  "credits": 2,
+  "maxFloatsPerCallback": 1024,
+  "metadataDescriptors": 417,
+  "slots": 32,
+  "scope": "NEW explicit eleven-node activity audio candidate. Native continuous kernel accepted separately; normal automatic tail/liveness and async curve-install timing are not yet accepted."
+}
