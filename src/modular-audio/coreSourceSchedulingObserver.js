@@ -26,6 +26,6 @@ export function attachCoreSourceSchedulingObserver(owner,{capacity=2048,onError=
   /** Call only after this actual node's terminal authority proves release.
    * Disposal itself may call wrapped panic/silence; keep observing until ACK. */
   detachAfterRelease(){if(detached)return;const health=node.sourceDisposalStatus?.();if(health?.profile!=='source-terminal-receipt-v1'||health.released!==true)throw Error('Actual source terminal receipt required before metadata detach');const errors=[];for(const record of saved.slice().reverse())try{if(record.object===node.port&&record.key==='onmessage'&&node.port.onmessage===null)continue;if(record.object[record.key]!==record.value)throw Error('Source scheduling method changed before observer retirement: '+record.key);if(record.port)record.object[record.key]=receiver;else if(record.descriptor)Object.defineProperty(record.object,record.key,record.descriptor);else delete record.object[record.key];}catch(failure){errors.push(failure);}detached=true;if(errors.length)throw new AggregateError(errors,'Released source metadata observer cleanup failed');},
-  status:()=>({version:1,profile:'core-fm-prepublication-scheduling-observer-v1',detached,retiring,error:error?String(error):null,ledger:ledger.status()})
+  status:()=>({version:1,profile:'core-fm-prepublication-scheduling-observer-v1',detached,retiring,error:error?String(error):null,failure:error?.diagnostics??null,ledger:ledger.status()})
  });
 }

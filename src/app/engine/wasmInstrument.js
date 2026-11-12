@@ -1,3 +1,4 @@
+import{createNoopRoomLevel}from'../../audio/noopRoomLevel.js';
 import{retireAudioActions,finishAudioRetirement}from'../../audio/retireAudio.js';
 import{validateAudioEnvironment,nativeInstrumentRuntimeKey}from'./audioEnvironment';
 import DEFAULTS from './presetDefaults';
@@ -14,7 +15,7 @@ export default class WasmInstrument {
   try{i.voice=await LabVoice.create(context,i.spec(),{audioEnvironment:i.audioEnvironment,notes,roomPool,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.attachVoice(i.voice);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
   catch(e){try{await i.dispose();}catch(cleanupError){e.cleanupError=cleanupError;}throw e;}
  }
- constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.preparations=new Set();this.retirements=new Set();this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
+ constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.preparations=new Set();this.retirements=new Set();this.reverb=createNoopRoomLevel();this.held=new Map();this.nextId=1;this.syncEnvelope();}
  spec(){const native=nativeWasmVoice(this.preset,this.polyphony);if(native&&this.preset.mixerSpaceMoved)native.patch.effects={...native.patch.effects,reverb:0,delay:0,delayToReverb:0};return this.overrideSpec??native??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
  /** Timbre drift (composition/timbreDrift.js): the source patched live from the preset and these values, the preset unchanged. */
  setDrift(values,seconds=.5){if(!this.voice||this.loading)return;const spec=this.spec();if(spec.kind==='legacy'){this.voice.native?.setDrift?.(values);return;}if(this.overrideSpec||spec.kind!=='subtractive'||this.preset.wasmVoice)return;const drifted=values?translatedWasmVoice({...this.preset,...values},this.polyphony,this.dynamics):spec;if(drifted.kind!==spec.kind||JSON.stringify([drifted.patch.effects,drifted.patch.inserts])!==JSON.stringify([spec.patch.effects,spec.patch.inserts]))return;this.voice.patchSource(drifted.patch,{seconds});}
@@ -33,7 +34,7 @@ export default class WasmInstrument {
   this.loading=true;this.error=null;
   this.ready=LabVoice.create(this.AC,spec,{audioEnvironment:this.audioEnvironment,roomPool:this.roomPool,onError:error=>{this.error=error;console.error('Wasm voice failed',error);}}).then(voice=>{
    if(this.disposed||revision!==this.revision){this.retireVoice(voice);return;}
-   const old=this.voice;this.attachVoice(voice);this.voice=voice;this.reverb=voice.native?.reverb??{settled:true,hear(){},setLevel(){}};this.retireVoice(old);for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
+   const old=this.voice;this.attachVoice(voice);this.voice=voice;this.reverb=voice.native?.reverb??createNoopRoomLevel();this.retireVoice(old);for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
   }).catch(error=>{if(revision===this.revision){this.loading=false;this.preset=previous;this.syncEnvelope();this.error=error;}console.error('Could not change Wasm voice',error);});
   const pending=this.ready;this.preparations.add(pending);pending.finally(()=>this.preparations.delete(pending)).catch(()=>{});
  }

@@ -1,0 +1,4 @@
+import{generatorMainControlRoot}from'./generatorMainControlRoot.js';
+/** UI cue for a selected live-input policy. The backend's recorded event row,
+ * not this estimate, remains the actual scheduling authority. */
+export function generatorLiveInputTime(g,role){const root=generatorMainControlRoot(g);if(!root)return null;root.check();const backend=g.roles[role]?.instrument?.voice?.backend,factory=g.audioEnvironment?.createCoreBackend,owner=role==='perc'?factory:backend,policy=role==='perc'?factory?.policy:backend?.liveInputTiming;if(!policy)return null;if(owner?.context!==g.AC||!Object.isFrozen(policy)||policy.profile!=='clocked-core-explicit-live-input-lead-v1'||typeof policy.leadSeconds!=='number'||!Number.isFinite(policy.leadSeconds)||policy.leadSeconds<.001||policy.leadSeconds>2)throw Error('Actual context-bound live-input timing policy required');return g.AC.currentTime+policy.leadSeconds;}

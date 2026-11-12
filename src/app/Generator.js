@@ -1,3 +1,6 @@
+import{generatorLiveInputTime}from'../modular-audio/generatorLiveInputTime.js';
+import{rememberGeneratorMainBirth,invalidateGeneratorMainBirth}from'../modular-audio/generatorMainBirth.js';
+import{generatorMainControlRoot,generatorMainControlAuthor,mainRoleSourceDestination,disposeGeneratorMainControls}from'../modular-audio/generatorMainControlRoot.js';
 import{generatorSweepCellStatus,disposeGeneratorSweepCell}from'../modular-audio/generatorSweepCell.js';
 import{assertPreparedFade,registerAutomaticFadePolicy,assertAutomaticPreparedFadePolicy,automaticFadePolicyStatus}from'../modular-audio/preparedStartPolicy.js';
 import{prepareGeneratorStoppedRuntime,commitGeneratorStoppedRuntime}from'../modular-audio/generatorStoppedRuntime.js';
@@ -209,7 +212,7 @@ class Generator {
         {
             const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
             const Kit = this.percussionEngine === 'native' ? DrumKit : WasmDrumKit;
-            const instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, model:this.percussionEngine });
+            const instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, fdnRoomFactory:this.audioEnvironment?.fdnRoomFactory, model:this.percussionEngine });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             instrument.connect(gain);
@@ -224,6 +227,7 @@ class Generator {
         // mutes are settings (they persist and travel in links); solo is not
         Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted && this.settings.muted[role]); });
         this.applyMix();
+        rememberGeneratorMainBirth(this);
         this.applyWander();
         this.applyBus();
         this.toneNow = null;
@@ -267,7 +271,7 @@ class Generator {
     }
 
     // The master meter requests sleep only after one second of exact silence.
-    canSleepAudio(){return preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
+    canSleepAudio(){const main=generatorMainControlRoot(this);return!this.mainControlPreparation&&(!main||main.status().state==='disposed')&&preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
 
     // The piece's meter - or, while a bar is being planned, that bar's (meterFor): a breakdown
     // may have one of its own (settings.breakdowns.meter). A planned bar keeps its meter.
@@ -390,7 +394,7 @@ class Generator {
                 if (revision !== this.percussionRevision || this.roles.perc.instrument !== old) {replacement.dispose();return;}
                 replacement.setKit(this.settings.drumKit);replacement.setVoicePreset(this.settings.drums.kit);
                 const future = old.futureBookings();
-                replacement.connect(r.gain);r.instrument = replacement;r.presetName = percussionVoice(this.settings.drums.kit).name;
+                replacement.connect(mainRoleSourceDestination(this,'perc'));r.instrument = replacement;r.presetName = percussionVoice(this.settings.drums.kit).name;
                 this.percussionEngine = 'wasm';
                 old.bus.gain.setTargetAtTime(0,this.AC.currentTime,.006);old.silence();
                 for (const event of future) replacement.scheduleNote(event.drum,event.time,event.duration,event.velocity,event.vary);
@@ -431,7 +435,7 @@ class Generator {
                 if(revision!==this.audioEngineRevision){await closeCandidates();return;}
                 if(replacements.some(r=>this.roles[r.role].instrument!==r.source||JSON.stringify(r.source.preset)!==r.snapshot))throw Error('Sounds changed while preparing the engine. Please try the engine switch again.');
                 const running=this.isRunning;if(running)this.stop();
-                for(const {role,instrument,roomRoute}of replacements){const r=this.roles[role],old=r.instrument,oldRoute=r.roomRoute;retirements.push(retireAudioActions([()=>oldRoute?.dispose(),()=>this.retireInstrument(old)],'Engine role retirement failed'));r.instrument=instrument;r.roomRoute=roomRoute;instrument.connect(r.tone);}
+                for(const {role,instrument,roomRoute}of replacements){const r=this.roles[role],old=r.instrument,oldRoute=r.roomRoute;retirements.push(retireAudioActions([()=>oldRoute?.dispose(),()=>this.retireInstrument(old)],'Engine role retirement failed'));r.instrument=instrument;r.roomRoute=roomRoute;instrument.connect(mainRoleSourceDestination(this,role));}
                 const oldPool=this.wasmRoomPool;retirements.push(retireAudioActions([()=>oldPool?.dispose()],'Engine room pool retirement failed'));this.wasmRoomPool=roomPool;
                 this.audioEngine=mode;committed=true;const retired=retireAudioActions(retirements.map(pending=>()=>pending),'Engine source retirement failed');
                 try{this.applyWander();this.applyMix();}catch(error){try{await retired;}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}
@@ -447,7 +451,7 @@ class Generator {
     assertAutomaticFadePolicy(seconds){if(this.hasPreparedAmbienceStart())assertPreparedFade(seconds);}
     assertFadeCancelPolicy(){const owner=getPublishedMainPreparedAmbience(this);if(owner&&this.fadeTimer&&(this.preparedFadeStop||owner.stoppedStatus().pendingStop))throw Object.assign(Error('Wait for the authored prepared fade to finish before restarting it'),{code:'PREPARED_AMBIENCE_FADE_CANCEL_UNSUPPORTED'});}
     preparedRoutingStatus(){return generatorSweepCellStatus(this);}
-    disposePreparedRouting(){return disposeGeneratorSweepCell(this);}
+    disposePreparedRouting(){return retireAudioActions([()=>disposeGeneratorSweepCell(this),()=>disposeGeneratorMainControls(this)],'Prepared Main routing retirement failed');}
     prepareRuntimeReturn(kind,values){const returns=getPublishedMainRuntimeReturns(this);if(!returns)throw Error('Explicit editable return publication required');return returns.prepare(kind,values);}
     prepareStoppedRuntime(options){return prepareGeneratorStoppedRuntime(this,options);}
     commitStoppedRuntime(candidate){return commitGeneratorStoppedRuntime(this,candidate);}
@@ -712,6 +716,7 @@ class Generator {
     assertRuntimeSettingEdit(patch){if(!hasPublishedMainRuntime(this))return;assertMainRuntimeSettings(this,{...this.settings,...patch});if('generation'in patch&&patch.generation!==this.settings.generation&&Object.values(this.roles).some(r=>r.stringPatchBase))assertMainRuntimeSourceEdit(this,'physical generation replacement');if(patch.drums&&!this.roles.perc.machine&&percussionVoice(patch.drums.kit).wasmOnly&&this.percussionEngine!=='wasm')assertMainRuntimeSourceEdit(this,'percussion engine replacement');}
     set(key, value) {
         this.assertRuntimeSettingEdit({[key]:value});
+        const main=generatorMainControlAuthor(this);if(main&&(key==='volumes'||key==='muted'))return main.applySettingsMix({[key]:value},ROLE_VOLUMES);
         const soundOnlyDrums = key === 'drums' && Object.keys(value).every(k => k === 'kit' || value[k] === this.settings.drums[k]);
         this.settings[key] = value;
         if (key === 'generation') this.refreshStringPatches();
@@ -780,6 +785,7 @@ class Generator {
         this.assertRuntimeSettingEdit(patch);
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         const soundOnlyDrums = patch.drums && Object.keys(patch.drums).every(k => k === 'kit' || patch.drums[k] === this.settings.drums[k]);
+        const mainMix=generatorMainControlAuthor(this),ownsMix=!!mainMix&&('volumes'in patch||'muted'in patch);if(ownsMix)mainMix.applySettingsMix({...('volumes'in patch?{volumes:patch.volumes}:{}),...('muted'in patch?{muted:patch.muted}:{})},ROLE_VOLUMES);
         Object.assign(this.settings, patch);
         if ('generation' in patch) this.refreshStringPatches();
         this.warmRoles();
@@ -787,10 +793,10 @@ class Generator {
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceWander' in patch) this.ambience.setWander(this.settings.ambienceWander);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
-        if ('volumes' in patch) this.applyVolumes();
+        if ('volumes' in patch&&!ownsMix) this.applyVolumes();
         if ('drumKit' in patch) this.roles.perc.instrument.setKit(this.settings.drumKit);
         if ('drums' in patch) void this.syncPercussionVoice();
-        if ('muted' in patch) this.applyMutes();
+        if ('muted' in patch&&!ownsMix) this.applyMutes();
         if ('wander' in patch) this.applyWander();
         if ('bus' in patch) this.applyBus();
         if ('dynamics' in patch || 'feel' in patch) this.applyDynamics();
@@ -844,6 +850,7 @@ class Generator {
     }
 
     applyVolumes() {
+        const main=generatorMainControlAuthor(this);if(main)return main.applyVolumes(ROLE_VOLUMES);
         Object.entries(this.roles).forEach(([role, r]) => { r.volume = this.settings.volumes[role] ?? ROLE_VOLUMES[role]; });
         this.applyMix();
     }
@@ -1050,7 +1057,7 @@ class Generator {
             }else instrument=new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,source??findPreset(ROLES[role].preset),this.AC),context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
             if(this.audioEnvironment)try{await instrument.ready;await instrument.sourceReady;}catch(error){try{await this.retireInstrument(instrument);}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}
             if(revision!==r.sourceRevision){await this.retireInstrument(instrument);return;}
-            r.roomRoute?.dispose();r.roomRoute=null;this.retireInstrument(r.instrument);r.instrument=instrument;instrument.connect(r.tone);
+            r.roomRoute?.dispose();r.roomRoute=null;this.retireInstrument(r.instrument);r.instrument=instrument;instrument.connect(mainRoleSourceDestination(this,role));
             if(this.wasmRoomPool&&!source?.classics&&!source?.iowa)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
             r.stringPatchBase=null;r.edited=externalSource(source)&&!source?.iowa;r.presetName=name??source?.classics?.name??source?.diy?.name??ROLES[role].preset;
             this.applyMix();
@@ -1075,7 +1082,7 @@ class Generator {
             if (!r.machine) return;
             if (percussionVoice(this.settings.drums.kit).wasmOnly) nextEngine = 'wasm';
             const Kit = nextEngine === 'native' ? DrumKit : WasmDrumKit;
-            instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, model: nextEngine });
+            instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, fdnRoomFactory:this.audioEnvironment?.fdnRoomFactory, model: nextEngine });
             try {
                 if (instrument.ready) await instrument.ready;
                 instrument.setKit(this.settings.drumKit);
@@ -1086,7 +1093,7 @@ class Generator {
         if (revision !== r.sourceRevision) { await this.retireInstrument(instrument); return; }
         if (source?.classics) instrument.setKit(this.settings.drumKit);
         r.instrument.silence?.();this.retireInstrument(r.instrument);
-        r.instrument = instrument;r.machine = !!source?.classics;instrument.connect(r.gain);
+        r.instrument = instrument;r.machine = !!source?.classics;instrument.connect(mainRoleSourceDestination(this,'perc'));
         r.presetName = source?.classics?.name ?? percussionVoice(this.settings.drums.kit).name;
         if (!r.machine) { this.percussionEngine=nextEngine; await this.syncPercussionVoice(); }
         this.applyMix();
@@ -1269,6 +1276,7 @@ class Generator {
     }
 
     setRoleVolume(role, volume) {
+        const main=generatorMainControlAuthor(this);if(main)return main.setRoleVolume(role,volume);
         this.roles[role].volume = volume;
         this.settings.volumes = { ...this.settings.volumes, [role]: volume };
         this.applyMix();
@@ -1276,6 +1284,7 @@ class Generator {
 
     /** Mute / solo, as on a mixer: any solo silences every role not soloed. Mutes are kept in the settings. */
     setRoleMix(role, { mute, solo }) {
+        const main=generatorMainControlAuthor(this);if(main)return main.setRoleMix(role,{mute,solo});
         const r = this.roles[role];
         if (mute !== undefined) {
             r.mute = mute;
@@ -1326,6 +1335,7 @@ class Generator {
     }
 
     applyMutes() {
+        const main=generatorMainControlAuthor(this);if(main)return main.applyMutes();
         Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted[role]); });
         this.applyMix();
     }
@@ -1339,6 +1349,8 @@ class Generator {
     }
 
     applyMix() {
+        const main=generatorMainControlAuthor(this);if(main)return main.applyMix();
+        invalidateGeneratorMainBirth(this,'legacy Main mix write');
         const anySolo = Object.values(this.roles).some((r) => r.solo);
         Object.values(this.roles).forEach((r) => {
             const audible = anySolo ? r.solo : !r.mute;
@@ -1405,6 +1417,7 @@ class Generator {
      * heard again. Generated and played notes share an instrument, so the mute cannot stay on one and not the other. Until then a mute changes nothing.
      */
     playAlong(role) {
+        const main=generatorMainControlAuthor(this);if(main)return main.playAlong(role);
         const r = this.roles[role];
         if (this.audible(role) || r.playedLive) return;
         r.instrument.silence();
@@ -1421,6 +1434,7 @@ class Generator {
             this.checkRoleMotion();
         }
         if (this.AC.state !== 'running') this.AC.resume();
+        const inputTime=generatorLiveInputTime(this,role);
         this.endStopFade();
         if (role === 'midi') {
             const id = this.midiPiano().startNote(midi, velocity);
@@ -1429,17 +1443,18 @@ class Generator {
         }
         this.playAlong(role);
         if (role === 'perc') {
-            this.roles.perc.instrument.scheduleNote(midi, this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
-            this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, length: 0.15 });
+            this.roles.perc.instrument.scheduleNote(midi, inputTime??this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
+            this.emitVisualNote({ type: 'on', role, midi, velocity, time: inputTime??this.AC.currentTime + 0.005, length: 0.15 });
             return null;
         }
         const id = this.roles[role].instrument.startNote(midi, velocity);
         this.liveNotes?.add(role+':'+id);
-        this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, liveId: id });
+        this.emitVisualNote({ type: 'on', role, midi, velocity, time: inputTime??this.AC.currentTime + 0.005, liveId: id });
         return id;
     }
 
     liveNoteOff(role, id) {
+        const inputTime=generatorLiveInputTime(this,role);if(inputTime!==null&&role!=='perc'&&role!=='midi'){this.roles[role].instrument.stopNote(id);this.liveNotes?.delete(role+':'+id);this.emitVisualNote({type:'off',role,liveId:id,time:inputTime});return;}
         this.liveNotes?.delete(role+':'+id);
         if (role === 'perc') return;
         if (role === 'midi') { this.midi?.instrument.stopNote(id); return; }
@@ -2355,7 +2370,9 @@ class Generator {
     // Section tone: glides to a bar's cutoff over that bar (at once when
     // starting).
     applyTone(tone, time, barSeconds) {
+        const main=generatorMainControlAuthor(this);if(main)return main.applyTone(tone,time,barSeconds);
         if (tone === this.toneNow) return;
+        invalidateGeneratorMainBirth(this,'legacy Main tone write');
         const glide = this.toneNow !== null;
         this.toneNow = tone;
         TONE_ROLES.forEach((role) => {
@@ -2428,7 +2445,8 @@ class Generator {
         const seconds = (e) => (rubato ? rubatoTime(rubato, unit, e.beat + e.length) - rubatoTime(rubato, unit, e.beat) : e.length * secondsPerBeat);
         const book = (e, start) => {
             if(e.booked)return;
-            const connected=held.get(e);
+            const connected=held.get(e),main=generatorMainControlAuthor(this);
+            const performBooking=()=>{
             if(connected?.heldMembers){
                 for(const n of connected.heldMembers)n.event.booked=true;
                 (this.heldActiveRoles??=new Set()).add(e.role);
@@ -2439,11 +2457,11 @@ class Generator {
             if (this.noteLog.length > 96) this.noteLog.shift();
             this.emitVisualNote({ type: 'on', ...this.noteLog[this.noteLog.length - 1] });
             // a kick of the sequencer pumps the chords and the bass (settings.sequencer.pump, up to 9 dB and 6 dB)
-            if (e.exact && e.track === 'bd' && this.settings.sequencer?.on && this.settings.sequencer.lanes && this.settings.sequencer.pump > 0) {
+            if (!main && e.exact && e.track === 'bd' && this.settings.sequencer?.on && this.settings.sequencer.lanes && this.settings.sequencer.pump > 0) {
                 const at = Math.max(start, this.AC.currentTime), pump = this.settings.sequencer.pump;
                 for (const [role, db] of [['pad', 9], ['bass', 6]]) this.roles[role]?.ducker?.note(at, at + 0.04, 10 ** (-db * pump / 20));
             }
-            if (this.settings.ducking > 0 && this.audible(e.role)) {
+            if (!main && this.settings.ducking > 0 && this.audible(e.role)) {
                 const at = Math.max(start, this.AC.currentTime), length = connected?.duration ?? seconds(e);
                 for (const [role, by] of Object.entries(duckedBy(this.settings.layers))) if (by[e.role]) this.roles[role].ducker?.note(at, at + length, duckFloor(role, e.role, this.settings.ducking, this.settings.layers));
             }
@@ -2452,6 +2470,12 @@ class Generator {
             // a sequencer hit names its machine track; the other kits play the nearest drum
             if (e.track && instrument.hitTrack) instrument.hitTrack(e.track, e.midi, Math.max(start, this.AC.currentTime), e.velocity);
             else instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), (connected?.duration??seconds(e)), e.velocity, e.detune, connected?.expression??e.expression);
+            };
+            if(!main)return performBooking();
+            const ducks=[];
+            if(e.exact&&e.track==='bd'&&this.settings.sequencer?.on&&this.settings.sequencer.lanes&&this.settings.sequencer.pump>0){const pump=this.settings.sequencer.pump;for(const[role,db]of[['pad',9],['bass',6]])if(this.roles[role]?.ducker)ducks.push({role,start,end:start+.04,floor:10**(-db*pump/20)});}
+            if(this.settings.ducking>0&&this.audible(e.role)){const length=connected?.duration??seconds(e);for(const[role,by]of Object.entries(duckedBy(this.settings.layers)))if(by[e.role]&&this.roles[role].ducker)ducks.push({role,start,end:start+length,floor:duckFloor(role,e.role,this.settings.ducking,this.settings.layers)});}
+            return main.bookDucks(ducks,performBooking,{futureOnly:true});
         };
         const current = this.plan.get(bar).events;
         current

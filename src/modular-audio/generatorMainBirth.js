@@ -1,0 +1,7 @@
+import{planGeneratorMainMix}from'./generatorMainControlPlan.js';
+const records=new WeakMap();
+/** Called by the actual Generator constructor after its original initial mix.
+ * This records authored values; it never reads an AudioParam getter. */
+export function rememberGeneratorMainBirth(g){if(records.has(g)||g.AC?.state!=='suspended'||g.AC.currentTime!==0)return null;try{const plan=planGeneratorMainMix(g),roles=Object.freeze(Object.fromEntries(plan.states.map(s=>[s.role,Object.freeze({volume:s.volume,initialVolumeTarget:s.target,mute:s.mute,solo:s.solo,playedLive:s.playedLive})]))),record={valid:true,reason:null,context:g.AC,container:g.roles,roles};records.set(g,record);return roles;}catch{return null;}}
+export function invalidateGeneratorMainBirth(g,reason){const record=records.get(g);if(record){record.valid=false;record.reason??=reason;}}
+export function generatorMainBirth(g){const record=records.get(g);if(!record||!record.valid||record.context!==g.AC||record.container!==g.roles)throw Object.assign(Error('Original cold Generator control history is unavailable'),{code:'GENERATOR_MAIN_BIRTH_REFUSED'});for(const[role,birth]of Object.entries(record.roles)){const r=g.roles[role];if(!r||r.volume!==birth.volume||r.mute!==birth.mute||r.solo!==birth.solo||r.playedLive!==birth.playedLive)throw Object.assign(Error('Generator controls changed after their constructor prelude'),{code:'GENERATOR_MAIN_BIRTH_REFUSED'});}return record.roles;}

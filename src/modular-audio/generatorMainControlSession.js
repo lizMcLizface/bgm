@@ -1,0 +1,12 @@
+import{prepareRangeColdMainRoleControls}from'./mainRoleRangeColdGroup.js';
+import{MAIN_ROLE_RANGE_BIRTH_PROFILE}from'./mainRoleRangeRecipe.js';
+import{generatorMainBirth}from'./generatorMainBirth.js';
+import{prepareMainControlClock}from'./mainControlClockLease.js';
+import{registerGeneratorMainControlRoot,generatorMainControlRoot}from'./generatorMainControlRoot.js';
+const pending=new WeakMap();
+/** Explicit module-start preparation. Caller declares actual source channel
+ * contracts; no inference from a preset name or silent input is performed. */
+export function prepareGeneratorMainControls(g,{channels,signal}={}){
+ if(pending.has(g)||generatorMainControlRoot(g))throw Error('Main control session already exists');const birth=generatorMainBirth(g),ids=Object.keys(birth);if(g.AC.state!=='suspended'||g.AC.currentTime!==0||!channels||Object.keys(channels).length!==6||ids.some(id=>![1,2].includes(channels[id])))throw Error('Explicit virgin Main source-channel contracts required');
+ const record={state:'preparing',clock:null,group:null};pending.set(g,record);g.mainControlPreparation=true;const work=(async()=>{try{record.clock=await prepareMainControlClock(g.AC,{signal});if(signal?.aborted)throw Object.assign(Error('Main controls cancelled'),{name:'AbortError'});const factory=prepareRangeColdMainRoleControls(g.AC);record.group=await factory.createCold({profile:MAIN_ROLE_RANGE_BIRTH_PROFILE,roles:Object.fromEntries(ids.map(id=>[id,{channels:channels[id],volume:birth[id].volume,initialVolumeTarget:birth[id].initialVolumeTarget}])),signal,onError:issue=>{record.error??=issue;record.root?.quarantine(issue);}});const root=registerGeneratorMainControlRoot(g,record.group,{clockLease:record.clock});record.root=root;if(record.error){root.quarantine(record.error);throw record.error;}record.state='ready';g.mainControlPreparation=false;return root;}catch(primary){let clean=!primary.cleanupError;try{if(record.group){const receipt=await record.group.dispose();clean&&=receipt?.released===true&&record.group.status().quotaReleased===true;}else if(primary.groupStatus)clean&&=primary.groupStatus.cleanupClean===true&&primary.groupStatus.quotaReleased===true;}catch(cleanupError){clean=false;primary.cleanupError=cleanupError;}if(clean)try{await record.clock?.release();}catch(cleanupError){clean=false;primary.cleanupError=cleanupError;}record.state=clean?'closed':'quarantined';if(clean){pending.delete(g);g.mainControlPreparation=false;}else g.runtimeEnvironmentError??=primary;throw primary;}})();work.catch(()=>{});return work;
+}
