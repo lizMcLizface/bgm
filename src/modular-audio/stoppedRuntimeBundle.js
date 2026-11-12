@@ -2,13 +2,15 @@ import{admitDetachedSourceFamilies}from'./stoppedRuntimeOwners.js';
 import{reserveContextPreparation}from'./contextPreparationRegistry.js';
 import{captureStoppedRuntime,assertStoppedRuntime,inspectStoppedRuntime,assertDetachedConstruction,verifyRunningNativeClock}from'./stoppedRuntimeSnapshot.js';
 /** Exact-edge journal. No broad disconnect, Native method patch or inferred edge. */
-export function applyStoppedRuntimeEdges(context,{remove=[],add=[]}={}){
+export function applyStoppedRuntimeEdges(context,{remove=[],add=[],removeLabels,addLabels}={}){
  if(!Array.isArray(remove)||!Array.isArray(add)||remove.length+add.length>96)throw Error('Runtime edge journal capacity exceeded');
  const checked=(edge,list)=>{if(!Array.isArray(edge)||edge.length!==2||!edge[0]||typeof edge[0].connect!=='function'||typeof edge[0].disconnect!=='function'||!edge[1]||edge[0].context!==context||edge[1].context!==context)throw Error('Explicit same-context Native edge required');if(list.some(other=>other!==edge&&other[0]===edge[0]&&other[1]===edge[1]))throw Error('Duplicate Native runtime edge');};
  for(const edge of remove)checked(edge,remove);for(const edge of add)checked(edge,add);for(const a of add)if(remove.some(r=>r[0]===a[0]&&r[1]===a[1]))throw Error('Unchanged Native runtime edge must be omitted');
+ for(const[labels,list]of[[removeLabels,remove],[addLabels,add]])if(labels!==undefined&&(!Array.isArray(labels)||labels.length!==list.length||labels.some(label=>typeof label!=='string'||label.length>96)))throw Error('Runtime edge semantic labels differ');
+ const perform=(operation,from,to,index,label,phase)=>{try{return operation==='connect'?from.connect(to):from.disconnect(to);}catch(error){const diagnostics={operation,index,label:label??null,phase,from:from.constructor?.name??'node',to:to.constructor?.name??'node'};try{error.runtimeEdge=diagnostics;}catch{const wrapped=Error(error.message,{cause:error});wrapped.name=error.name;wrapped.runtimeEdge=diagnostics;throw wrapped;}throw error;}};
  const applied=[];let restored=false;
- const restore=()=>{if(restored)return;const errors=[];for(const[operation,from,to]of applied.slice().reverse())try{operation==='connect'?from.disconnect(to):from.connect(to);}catch(error){errors.push(error);}if(errors.length)throw new AggregateError(errors,'Runtime edge rollback failed');restored=true;};
- try{for(const[from,to]of remove){from.disconnect(to);applied.push(['disconnect',from,to]);}for(const[from,to]of add){from.connect(to);applied.push(['connect',from,to]);}}catch(error){try{restore();}catch(rollback){const failure=new AggregateError([error,rollback],'Runtime edge installation and rollback failed');failure.rollbackFailed=true;throw failure;}throw error;}
+ const restore=()=>{if(restored)return;const errors=[];for(const[operation,from,to,index,label]of applied.slice().reverse())try{perform(operation==='connect'?'disconnect':'connect',from,to,index,label,'rollback');}catch(error){errors.push(error);}if(errors.length)throw new AggregateError(errors,'Runtime edge rollback failed');restored=true;};
+ try{for(const[index,[from,to]]of remove.entries()){perform('disconnect',from,to,index,removeLabels?.[index],'install');applied.push(['disconnect',from,to,index,removeLabels?.[index]]);}for(const[index,[from,to]]of add.entries()){perform('connect',from,to,index,addLabels?.[index],'install');applied.push(['connect',from,to,index,addLabels?.[index]]);}}catch(error){try{restore();}catch(rollback){const failure=new AggregateError([error,rollback],'Runtime edge installation and rollback failed');failure.rollbackFailed=true;throw failure;}throw error;}
  return Object.freeze({restore,count:applied.length});
 }
 /** NEW unselected transaction. Generator alone supplies its future binding seam.

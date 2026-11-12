@@ -395,7 +395,8 @@ class Generator {
         if(mode!=='wasm'&&Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice))throw Error('This preset uses Wasm-only voices. Choose another sound or preset to compare engines.');
         mode=mode==='wasm'?'wasm':'legacy';const revision=(this.audioEngineRevision??0)+1;this.audioEngineRevision=revision;
         const work=(async()=>{
-            const replacements=[];let committed=false;const roomPool=mode==='wasm'&&PERFORMANCE.sharedReverb?new WasmRoomPool(this.AC,this.output,{busFactory:this.audioEnvironment?.createEffectsBus}):null;
+            const replacements=[],retirements=[];let committed=false,candidateCleanup;const roomPool=mode==='wasm'&&PERFORMANCE.sharedReverb?new WasmRoomPool(this.AC,this.output,{busFactory:this.audioEnvironment?.createEffectsBus}):null;
+            const closeCandidates=()=>candidateCleanup??=retireAudioActions([...replacements.flatMap(r=>[()=>r.roomRoute?.dispose(),()=>r.instrument.dispose()]),()=>roomPool?.dispose()],'Unused engine candidate retirement failed');
             try {
                 const Wasm=mode==='wasm'?(await import('./engine/wasmInstrument')).default:null;
                 for(const role of Object.keys(ROLES)){
@@ -405,14 +406,16 @@ class Generator {
                     const replacement={role,instrument,source:old,snapshot,roomRoute:null};replacements.push(replacement);
                     if(roomPool)replacement.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
                 }
-                if(revision!==this.audioEngineRevision){replacements.forEach(r=>{r.roomRoute?.dispose();r.instrument.dispose();});roomPool?.dispose();return;}
+                if(revision!==this.audioEngineRevision){await closeCandidates();return;}
                 if(replacements.some(r=>this.roles[r.role].instrument!==r.source||JSON.stringify(r.source.preset)!==r.snapshot))throw Error('Sounds changed while preparing the engine. Please try the engine switch again.');
                 const running=this.isRunning;if(running)this.stop();
-                for(const {role,instrument,roomRoute}of replacements){const r=this.roles[role];r.roomRoute?.dispose();r.instrument.dispose();r.instrument=instrument;r.roomRoute=roomRoute;instrument.connect(r.tone);}
-                this.wasmRoomPool?.dispose();this.wasmRoomPool=roomPool;
-                this.audioEngine=mode;committed=true;this.applyWander();this.applyMix();
+                for(const {role,instrument,roomRoute}of replacements){const r=this.roles[role],old=r.instrument,oldRoute=r.roomRoute;retirements.push(retireAudioActions([()=>oldRoute?.dispose(),()=>this.retireInstrument(old)],'Engine role retirement failed'));r.instrument=instrument;r.roomRoute=roomRoute;instrument.connect(r.tone);}
+                const oldPool=this.wasmRoomPool;retirements.push(retireAudioActions([()=>oldPool?.dispose()],'Engine room pool retirement failed'));this.wasmRoomPool=roomPool;
+                this.audioEngine=mode;committed=true;const retired=retireAudioActions(retirements.map(pending=>()=>pending),'Engine source retirement failed');
+                try{this.applyWander();this.applyMix();}catch(error){try{await retired;}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}
+                await retired;
                 if(running){this.audioEngineReady=null;await this.start();}
-            }catch(error){if(!committed){replacements.forEach(r=>{r.roomRoute?.dispose();r.instrument.dispose();});roomPool?.dispose();}throw error;}
+            }catch(error){if(!committed)try{await retireAudioActions([closeCandidates,...retirements.map(pending=>()=>pending)],'Failed engine switch cleanup failed');}catch(cleanupError){if(cleanupError!==error)error.cleanupError=cleanupError;}throw error;}
         })();this.audioEngineReady=work;
         try{await work;}finally{if(this.audioEngineReady===work)this.audioEngineReady=null;}
     }
