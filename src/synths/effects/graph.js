@@ -122,7 +122,7 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
  try{
   const stages=stagesOf(values);
   if(!await ensure(stages))return null;
-  const preparedExtras=Object.values(extra).filter(s=>s.prepareInitial);
+  const preparedExtras=[ownedCompressor,...Object.values(extra)].filter(s=>s?.prepareInitial);
   if(preparedExtras.length){patch(values,true);await Promise.all(preparedExtras.map(s=>s.prepareInitial()));if(disposed)return null;wire(stages);}
   else{wire(stages);patch(values,true);}
   return {input,node:output,dynamicsBackend:ownedCompressor?'owned-rust':'native',armRuntime:()=>Promise.all([ownedCompressor,...Object.values(extra)].filter(s=>s?.arm).map(s=>s.arm())),patch,setInstances:next=>patch(latest,false,next),connect:destination=>output.connect(destination),clear(){pool.forEach(i=>i.clear());Object.values(extra).forEach(s=>s.clear?.());Object.values(split).forEach(b=>b.clear());effects?.clear();},get reduction(){return metering?(ownedCompressor?ownedCompressor.reduction:compressor.getNode().reduction):0;},get meters(){
