@@ -1,6 +1,87 @@
 # Modular audio engine handoff
 
-Current continuation — 12 November 2026:
+Current continuation — 12 November 2026, after bbbdcb7a and reviewed build registration:
+The requested push through 111d282 completed as lizMcLizface. Later steps are
+local commits with that same author and committer; no deployment occurred.
+The application remains hybrid and its existing defaults remain operational.
+
+The explicit cold [Main control root](MODULAR_AUDIO_ENGINE_MAIN_CONTROL_AUTHORING.md)
+now drives the real Generator. Its six raw-frequency owners preserve constructor
+history, authored mix/tone/duck order and whole-batch capacity admission. The
+actual desktop run passes real engine preparation, stopped publication, live
+input, source replacement, a whole-runtime successor and terminal cleanup.
+Every role has nonzero routed PCM; the master peak is 0.4756564497947693. Two
+actual stopped confirmations reach Native frames 171392 and 204032; all source
+and control owners release, Root borrows reach zero and the running registry
+is empty before context close. The explicit 128 ms live-input policy is selected
+only for this run. Earlier timing failures remain failures and are retained.
+
+A separate actual terminal test deliberately produces late=1/dropped=0. Both
+replacement paths refuse the failed source. Explicit terminal destruction then
+releases all six actual source owners and the control Root, retaining the old
+ledger error; it neither recovers the runtime nor accepts late scheduling.
+309 focused Generator/ownership/timing checks and 74 mixer checks pass (three
+mixer skips). See the ignored main-cold-root-live128-first-pass.json and
+main-terminal-late-first-pass.json plus their independent audit receipts.
+The complete Generator cold save/reload review also passes: all seven independently
+recomputed recipe/route/authority fingerprints match after a real browser reload.
+Absolute clocks differ and remain reported; no PCM or clock fitting is claimed.
+
+The [raw-frequency six-role group](MODULAR_AUDIO_ENGINE_MAIN_ROLE_RANGE.md)
+passes 84 exact Native channel comparisons across six rates and true 192 kHz
+reload, using the separately accepted f8b72ab621c5a767 kernel. Its first reload
+capture timeout remains negative evidence; a capture-status successor passes.
+The older nominal groups and numerical kernels remain available unchanged.
+
+The [continuous private Room](MODULAR_AUDIO_ENGINE_ROOM_CONTINUOUS_INPUT.md)
+streams real input with explicit source/silence/END authority, bounded PCM
+credits, one declared latency and actual Worker/clock termination. It is an
+accepted leaf, not a shared sampled-room/PDC drop-in. Optional original FDN
+factory forwarding and Native compressor/Space ownership are also committed.
+The [complete Rust FDN frontend](MODULAR_AUDIO_ENGINE_FDN_FRONTEND_LIVE.md)
+is committed as bbbdcb7a. All 30 cases across six rates match the original
+Native frontend and independent instance word for word, with positive source
+and FDN releases. A real gap/reconnect preserves the frozen source/DSP cursor;
+the complete 192 kHz scene reconstructs with identical output-plane hashes.
+The current packaging-only 5a4295073639ce8e successor retains those numerical
+bodies and passes an actual 48 kHz recheck. Verification uses its single tracked
+Wasm and kernel receipt with temporary reads denied. Realtime zero-row arm
+readiness remains a separate, unselected follow-up; Offline pre-render arm
+must stay legal.
+
+[Continuous Worker Freeze](MODULAR_AUDIO_ENGINE_FREEZE_WORKER.md) is committed
+as 9b541078, with a maintained grouped test page. Twelve cases at six rates
+have 48 nonzero, exact aligned channels and 9,690 exact packet-end state checks.
+The declared half-second delay, seeded scope, eight-owner bound and PDC/lazy
+adoption limitations remain explicit. No default changes follow these gates.
+
+The coherent public build now passes all 85 provenance commands and the full
+public inventory, with Vite taking 55.63 seconds. The full tracked suite passes
+784 files /6,578 tests, with four skips and no unhandled errors, in 224.65 seconds.
+Its first negative (ten failures plus one unhandled error) is retained; six older
+partial-object/source fixtures were repaired to use actual ownership helpers,
+without weakening production guards. Compressor reference metadata now explicitly
+normalizes LF and retains unchanged numerical/runtime/profile/notices bytes.
+All 70 Wasm files present at 8029c76 remain byte-identical; the raw Main and FDN
+binaries are separate added leaves. Logs and numerical receipts are under
+reports/modular_audio/port-main-fdn-freeze-*.
+
+The NEW trim/ambience scalar leaf is still uncommitted review work. Its first
+48 kHz nine-owner group passes exact Native PCM and clean release: six role
+controllers, two program scalars and one inactive output owner. The full rate
+matrix is running. These owners have not been adopted by the Generator yet.
+
+Next: finish the scalar matrix and realtime FDN arm proof, then integrate
+master output/trim/ambience ownership and port the remaining sweep/send boundaries. Global
+adoption of delayed Room/Freeze also needs explicit downstream control epochs
+and PDC; physical source-family admission and outer Instrument seams remain.
+Cable editing and changing the default backend are later work. No hidden
+measured-string family is being added. Reports and temporary scripts remain
+under ignored reports/modular_audio/ and reports/scripts/.
+
+## Earlier assembled verification and boundaries
+
+Earlier continuation — 12 November 2026:
 The explicit prepared environment remains hybrid. The requested push through
 111d282 completed under lizMcLizface; subsequent verified steps are local
 commits with the same author and committer. No deployment occurred. Native

@@ -62,10 +62,24 @@ preparation requires caller-supplied source channel contracts and starts before
 the first gesture. Preparation/uncertain cleanup also prevents automatic idle
 suspension. Candidate owners cannot claim the stable root nodes as their own.
 
-Current limitation: the complete Generator has not had a cold save/reload
-review. This selected scope still retains declared Native master fade/trim,
-sweep/send and remaining effect frontend boundaries. Existing application
-defaults, old nominal validators and numerical kernels are unchanged.
+The actual 48k Main Generator cold save/reload review now passes in both the
+baseline and a fresh external browser reload. Complete initial settings and
+seed, six channel contracts, preset choices, the 128 ms input policy and the
+input recipe are consumed before Generator construction. All seven semantic
+SHA256 fingerprints (recipe, settings, input, presets, routes, authority and
+cleanup) match after independent recomputation from the raw reports. Each run
+configures six owners before wake with zero calls, observes six actual first
+Native frames at zero, produces nonzero audio on all six roles, completes two
+strict source confirmations and finishes with clean Main/source release health,
+zero Root borrows and zero running-context reservation tickets/shared leases.
+Reports are `main-cold-save-baseline-pass.json` and
+`main-cold-save-reload-pass.json`; exact hashes and assertions are in
+`reports/modular_audio/main-cold-save-reload-independent-audit.json`. Absolute
+music epochs differ (2.944 versus 2.341333333333333 seconds); clocks and PCM are
+not fitted or claimed identical. This selected scope still retains declared
+Native master fade/trim, sweep/send and remaining effect frontend boundaries.
+Existing application defaults, old nominal validators and numerical kernels
+are unchanged.
 
 Terminal-only source destruction is explicit and irreversible for that runtime.
 It awaits every actual source owner release while retaining existing program

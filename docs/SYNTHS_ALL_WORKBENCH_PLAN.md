@@ -1,5 +1,13 @@
 # Synths/all workbench pass
 
+12 November integration checkpoint: actual cold Main Generator controls, source
+swaps, terminal timing-failure cleanup and save/reload pass. Complete FDN
+frontend and continuous Worker Freeze leaves are committed; their explicit
+latency/lifecycle and realtime admission limits are recorded in the engine
+handoff. The coherent desktop build passes 85 provenance checks and the tracked
+suite passes 784 files /6,578 tests, with four skips. Existing desk defaults and
+legacy DSP remain operational; no deployment occurred.
+
 12 November port continuation: the current [engine handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md)
 records accepted Rust Main controls, prepared Room capacity and stopped source/return
 ownership. Desktop checks are grouped; no repeated phone settings or per-preset
