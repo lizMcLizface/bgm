@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "profile": "ordered-send-gain-sum-live-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/rack-filter-normal/src/timeline.rs",
+  "gainReference": "synth-engine/main-strip-live/src/lib.rs",
+  "scope": "Explicit immutable ordered1..8 fixed mono/stereo Gain slots, raw set/target/cancel, params-only/active/non-silent or silent AUTHORITATIVE activity, first non-silent copy then Float32 additions, mono speaker duplication. Not arbitrary original Native fan-in order or application adoption.",
+  "nativeSources": [
+    {
+      "file": "audio_node_input.cc",
+      "sha256": "5f9b7a1fb0303142eee45db402aa362a1c8926a77fc25a5a29703e264f8b67cb"
+    },
+    {
+      "file": "ordered-send-audio_channel.cc",
+      "sha256": "a02f6b9c0d4fac9ab0862ceca28c5b03a49181cca7ebdb97b04974aa9f467a8c"
+    },
+    {
+      "file": "tape-native-blink-audio_bus.cc",
+      "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
+    },
+    {
+      "file": "tape-native-gain_handler.cc",
+      "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+    },
+    {
+      "file": "audio_handler.cc",
+      "sha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b"
+    }
+  ]
+}

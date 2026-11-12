@@ -1,0 +1,22 @@
+{
+  "api": 1,
+  "audited": false,
+  "profile": "ordered-send-gain-sum-live-v1",
+  "version": "b4ebfc029ac9b939",
+  "source": "c0febf112d6ea1f84729a093c68e102cd7698fe94bfa05295ac77dacfeb20df5",
+  "wasm": "1795a8bd174d63e443be3a0b44c6c93c8f1e384522fa02d7dd00710897390081",
+  "bytes": 38121,
+  "files": [
+    "tools/buildOrderedSend.mjs",
+    "synth-engine/ordered-send-live/Cargo.toml",
+    "synth-engine/ordered-send-live/Cargo.lock",
+    "synth-engine/ordered-send-live/src/lib.rs",
+    "synth-engine/ordered-send-live/src/allocation.rs",
+    "synth-engine/ordered-send-live/CHROMIUM_PROFILE.json",
+    "synth-engine/ordered-send-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/main-strip-live/src/lib.rs",
+    "src/modular-audio/orderedSendRust.js"
+  ],
+  "scope": "Explicit immutable ordered1..8 fixed mono/stereo Gain slots, raw set/target/cancel, params-only/active/non-silent or silent AUTHORITATIVE activity, first non-silent copy then Float32 additions, mono speaker duplication. Not arbitrary original Native fan-in order or application adoption."
+}
