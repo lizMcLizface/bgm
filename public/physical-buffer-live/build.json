@@ -5,10 +5,10 @@
     "plucked"
   ],
   "source": "db2aac863a8b44cc4d4b18fe80229f4137d9bfe050885049d88603c395c098ca",
-  "runtime": "01186d0105d9f1338feca2a92310ad14b8c4894b7a412cb0d70ffb311a84cfdc",
+  "runtime": "74fdf98b9a8a801fcb9db60b515015ae3a38734604ed4c12a8ef9cf3956916ef",
   "reference": "983ad5ad7def15918b63a0329654ab3b403de3dcaf6619b18d873b232b0b6b1d",
   "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
   "bytes": 253652,
   "audited": false,
-  "version": "fdbe6f5755a91641"
+  "version": "0e162133cdf27173"
 }
