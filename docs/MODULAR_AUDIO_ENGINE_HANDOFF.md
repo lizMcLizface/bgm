@@ -6,6 +6,47 @@ port is not complete. Native defaults remain operational. The requested push
 through 111d282 completed using lizMcLizface; subsequent verified checkpoints
 are local commits with the same author and committer. No deployment occurred.
 
+Latest committed control/lifecycle continuation (12 November):
+
+- The [explicit live Main control host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md)
+  `a3f4912dc25dbdea` now executes tone, volume and duck in the mutable Rust kernel
+  `efeda6631d83ff91`, with exact Native source7a author/output frames and raw
+  Float64 set/target/cancel records. All36 grouped six-rate mono/stereo cases,
+  two actual worklets each, have zero different words against original Native
+  chains. True HTML reload repeats the complete626,877-byte report exactly.
+  An actual48k live group proves exact source/outputs, primary retirement,
+  nonzero continuing survivor, third-owner refusal and suspension retirement.
+  The29 focused kernel/host checks and both provenance checks pass. This remains
+  an explicit continuous host:32unobserved records, conservative256 lifetime
+  insertions/lane including constructor steps; no normal Main/GUI adoption,
+  unbounded timeline credit or linear/hold/dynamic intrinsic support.
+- [Native constructor B1](MODULAR_AUDIO_ENGINE_NATIVE_CONSTRUCTOR_LIFECYCLE.md)
+  and [inner source B2a](MODULAR_AUDIO_ENGINE_NATIVE_INNER_SOURCE_LIFECYCLE.md)
+  are committed ownership prerequisites. B2a passes241 focused checks, real
+  two-owner White/Pink/Brown/Crusher/Tape output/retirement, and all2,031 original
+  drive curves /4,161,519 samples exactly. Its Tape metadata is explicitly
+  `d0e8f7c36f127ed9` (underlying TapeLive `e68ef063400479f0`); the numerical
+ 178,186-byte Tape binary and all other baseline Wasm are unchanged. The original
+ 3b17 receipt remains separately pinned and its full processor body is recovered
+  by replacing only three host-version literals. JS Noise/Crusher are still JS;
+  whole Instrument construction/factory and physical-family admission remain open.
+- Mutable Room output controls are being checked separately. The six-rate
+  `4f4e00c9e6fabaea` matrix passes24cases/48Native comparisons; its actual lifecycle
+  gate found a real pending-dispose/clock-retirement race. Successor
+  `13629fa3a440d127` preserves the complete numerical/processor/Worker bodies and
+  now passes three actual source7a generations and all ten positive terminal
+  ACK/Worker/clock releases. Its true cold recipe and direct-controller layout
+  gates are still pending. Neither historical Room proof nor a family label
+  admits general private/shared Room routing automatically.
+
+Next work: finish the Room control recipe/layout gates, complete stopped source
+and lazy-return editing ownership, and close outer Instrument acquisition and
+factory cleanup before selected physical-family admission. Then integrate the
+explicit Rust Main control host with the original UI authoring contract and
+run a fresh assembled public build/regression group. The690-file/5748-check
+full-suite result below belongs to the earlier1ba43f8 assembly, before these
+later leaf commits; it is not evidence for current unfinished parallel changes.
+
 Latest leaf checkpoints (read before the older history below):
 
 - Complete cold Room `be3bdf1dc8315dd8` passes 24 Full/Light mono/stereo
