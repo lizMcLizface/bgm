@@ -1,11 +1,11 @@
 {
   "api": 1,
-  "profile": "context-owned-ambience-spatial-live-v1",
-  "runtime": "9aa42f523aec396df3e232977c4a77a03ad97dac60211a37dee9943db7ed58c4",
+  "profile": "context-owned-ambience-spatial-live-v2",
+  "runtime": "ffb3da64950ad954ed203555ab4ef5f9d6ac6181e2ddaa1eba501e09ea511931",
   "reference": "1f6a2110427b7b558d07a3ec0954b6b63f6a77bfdf22a891bc73c30e59841e0d",
   "coreWasm": "8dfabd5bcf859c6e08ff2d4a783fe780bf4f4c4c1c56736ea64f3fe25f7f89ce",
   "preparationWasm": "f1226732843f2d347d7330e4094dc46149b89b759850b2a1fe44e0bd5401df97",
   "coreVersion": "456b8b06217bed36",
   "preparationVersion": "64f5ce456738d611",
-  "version": "df07388db386f9a0"
+  "version": "5582af108c1eace7"
 }
