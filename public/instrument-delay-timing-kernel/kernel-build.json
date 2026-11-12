@@ -1,0 +1,33 @@
+{
+  "api": 1,
+  "profile": "original-instrument-delay-per-channel-timing-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "67c22492b0fb4257",
+  "source": "a10e7b4dfb529963ff7599c7b30e7f56d4534fd8033b13dc742144dcbccd2615",
+  "wasm": "772b8c9cd5b5099ba7b1d7cbedc66f3e885b6e7ae34399056e5e3304f9e40cbb",
+  "bytes": 87770,
+  "files": [
+    "synth-engine/instrument-delay-timing/Cargo.toml",
+    "synth-engine/instrument-delay-timing/Cargo.lock",
+    "synth-engine/instrument-delay-timing/src/lib.rs",
+    "synth-engine/instrument-delay-timing/src/allocation.rs",
+    "synth-engine/instrument-delay-timing/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-delay-timing/CHROMIUM_NOTICES.txt",
+    "synth-engine/instrument-delay-timing/FORK_EDITS.json",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/instrument-tone/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "synth-engine/instrument-delay/src/lib.rs",
+    "src/nodes/delay.js",
+    "src/nodes/pingPongDelay.js",
+    "src/nodes/filter.js",
+    "src/nodes/gain.js",
+    "src/app/engine/tempoEffects.js",
+    "src/modular-audio/ownedInstrumentDelay.js",
+    "tools/buildInstrumentDelayTiming.mjs"
+  ],
+  "scope": "Literal original Delay/PingPong with DelayHandler per-input-channel repeated timeline evaluation. Raw future cancel/target author times, unchanged Gain/filter/Delay arithmetic, fixed mono/stereo layout and native128 traversal. Separate successor; accepted171 numerical and880 live artifacts remain unchanged. No automatic Native Tail, intrinsic getter, normal Instrument or device deadline claim.",
+  "profileSha256": "3312aa446819953cff9441fbb8e7a00fd3b0f6aa2ae40ae8faac1a4232d8d22d",
+  "notices": "cc6b1945b1286f311a279f766cf1a6e4c3de3e307ddba36501976841fca89c22"
+}

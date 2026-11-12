@@ -1,0 +1,45 @@
+{
+  "baseline": "2237a4b52599f1e911d4714f2fc9e206510894a4b2cb5cc3b0afd9456dccb518",
+  "edits": [
+    [
+      "seconds:&[f32;N]",
+      "seconds:&[[f32;N];2]"
+    ],
+    [
+      "let desired=seconds[i].max(0.)*self.rate",
+      "let desired=seconds[c][i].max(0.)*self.rate"
+    ],
+    [
+      "   for c in 0..channels{let first=self.ring[c][a];output[c][i]=first+fraction*(self.ring[c][b]-first);}",
+      "   let first=self.ring[c][a];output[c][i]=first+fraction*(self.ring[c][b]-first);"
+    ],
+    [
+      "  for i in 0..N{let w=(self.at+i)%length;",
+      "  for c in 0..channels{for i in 0..N{let w=(self.at+i)%length;"
+    ],
+    [
+      "  }self.at=(self.at+N)%length;output",
+      "  }}self.at=(self.at+N)%length;output"
+    ],
+    [
+      " fn render(&mut self,channels:u32,pulled:bool)->bool{",
+      " // Native DelayHandler evaluates the same delayTime timeline once PER channel.\n // The second evaluation may update a running SetTarget from channel0 intrinsic.\n // Gain/filter timelines remain evaluated once; no per-channel parameter fitting.\n fn delay_curves(&mut self,lane:usize)->[[f32;N];2]{\n  let mut out=[self.curves[lane];2];\n  for channel in 1..self.channels{self.lanes[lane].prepare(self.frame,self.rate);self.lanes[lane].clamp_output(0.,1.);self.curves[lane]=self.lanes[lane].output;out[channel]=self.curves[lane];}\n  out\n }\n fn render(&mut self,channels:u32,pulled:bool)->bool{"
+    ],
+    [
+      "let loop_input=sum(&input,&self.previous,self.channels);let delayed=self.lines[0].as_mut().unwrap().process(&loop_input,&self.curves[0],self.channels);",
+      "let loop_input=sum(&input,&self.previous,self.channels);let seconds=self.delay_curves(0);let delayed=self.lines[0].as_mut().unwrap().process(&loop_input,&seconds,self.channels);"
+    ],
+    [
+      "let pre=self.lines[1].as_mut().unwrap().process(&input,&self.curves[1],self.channels);",
+      "let seconds=self.delay_curves(1);let pre=self.lines[1].as_mut().unwrap().process(&input,&seconds,self.channels);"
+    ],
+    [
+      "let right_input=sum(&pre,&left_feedback,self.channels);let right=self.lines[2].as_mut().unwrap().process(&right_input,&self.curves[2],self.channels);",
+      "let right_input=sum(&pre,&left_feedback,self.channels);let seconds=self.delay_curves(2);let right=self.lines[2].as_mut().unwrap().process(&right_input,&seconds,self.channels);"
+    ],
+    [
+      "let left=self.lines[0].as_mut().unwrap().process(&left_input,&self.curves[0],self.channels);",
+      "let seconds=self.delay_curves(0);let left=self.lines[0].as_mut().unwrap().process(&left_input,&seconds,self.channels);"
+    ]
+  ]
+}
