@@ -1,0 +1,99 @@
+{
+  "kind": "portable-tape-owned-future-lifecycle-queue",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Fixed32 owned retire/activate event queue over exact3d body, callback transaction on stack copy. No Native hidden task inference, no cancellation, no audio/clock adapter yet.",
+  "sources": [
+    {
+      "file": "reports/scripts/pinned/audio_handler.cc",
+      "normalizedLfSha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/audio_handler.h",
+      "normalizedLfSha256": "77a23aab1199155f0e313d317e48d10f07a9c7614b4eca4aa5dd48c0121fb187",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.h"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-wave_shaper_handler.cc",
+      "normalizedLfSha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-delay_handler.cc",
+      "normalizedLfSha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-biquad_filter_handler.cc",
+      "normalizedLfSha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/biquad_filter_handler.h",
+      "normalizedLfSha256": "6001fe19b729243101dfd3583bff03adc41c6a03e806c301ff1accab6b554e76",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.h"
+    },
+    {
+      "file": "reports/scripts/piano-native-biquad.cc",
+      "normalizedLfSha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/biquad.cc"
+    },
+    {
+      "file": "synth-engine/rack-native/src/tail.rs",
+      "normalizedLfSha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    },
+    {
+      "file": "synth-engine/tape-live/src/tone.rs",
+      "normalizedLfSha256": "fd03fb3945e9a5c552503d8dcc97fb3679321de49022cb2079e82f27892d5ace"
+    },
+    {
+      "file": "reports/scripts/pinned/deferred_task_handler.cc",
+      "normalizedLfSha256": "3db25afa2b090da39d914e7fea537e79c6f0e436a47955151b8cde592bb62eb9",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/deferred_task_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/offline_audio_context.cc",
+      "normalizedLfSha256": "c9307da9c70dfb38fcf72d7a487bf05e307079cb8aff5b75aa92c324302eface",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-native-offline_audio_destination_handler.cc",
+      "normalizedLfSha256": "0865220dc00b733554f0695301e96be71d6c201d835774efc03a6938750e8c0b",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/offline_audio_destination_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-native-audio_node_wiring.cc",
+      "normalizedLfSha256": "f666e2da53bf246a2492aa2e0ab20a2f0ccfa28b14d15250997ec83eda426faa",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_wiring.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/audio_node_output.cc",
+      "normalizedLfSha256": "18497939a5fe50a7e49353de19a4984cd86d3d57618041842b21f9dc3add1d74",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_output.cc"
+    }
+  ],
+  "rules": [
+    "Tail eligibility NEVER changes output connectivity",
+    "Explicit canonical retire(frame,remainingMask,epoch) atomically validates all removed stages",
+    "Retire requires eligible stage and retired predecessor, with input-inactive authority for shaper",
+    "Only masks7,6,4,0 represent this fixed serial chain",
+    "Explicit activate uses a strictly newer nonzero u32 epoch, preserves DSP and parameter history",
+    "Stale epoch, changed edit frame, active input under a retired chain and malformed authority fail closed",
+    "No future queue/cancellation or timestamp rebasing; next begin must use the exact authored edit frame",
+    "Whole-route demand is separate from stage output retirement",
+    "Connected Delay parameter-only processing continues all four oscillator/depth clocks"
+  ],
+  "sourceCopyTransforms": [
+    "Remove allocation-audit module hook only",
+    "Add Clone,Copy derivation to value-only Lifecycle state for zero-heap transactional validation"
+  ],
+  "queueRules": [
+    "Canonical future frames at/after next callback; chronologically authored order including same-frame order",
+    "Sequence1..16777215 never wraps",
+    "Projected epoch/output-mask validation before queue admission",
+    "Late queued event rejects before policy mutation, dequeue or observed ACK",
+    "All same-frame events plus input/demand authority validate on a stack policy copy",
+    "No earlier insertion or cancellation in this first component contract"
+  ]
+}

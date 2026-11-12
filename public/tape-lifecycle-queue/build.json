@@ -1,0 +1,32 @@
+{
+  "api": 1,
+  "profile": "portable-tape-owned-future-lifecycle-v1",
+  "textEncoding": "utf-8-normalized-LF",
+  "audited": false,
+  "nativeAutomaticRetirementEquivalent": false,
+  "clockAuthority": "caller-supplied-canonical-frame; no AudioWorklet adapter in this component",
+  "lifecycleSourceVersion": "3d17422c4a741992",
+  "lifecycleSourceSha256": "862439e62b26b93fe7cc057de5d8c836354b2bdbc1e91608793d3ab85c88e0b3",
+  "capacity": 32,
+  "sequenceMax": 16777215,
+  "source": "23f2a81a28938d64f926af33091b61410f5573eea22cedd69cdb98a3d3a9af17",
+  "wasm": "472959b070b7596c072c373db1825da5e6052ef809e6c96c18bfaeff4e0900d0",
+  "version": "22185a0898a73ca7",
+  "bytes": 65330,
+  "files": [
+    "tools/buildTapeLifecycleQueue.mjs",
+    "synth-engine/tape-lifecycle-queue/Cargo.toml",
+    "synth-engine/tape-lifecycle-queue/Cargo.lock",
+    "synth-engine/tape-lifecycle-queue/CHROMIUM_PROFILE.json",
+    "synth-engine/tape-lifecycle-queue/CHROMIUM_NOTICES.txt",
+    "synth-engine/tape-lifecycle-queue/src/lib.rs",
+    "synth-engine/tape-lifecycle-queue/src/lifecycle.rs",
+    "synth-engine/tape-lifecycle-queue/src/allocation.rs",
+    "synth-engine/tape-portable-lifecycle/src/lib.rs",
+    "public/tape-portable-lifecycle/build.json",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/modular-audio/ownedTapeLifecycleQueue.js"
+  ],
+  "profileSha256": "b4fd7e72c4620fbc1991078ad5ffc2d77e2ab722290b4d1e8edc7a100f55a734",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972"
+}
