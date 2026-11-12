@@ -1,0 +1,27 @@
+import {createClockedPhysicalBufferLiveSource} from '../app/engine/physicalBufferClockedSource.js';
+import {createPianoStreamingPreparation,pianoStreamingIdentity} from '../app/engine/pianoStreamingSource.js';
+import {createPluckedLivePreparation} from '../app/engine/pluckedLivePreparation.js';
+import {pluckedStringBufferSpec} from './ownedPluckedString.js';
+import {loadPhysicalClockedAssets} from './physicalClockedAssets.js';
+import {PhysicalClockedOwnership,reservePhysicalClockedSource,physicalClockedQuota} from './physicalClockedOwnership.js';
+import {observeProcessorModule} from '../audio/processorModuleObservation.js';
+import {PHYSICAL_CLOCKED_PROFILE} from './physicalClockedProfile.js';
+const adapters={
+ piano:{hook:'ownedPianoSource',prepare:createPianoStreamingPreparation,resourceIdentity:pianoStreamingIdentity,getOptions:plan=>{if(!plan.piano||plan.string)throw Error('Clocked piano needs its actual piano note plan');return plan.piano;},preparationMessage:(sampleRate,frequency,_options,note)=>({sampleRate,freq:note.freq,bodyFrequency:frequency,settings:note.settings})},
+ plucked:{hook:'ownedPluckedSource',prepare:createPluckedLivePreparation,resourceIdentity:(rate,frequency,options)=>{const spec=pluckedStringBufferSpec(rate,frequency,options);return{note:{freq:spec.frequency,settings:spec},key:JSON.stringify([rate,spec.frequency,frequency,spec])};},getOptions:plan=>{if(!plan.string||plan.piano)throw Error('Clocked KS needs its actual plucked note plan');return plan.string;},preparationMessage:(sampleRate,freq,settings)=>({sampleRate,freq,settings})},
+};
+function live(context,clock){if(!context||context.state!=='running'||Number.isFinite(context.length)||clock?.context!==context||clock.spec?.rate!==context.sampleRate||typeof clock.requestStats!=='function')throw Error('Physical7a needs its explicitly running Native7a context owner');clock.check();}
+export function physicalNativeAnchorFrame(snapshot,clock){const frame=snapshot?.codec?.lastFrame;if(snapshot?.version!=='7a0838a735108706'||snapshot.anchorReady!==true||snapshot.done||snapshot.error||snapshot.codec?.generation!==clock.spec?.generation||!Number.isSafeInteger(frame)||frame<0||frame%128)throw Error('Physical7a per-node actual Native anchor receipt differs');return frame;}
+/** Explicit opt-in live profile. The caller owns the supplied shared clock. */
+export async function preparePhysicalClockedSources(context,{clock,load=loadPhysicalClockedAssets,createSource=createClockedPhysicalBufferLiveSource,preparations={}}={}){
+ live(context,clock);let code;const observed=await observeProcessorModule(Promise.resolve().then(load).then(value=>{code=value;})).promise;if(!observed.loaded)throw observed.error??Error('Physical7a assets observation cancelled');live(context,clock);
+ const create=async(material,instrument,{signal}={})=>{
+  const cancelled=()=>Object.assign(Error('Physical7a creation cancelled'),{name:'AbortError',code:'AUDIO_OWNER_DISPOSED'});if(signal?.aborted)throw cancelled();
+  live(context,clock);if(!adapters[material]||instrument?.AC!==context||instrument.disposed||!Number.isInteger(instrument.polyphony)||instrument.polyphony<1||instrument.polyphony>32)throw Error('Physical7a material/instrument capability differs');
+  const reservation=reservePhysicalClockedSource(context),ownership=new PhysicalClockedOwnership(context,clock,reservation,{engineVersion:code.version});let source,onAbort;const aborted=new Promise((_,reject)=>{onAbort=()=>reject(cancelled());signal?.addEventListener('abort',onAbort,{once:true});});aborted.catch(()=>{});
+  try{source=await createSource(instrument,{...adapters[material],material,prepare:preparations[material]??adapters[material].prepare,load:async()=>code,clockedOwnership:ownership,clockSpec:clock.spec,initialNativeFrame:async()=>{if(signal?.aborted)throw cancelled();live(context,clock);const stats=await clock.requestStats();if(signal?.aborted)throw cancelled();live(context,clock);return physicalNativeAnchorFrame(stats,clock);}});await Promise.race([source.awaitInitialized(),aborted]);await Promise.race([source.awaitPulled(),aborted]);live(context,clock);if(instrument.disposed)throw Error('Disposed Physical7a instrument before publication');return source;}
+  catch(error){const issues=[];if(error.cleanupReady?.then)try{await error.cleanupReady;}catch(issue){issues.push(issue);}if(source)try{await source.dispose();}catch(issue){issues.push(issue);}else if(!issues.length)try{await ownership.dispose();ownership.finish();}catch(issue){issues.push(issue);}if(issues.length){reservation.quarantine(issues[0]);const cleanupReady=Promise.reject(new AggregateError(issues,'Physical7a failed creation cleanup remains uncertain'));cleanupReady.catch(()=>{});error.cleanupReady=cleanupReady;error.cleanupError=issues.length===1?issues[0]:new AggregateError(issues,'Physical7a cleanup failures');}throw error;}finally{signal?.removeEventListener('abort',onAbort);}
+ };
+ const pianoFactory=(instrument,options)=>create('piano',instrument,options),pluckedFactory=(instrument,options)=>create('plucked',instrument,options);for(const[material,factory]of[['piano',pianoFactory],['plucked',pluckedFactory]])Object.defineProperties(factory,{context:{value:context},material:{value:material},version:{value:code.version},profile:{value:PHYSICAL_CLOCKED_PROFILE}});
+ return Object.freeze({context,clockVersion:'7a0838a735108706',profile:PHYSICAL_CLOCKED_PROFILE,version:code.version,pianoFactory,pluckedFactory,create,quota:()=>physicalClockedQuota(context)});
+}
