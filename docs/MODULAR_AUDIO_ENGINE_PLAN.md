@@ -1,5 +1,8 @@
 # Modular audio engine and parallel rendering plan
 
+12 November original-control port continuation: the separate [Filter/EQ2 numerical port](MODULAR_AUDIO_ENGINE_INSTRUMENT_TONE.md) passes72 actual Native cases across8–192kHz and a true12-scene192kHz document reload. Independent Rust streams are word-exact; maximum absolute error8.463859558105469e-6 and relativeRMS2.2315727016576927e-5 remain below unchanged1e-4 bounds. All36 allocation cases have zero allocation/free/growth over9216quanta. This is captured numerical replay, not a live Rust actor or normal Instrument adoption. Prepared Sweep OPEN now has36 physically disconnected insertion cases and98304 bounded current-time calls; its application first-use join is the next active step. The ordered send/sum leaf is committed asfcbbbe32 with exact six-rate Native comparisons, reload and actual running terminal acknowledgements; explicit Generator integration remains in progress. A separate live BitCrusher reuse run exposed a real demand/disconnect ordering issue after its numerical/gap/reload checks passed; the negative is retained and that live path is not accepted. Existing defaults remain operational, reports remain ignored, and no deployment occurred.
+
+
 Current continuation — 12 November 2026, joined master scalar application checkpoint:
 The requested push through 111d282 completed as lizMcLizface. Later steps are
 local commits with that same author and committer; no deployment occurred.
