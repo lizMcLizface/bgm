@@ -1,0 +1,18 @@
+{
+  "profile": "original-instrument-distortion-live-resource-v1",
+  "scope": "NEW8slot immutable44100f32 resources, bounded32commands, independent original gain timelines. Native17c9captured math unchanged; live route/transport not yet accepted.",
+  "sources": [
+    {
+      "path": "synth-engine/instrument-distortion/src/lib.rs",
+      "sha256": "b4d9212b6c17843833faf47d2e7a545d74f632dd3ff5efa9baa5edb1d3c2a2d3"
+    },
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js"
+  ]
+}

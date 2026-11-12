@@ -1,0 +1,9 @@
+import{StampedFloat64Words}from'./stampedWordTransport.js';
+export const DISTORTION_WORD_OPTIONS=Object.freeze({wordCount:14,slots:32,prefix:'distortion'});
+export class InstrumentDistortionWordCodec{
+ constructor(){this.f64=new StampedFloat64Words();this.words=new Uint16Array(14);this.op=0;this.lane=0;this.value=0;this.extra=0;this.seconds=0;}
+ encode(op,lane,value,extra,seconds){if(![0,1].includes(op)||!Number.isInteger(lane)||lane<0||lane>1||typeof value!=='number'||!Number.isFinite(value)||typeof extra!=='number'||!Number.isFinite(extra)||typeof seconds!=='number'||!Number.isFinite(seconds)||seconds<0||op===0&&(!Number.isFinite(Math.fround(value))||extra!==0)||op===1&&(lane!==0||!Number.isInteger(value)||value<0||value>7||!Number.isInteger(extra)||extra<1||extra>4294967295))throw Error('Invalid live original Distortion control schema');this.words[0]=op;this.words[1]=lane;this.f64.encode(value,this.words,2);this.f64.encode(extra,this.words,6);this.f64.encode(seconds,this.words,10);return this.words;}
+ decode(words,offset=0){if(!Number.isInteger(offset)||offset<0||offset+14>words.length)throw Error('Invalid live original Distortion word offset');const op=words[offset],lane=words[offset+1],value=this.f64.decode(words,offset+2),extra=this.f64.decode(words,offset+6),seconds=this.f64.decode(words,offset+10);this.encode(op,lane,value,extra,seconds);Object.assign(this,{op,lane,value,extra,seconds});return this;}
+ apply(core,author){if(this.seconds!==author/core.rate)throw Error('Live original Distortion seconds differ from authored epoch');if(this.op===0)core.lane(this.lane,this.value,author,this.seconds);else core.curve(this.value,this.extra,author,this.seconds);}
+ initial(core,author){if(this.seconds!==author/core.rate)throw Error('Live original Distortion constructor seconds differ');if(this.op===0)core.initial(this.lane,this.value,author,this.seconds);else core.initialCurve(this.value,this.extra,author,this.seconds);}
+}

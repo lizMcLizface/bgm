@@ -1,0 +1,27 @@
+{
+  "api": 1,
+  "profile": "original-instrument-distortion-live-resource-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "0020ba74cab101ee",
+  "source": "58905499b2b084db54b248ce592c133ab11e7b23b843956fc19df2eda2fb86ce",
+  "wasm": "fc970c3cd1a0145e4fcfe409f52c01a0145413ca2c2dccf24ba7973a72bc9424",
+  "bytes": 45446,
+  "files": [
+    "synth-engine/instrument-distortion-live/Cargo.toml",
+    "synth-engine/instrument-distortion-live/Cargo.lock",
+    "synth-engine/instrument-distortion-live/src/lib.rs",
+    "synth-engine/instrument-distortion-live/src/allocation.rs",
+    "synth-engine/instrument-distortion-live/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-distortion-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/instrument-distortion/src/lib.rs",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentDistortionLive.js",
+    "tools/buildInstrumentDistortionLive.mjs"
+  ],
+  "scope": "NEW8slot immutable44100f32 resources, bounded32commands, independent original gain timelines. Native17c9captured math unchanged; live route/transport not yet accepted.",
+  "profileSha256": "e1f716d15242ce6d65ef9ba8df138535626c1977cdb9a6f8153c96161ea65b67",
+  "notices": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71"
+}
