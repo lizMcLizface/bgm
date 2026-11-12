@@ -3,15 +3,17 @@
   "profile": "original-instrument-tone-live-host-v1",
   "audited": false,
   "textEncoding": "utf-8-normalized-LF",
-  "version": "d1d152b4493cb684",
+  "version": "0aa47d87e64f5e69",
   "kernelVersion": "1afe2ec923809c85",
   "clockVersion": "7a0838a735108706",
-  "processorName": "instrument-tone-d1d152b4493cb684",
-  "processor": "c363ae03b6b0e996ed2444f819c50675626452be28a3f005141f960c2b139ee2",
-  "source": "1589d19bec10dace2f3b2fb359c8373c8c35ba992f8652371aab05a1bdf0308f",
+  "processorName": "instrument-tone-0aa47d87e64f5e69",
+  "processor": "74e2745f3018beffdf3769a81021e97c896c936f86ab397af8984f17e30e2011",
+  "source": "7de93b85a917f9fdf482e6b1fee60c52ee1dade85b6d2492432cc0304944292d",
   "files": [
     "tools/buildInstrumentToneHost.mjs",
     "src/nodes/instrumentToneRust.js",
+    "src/nodes/instrumentToneFacade.js",
+    "src/modular-audio/physicalInputRouteState.js",
     "src/modular-audio/instrumentToneProcessor.js",
     "src/modular-audio/instrumentToneWords.js",
     "src/modular-audio/ownedInstrumentTone.js",
@@ -23,6 +25,6 @@
   ],
   "wasm": "10d118906e1abb8ddec84c308b5071094681846258ca012b3785703902a2acde",
   "bytes": 85857,
-  "metadataDescriptors": 581,
-  "scope": "Explicit prepared immutable mono/stereo original Filter/EQ2/combined stages,32 acknowledged raw-F64 stamped rows, Source7a, isolated control-only service, physical demand/reconnect and actual terminal ACK. Running demand transitions remain unaccepted pending strict graph interleaving proof. No automatic Native Tail, external AudioParam connection, synchronous intrinsic getter, normal Instrument selection or physical deadline claim."
+  "metadataDescriptors": 580,
+  "scope": "Explicit prepared immutable mono/stereo original Filter/EQ2/combined stages,32 acknowledged raw-F64 stamped rows, Source7a, isolated control-only service, physical demand/reconnect and actual terminal ACK. Atomic requested-route identity, observed physical-input reconciliation, bounded active drain and realized OFF receipts. No automatic Native Tail, external AudioParam connection, synchronous intrinsic getter, normal Instrument selection or physical deadline claim."
 }

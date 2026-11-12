@@ -57,7 +57,7 @@ closures are not running Rust SourceACKs. See the ignored
 instrument-tone-independent-audit.json and its exact source/receipt hashes.
 Reports and temporary audit scripts remain in the ignored reports folder.
 
-This checkpoint is numerical replay. It does not establish a running Rust
+The numerical checkpoint alone is replay. It does not establish a running Rust
 AudioWorklet actor, automatic Native Biquad tail behavior, AudioParam signal
 connections, synchronous intrinsic getters, normal Instrument adoption or
 physical-device deadline guarantees. The next implementation task is the
@@ -101,3 +101,52 @@ route-tag / observed-physical-input transition contract, including actual
 active draining, empty-input acknowledgement and adversarial live checks.
 No normal Instrument selection, synchronous AudioParam getter, automatic Native
 Tail behavior, external LFO AudioParam bridge or default change is implied.
+
+## Physical route and logical facade checkpoint — 12 November
+
+Current host **0aa47d87e64f5e69** retains the exact **1afe2ec923809c85**
+Wasm bytes. It replaces the old separate demand/reconnect controls with the
+committed atomic physical-route tag protocol. A requested disconnect cannot
+stand in for an observed disconnected input. Real connected draining blocks
+process every sample; opening and physically absent-input callbacks perform no
+Biquad DSP. Only a newly realized OFF followed by a new ON can authorize an
+active source-clock reanchor. An OFF arm requires a fresh matching physical OFF
+receipt. The private silent service route persists until outstanding control and
+route receipts complete, including during an Offline suspension. Terminal gate
+publication still precedes edge removal; a failed terminal write retains the
+edges until actual SourceACK or context close and keeps failed audio health.
+
+The explicit facade creates the actual private actor and exposes logical
+Filter/EQ2 controls. Combined mode offers one whole-chain input/output, without
+pretending to expose an intermediate EQ/Filter port. Stored configured targets
+update only after command admission; observed curves are asynchronous, typed,
+identity-checked receipts at the reported Rust frontier. Synchronous Native
+intrinsic getters throw a typed unsupported error. These controls confer no
+source ownership authority and do not select the normal Instrument backend.
+
+The complete route predecessor 7955dda1fbdfd614 passes 72 actual Native cases
+across all six rates, 144 comparisons and the true twelve-recipe 192 kHz HTML
+reload. Maximum absolute error remains 8.463859558105469e-6 and relative RMS
+2.2315727016576927e-5 under unchanged 1e-4 limits; independent Rust and input
+streams remain word-exact. The final emitted processor differs only by its host
+version literal, with a reconstructed source-hash proof. The final host also
+passes all twelve 48 kHz Native cases.
+
+Final actual live verification covers twenty reused-context rounds / forty
+independent actors across Filter, EQ2 and combined mono/stereo modes. Each
+prepared actor has zero Biquad frames; dormant controls leave Biquad history
+frozen, distinct Filter and EQ targets stay independent, returned output is
+nonzero and finite, and all forty real clean SourceACKs release their clocks
+before context close. Eight adversarial upstream holds produce eight nonzero
+physical DRAIN witnesses, each advancing exactly 128 Biquad frames with unchanged
+input words, followed by genuine matching OFF acknowledgements. The original
+strict refusal negative is retained in the BitCrusher history; no synthetic
+parameter curve, PCM shift or silent fallback resolves it. Seventy-one focused
+checks pass. Evidence and exact source bridges are ignored under reports; see
+instrument-tone-0aa4-independent-final-audit.json.
+
+This accepts the bounded explicit live owner and facade, not automatic Native
+tail traversal, external AudioParam connections, arbitrary unbounded timeline
+loads, device deadlines, or normal factory adoption. Next: issue a genuine
+private producer-output borrow with retained lifetime, then compose selected
+Instrument/rack factories using whole-patch preflight before any parent mutation.

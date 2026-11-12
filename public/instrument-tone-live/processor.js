@@ -1,4 +1,80 @@
 (() => {
+  // src/modular-audio/physicalInputRouteState.js
+  var PHYSICAL_ROUTE_TAG_MAX = 16777215;
+  var PhysicalInputRouteState = class {
+    constructor(channels, { limit = 64 } = {}) {
+      if (![1, 2].includes(channels) || !Number.isInteger(limit) || limit < 1 || limit > 64) throw Error("Invalid physical route geometry");
+      this.channels = channels;
+      this.limit = limit;
+      this.tag = 0;
+      this.serial = 0;
+      this.requestedOn = false;
+      this.actualChannels = 0;
+      this.actualPulled = false;
+      this.phase = "off";
+      this.mismatchQuanta = 0;
+      this.hasBeenActive = false;
+      this.lastActiveSerial = 0;
+      this.confirmedOffSerial = 0;
+      this.allowReanchor = false;
+      this.frame = null;
+    }
+    observe(curve, channels) {
+      if (!(curve instanceof Float32Array) || ![1, 128].includes(curve.length) || ![0, this.channels].includes(channels)) throw Error("Physical route shape differs");
+      let previous = this.tag, maxOff = 0;
+      for (const value of curve) {
+        if (!Number.isInteger(value) || value < 0 || value > PHYSICAL_ROUTE_TAG_MAX || value < previous || value === 1) throw Error("Physical route tag is malformed/backward");
+        const serial2 = Math.floor(value / 2);
+        if (value !== previous && serial2 === Math.floor(previous / 2)) throw Error("Physical route identity changed its request");
+        previous = value;
+        if (value > 0 && value % 2 === 0) maxOff = Math.max(maxOff, serial2);
+      }
+      const tag = curve[curve.length - 1], serial = Math.floor(tag / 2), on = tag % 2 === 1;
+      if (channels > 0 && (tag === 0 || !on && (!this.hasBeenActive || serial <= this.lastActiveSerial))) throw Error("Unsolicited off-route input has no realized active transition");
+      const oldActive = this.lastActiveSerial;
+      if (channels === 0 && this.hasBeenActive && maxOff > oldActive) this.confirmedOffSerial = Math.max(this.confirmedOffSerial, maxOff);
+      this.tag = tag;
+      this.serial = serial;
+      this.requestedOn = on;
+      this.actualChannels = channels;
+      this.actualPulled = channels > 0;
+      this.allowReanchor = false;
+      if (channels > 0) {
+        if (on) {
+          this.phase = "active";
+          this.allowReanchor = this.hasBeenActive && serial > oldActive && this.confirmedOffSerial > oldActive && serial > this.confirmedOffSerial;
+          this.lastActiveSerial = serial;
+          this.hasBeenActive = true;
+          this.mismatchQuanta = 0;
+        } else {
+          this.phase = "drain";
+          this.mismatchQuanta++;
+        }
+      } else if (!on) {
+        this.phase = "off";
+        this.mismatchQuanta = 0;
+      } else {
+        this.phase = this.hasBeenActive && serial === oldActive ? "withdrawal-pending" : "opening";
+        this.mismatchQuanta++;
+      }
+      if (this.mismatchQuanta > this.limit) throw Error("Physical route request/connection mismatch bound");
+      return this;
+    }
+    committed(frame) {
+      if (!Number.isSafeInteger(frame) || frame < 0 || frame % 128) throw Error("Physical route receipt frame differs");
+      this.frame = frame;
+    }
+    realized() {
+      return this.requestedOn === this.actualPulled && (this.requestedOn ? this.phase === "active" : this.phase === "off");
+    }
+    proof() {
+      return { version: 1, tag: this.tag, serial: this.serial, requestedOn: this.requestedOn, actualInputChannels: this.actualChannels, actualPulled: this.actualPulled, realized: this.realized(), phase: this.phase, frame: this.frame };
+    }
+    snapshot() {
+      return { ...this.proof(), mismatchQuanta: this.mismatchQuanta, limit: this.limit, hasBeenActive: this.hasBeenActive, lastActiveSerial: this.lastActiveSerial, confirmedOffSerial: this.confirmedOffSerial, allowReanchor: this.allowReanchor };
+    }
+  };
+
   // src/modular-audio/ownedInstrumentTone.js
   var INSTRUMENT_TONE_MODES = Object.freeze({ filter: 0, eq2: 1, "eq2-filter": 2 });
   var INSTRUMENT_TONE_STATS = Object.freeze(["frame", "peak", "calls", "commands", "rejected", "renderedFrames", "unpulledFrames", "late", "mainThreadClamps", "mode", "channels", "filterType"]);
@@ -351,7 +427,7 @@
   var exactIdentity = (a, b) => a && b && typeof a === "object" && !Array.isArray(a) && Object.keys(a).length === 3 && Object.keys(b).length === 3 && Object.keys(b).every((k) => a[k] === b[k]);
   var InstrumentToneProcessor = class extends AudioWorkletProcessor {
     static get parameterDescriptors() {
-      return [{ name: "terminalGate", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, { name: "resumeGeneration", defaultValue: 0, minValue: 0, maxValue: 16777215, automationRate: "a-rate" }, { name: "hostDemand", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, ...nativeContextClockDescriptors(), ...stampedWordDescriptors(INSTRUMENT_TONE_WORD_OPTIONS)];
+      return [{ name: "terminalGate", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, { name: "routeTag", defaultValue: 0, minValue: 0, maxValue: 16777215, automationRate: "a-rate" }, ...nativeContextClockDescriptors(), ...stampedWordDescriptors(INSTRUMENT_TONE_WORD_OPTIONS)];
     }
     constructor({ processorOptions: p }) {
       super();
@@ -369,8 +445,9 @@
       this.pendingQuanta = 0;
       this.preorigin = 0;
       this.future = 0;
-      this.lastResumeSeen = 0;
-      this.lastPulledResume = 0;
+      this.route = null;
+      this.lastRouteAck = null;
+      this.routeEvents = 0;
       this.hasPulled = false;
       this.firstPulledFrame = null;
       this.reanchors = 0;
@@ -380,7 +457,8 @@
       this.codec = new InstrumentToneWordCodec();
       this.port.onmessage = ({ data }) => this.message(data);
       try {
-        if (p.version !== "d1d152b4493cb684" || !exactIdentity(p.identity, { hostVersion: p.version, kernelVersion: "1afe2ec923809c85", ownerGeneration: p.identity?.ownerGeneration }) || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1 || p.identity.ownerGeneration > 4294967295 || ![1, 2].includes(p.channels)) throw Error("Instrument tone host identity/layout differs");
+        if (p.version !== "0aa47d87e64f5e69" || !exactIdentity(p.identity, { hostVersion: p.version, kernelVersion: "1afe2ec923809c85", ownerGeneration: p.identity?.ownerGeneration }) || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1 || p.identity.ownerGeneration > 4294967295 || ![1, 2].includes(p.channels)) throw Error("Instrument tone host identity/layout differs");
+        this.route = new PhysicalInputRouteState(this.channels);
         this.clock = new NativeContextClockCodec(p.clockSpec);
         this.core = new OwnedInstrumentTone(new WebAssembly.Instance(p.module, {}).exports, sampleRate, { mode: p.mode, channels: p.channels, origin: p.originFrame });
         if (!Array.isArray(p.initialRows) || p.initialRows.length > 128) throw Error("Instrument tone cold command bound");
@@ -407,7 +485,7 @@
       return { frame: this.core.stat(0), scope: "Last prepared/rendered Rust curves, not synchronous Native intrinsic getters", lanes: lanes.map((lane) => ({ lane, value: this.core.curve(lane, 127), target: this.core.target(lane) })) };
     }
     snapshot() {
-      return { identity: this.identity, mode: this.mode, channels: this.channels, origin: this.origin, kernel: this.core?.stats() ?? this.lastStats ?? null, observed: this.observed(), clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, resumeGeneration: this.lastResumeSeen, lastPulledResumeGeneration: this.lastPulledResume, hasPulled: this.hasPulled, firstPulledFrame: this.firstPulledFrame, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, terminalGateSeen: this.terminalGateSeen, terminalQuanta: this.terminalQuanta, disposeRefusals: this.disposeRefusals, disposed: this.disposed, error: this.error };
+      return { identity: this.identity, mode: this.mode, channels: this.channels, origin: this.origin, kernel: this.core?.stats() ?? this.lastStats ?? null, observed: this.observed(), clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, route: this.route?.snapshot() ?? null, hasPulled: this.hasPulled, firstPulledFrame: this.firstPulledFrame, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, terminalGateSeen: this.terminalGateSeen, terminalQuanta: this.terminalQuanta, disposeRefusals: this.disposeRefusals, disposed: this.disposed, error: this.error };
     }
     receipt(reason) {
       if (this.disposed) return;
@@ -458,11 +536,11 @@
           throw Error(d.error ?? "Instrument tone clock generation retired");
         }
         if (!exactIdentity(d?.identity, this.identity) || !Number.isInteger(d.request) || d.request < 1 || d.request > 4294967295 || this.pending.length >= 16) throw Error("Instrument tone request identity/budget differs");
-        if (d.kind === "stats" && Object.keys(d).length !== 3 || d.kind === "flush" && Object.keys(d).some((k) => !["kind", "identity", "request", "requiredSequence", "requireClock"].includes(k))) throw Error("Instrument tone request shape differs");
+        if (d.kind === "stats" && Object.keys(d).length !== 3 || d.kind === "flush" && Object.keys(d).some((k) => !["kind", "identity", "request", "requiredSequence", "requiredRouteTag", "requireClock"].includes(k))) throw Error("Instrument tone request shape differs");
         if (d.kind === "stats") this.port.postMessage({ kind: "stats", identity: this.identity, request: d.request, stats: this.snapshot() });
         else if (d.kind === "flush") {
-          if (!Number.isInteger(d.requiredSequence) || d.requiredSequence < 0 || d.requiredSequence > 16777215 || d.requireClock !== void 0 && typeof d.requireClock !== "boolean") throw Error("Instrument tone flush contract differs");
-          this.pending.push({ request: d.request, requiredSequence: d.requiredSequence, requireClock: d.requireClock === true, minimumCoreCalls: d.requireClock ? this.core.stat(2) + 1 : 0 });
+          if (!Number.isInteger(d.requiredSequence) || d.requiredSequence < 0 || d.requiredSequence > 16777215 || d.requireClock !== void 0 && typeof d.requireClock !== "boolean" || d.requiredRouteTag !== void 0 && (!Number.isInteger(d.requiredRouteTag) || d.requiredRouteTag < 0 || d.requiredRouteTag > 16777215 || d.requiredRouteTag === 1)) throw Error("Instrument tone flush contract differs");
+          this.pending.push({ request: d.request, requiredSequence: d.requiredSequence, requiredRouteTag: d.requiredRouteTag, requireClock: d.requireClock === true, minimumCoreCalls: d.requireClock ? this.core.stat(2) + 1 : 0 });
           this.flush();
         } else throw Error("Unknown Instrument tone control request");
       } catch (error) {
@@ -472,9 +550,9 @@
     flush() {
       for (let i = this.pending.length - 1; i >= 0; i--) {
         const p = this.pending[i];
-        if (this.reader.sequence < p.requiredSequence || p.requireClock && (!this.clock.calls || this.core.stat(2) < p.minimumCoreCalls)) continue;
+        if (this.reader.sequence < p.requiredSequence || p.requireClock && (!this.clock.calls || this.core.stat(2) < p.minimumCoreCalls) || p.requiredRouteTag !== void 0 && (this.route.tag !== p.requiredRouteTag || !this.route.realized())) continue;
         this.pending.splice(i, 1);
-        this.port.postMessage({ kind: "flushed", identity: this.identity, request: p.request, clockReceipt: p.requireClock ? { version: 1, generation: this.clock.spec.generation, requiredSequence: p.requiredSequence, minimumCoreCalls: p.minimumCoreCalls, coreCalls: this.core.stat(2), clockCalls: this.clock.calls, frame: this.clock.lastFrame } : null, stats: this.snapshot() });
+        this.port.postMessage({ kind: "flushed", identity: this.identity, request: p.request, clockReceipt: p.requireClock ? { version: 1, generation: this.clock.spec.generation, requiredSequence: p.requiredSequence, minimumCoreCalls: p.minimumCoreCalls, coreCalls: this.core.stat(2), clockCalls: this.clock.calls, frame: this.clock.lastFrame, routeProof: this.route.proof() } : null, stats: this.snapshot() });
       }
     }
     wait(kind) {
@@ -531,20 +609,8 @@
         if (this.quiesce(parameters)) return true;
         const input = inputs[0] ?? [], channels = input.length;
         if (channels > 2 || channels !== 0 && channels !== this.channels || out.length !== this.channels || out.some((plane) => plane.length !== 128)) throw Error("Instrument tone input/output layout differs");
-        const demand = parameters.hostDemand;
-        if (!(demand instanceof Float32Array) || ![1, 128].includes(demand.length)) throw Error("Instrument tone demand shape differs");
-        let isolated = channels === 0;
-        for (const value of demand) {
-          if (value !== 0 && value !== 1) throw Error("Instrument tone demand must be literal Boolean");
-          if (value !== 0) isolated = false;
-        }
-        const pulled = demand[demand.length - 1] === 1;
-        if (!pulled && channels) throw Error("Instrument tone unpulled input must be physically isolated");
-        const resume = parameters.resumeGeneration;
-        if (!(resume instanceof Float32Array) || ![1, 128].includes(resume.length)) throw Error("Instrument tone reconnect shape differs");
-        for (let i = 0; i < resume.length; i++) if (!Number.isInteger(resume[i]) || resume[i] < 0 || resume[i] > 16777215 || i && resume[i] < resume[i - 1]) throw Error("Instrument tone reconnect generation differs");
-        const generation = resume[resume.length - 1];
-        if (generation < this.lastResumeSeen) throw Error("Instrument tone reconnect generation moved backwards");
+        this.route.observe(parameters.routeTag, channels);
+        const pulled = this.route.actualPulled, isolated = channels === 0;
         const frame = this.clock.next(parameters, { allowPending: isolated });
         if (frame === null) return this.wait("clock");
         const coreFrame = this.core.stat(0);
@@ -552,22 +618,30 @@
           if (!isolated || coreFrame - frame > 8192 || this.core.stat(2) !== 0) throw Error("Instrument tone clock precedes active core");
           return this.wait("preorigin");
         }
-        if (frame > coreFrame && pulled && this.hasPulled && generation <= this.lastPulledResume) throw Error("Instrument tone active frontier lacks physical reconnect permit");
+        if (frame > coreFrame && pulled && this.hasPulled && !this.route.allowReanchor) throw Error("Instrument tone active frontier lacks physical reconnect permit");
         if (!this.readDue(parameters, frame, isolated)) return true;
         if (frame > coreFrame) {
           this.reanchors++;
           this.reanchorFrames += frame - coreFrame;
         }
-        this.lastResumeSeen = generation;
         this.pendingQuanta = 0;
+        const renderedBefore = this.core.stat(5);
         for (let c = 0; c < channels; c++) this.core.input[c].set(input[c]);
         this.core.render(channels, pulled);
         if (pulled) {
           if (!this.hasPulled) this.firstPulledFrame = frame;
           this.hasPulled = true;
-          this.lastPulledResume = generation;
         }
         for (let c = 0; c < this.channels; c++) out[c].set(this.core.output[c]);
+        this.route.committed(frame);
+        if (this.route.phase !== "active" && this.route.phase !== "off" && this.routeEvents < 32) {
+          this.routeEvents++;
+          this.port.postMessage({ kind: "route-transition", identity: this.identity, route: this.route.proof(), renderedFramesBefore: renderedBefore, renderedFramesAfter: this.core.stat(5), kernelPeak: this.core.stat(1) });
+        }
+        if (this.route.realized() && this.lastRouteAck !== this.route.tag) {
+          this.lastRouteAck = this.route.tag;
+          this.port.postMessage({ kind: "route-observed", identity: this.identity, route: this.route.proof() });
+        }
         this.flush();
         if (this.endFrame !== null && frame + 128 >= this.endFrame) {
           this.receipt("offline-end");
@@ -581,5 +655,5 @@
       }
     }
   };
-  registerProcessor("instrument-tone-d1d152b4493cb684", InstrumentToneProcessor);
+  registerProcessor("instrument-tone-0aa47d87e64f5e69", InstrumentToneProcessor);
 })();
