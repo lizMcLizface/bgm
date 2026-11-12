@@ -1275,21 +1275,24 @@ const GenerativeApp = () => {
     // Play starts those; Stop stops everything and keeps them. While
     // anything plays they follow what is playing, so the link describes
     // what you hear.
-    const startPart = (key) => begin(() => (key === 'playMusic' ? gen.start() : gen.startAmbience()));
+    const beginPrepared=parts=>begin(()=>{const pending=gen.startSelectedParts(parts);pending.catch(error=>{if(error.name!=='AbortError')console.error('Could not start the selected playback parts',error);});return pending;});
+    const startPart = (key) => gen.hasPreparedAmbienceStart?.()?beginPrepared({music:key==='playMusic',ambience:key==='playAmbience'}):begin(() => (key === 'playMusic' ? gen.start() : gen.startAmbience()));
     const play = () => {
         emitQuest('play');
         const { playMusic, playAmbience } = gen.settings;
         if (!playMusic && !playAmbience) update('playMusic', true);
+        if(gen.hasPreparedAmbienceStart?.())return beginPrepared({music:playMusic||!playAmbience,ambience:playAmbience});
         begin(() => Promise.all([
             (playMusic || !playAmbience) && gen.start(),
             playAmbience && gen.startAmbience(),
         ]));
     };
-    const stop = () => gen.stopAll();
-    const toggle = () => (gen.anyRunning ? stop() : play());
+    const stop = () => {const result=gen.stopAll();if(gen.hasPreparedAmbienceStart?.())result?.catch(error=>console.error('Could not stop the selected playback parts',error));return result;};
+    const toggle = () => (gen.anyRunning||gen.hasPreparedAmbienceStart?.()&&gen.preparedStartStatus().pending ? stop() : play());
     // Switching a part off stops it (all off: paused). Switching one on
     // starts it - and, when nothing was playing, everything that is on.
     const setPart = (key, on) => {
+        if(gen.hasPreparedAmbienceStart?.()){const change=(async()=>{if(gen.preparedStartStatus().pending)await gen.cancelPreparedStart();const active=key==='playMusic'?gen.isRunning:gen.ambienceRunning;if(!on&&active)await(key==='playMusic'?gen.stop():gen.stopAmbience());update(key,on);if(on&&!active){if(gen.anyRunning)return startPart(key);return play();}})();change.catch(error=>{if(error.name!=='AbortError')console.error('Could not change selected playback parts',error);});return change;}
         const partRunning = key === 'playMusic' ? gen.isRunning : gen.ambienceRunning;
         if (!on && partRunning) (key === 'playMusic' ? gen.stop() : gen.stopAmbience());
         update(key, on);

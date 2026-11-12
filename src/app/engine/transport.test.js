@@ -160,3 +160,6 @@ describe('after the page was frozen', () => {
         t.stop();
     });
 });
+
+test('explicit prepared starts preserve the authored future epoch without changing the default start clock',()=>{const AC=makeContext(),t=new Transport({context:AC}),heard=[];t.onBeat(e=>heard.push(e));t.start(8,1.5);expect(t.nextBeatTime).toBe(1.5);expect(heard).toEqual([]);AC.currentTime=1.2;t.tick();expect(heard[0]).toMatchObject({beat:8,time:1.5});t.stop();const legacy=new Transport({context:AC}),normal=[];legacy.onBeat(e=>normal.push(e));legacy.start();expect(normal[0].time).toBeCloseTo(1.3,12);legacy.stop();});
+test('invalid or missed authored epochs refuse before transport state or listener mutation',()=>{const AC=makeContext();AC.currentTime=3;for(const when of[2,NaN,Infinity]){const t=new Transport({context:AC}),listener=vi.fn();t.onBeat(listener);expect(()=>t.start(0,when)).toThrow(/epoch/);expect(t.isRunning).toBe(false);expect(listener).not.toHaveBeenCalled();}});

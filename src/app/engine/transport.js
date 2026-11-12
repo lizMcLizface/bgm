@@ -109,12 +109,13 @@ class Transport {
     }
 
     /** @param {number} [fromBeat=0] - the first beat's number (resuming mid-piece) */
-    start(fromBeat = 0) {
+    start(fromBeat = 0, when) {
+        if(when!==undefined&&(!Number.isFinite(when)||when<this.AC.currentTime))throw Error('Authored transport start epoch is invalid or already past');
         if (this.timer) return;
         this.beat = fromBeat;
         this.lastTick = null;
         this.resetDiagnostics();
-        this.nextBeatTime = this.AC.currentTime + 0.1;
+        this.nextBeatTime = when??this.AC.currentTime + 0.1;
         this.tick();
         this.timer = startTicker(() => this.tick(), this.interval);
     }

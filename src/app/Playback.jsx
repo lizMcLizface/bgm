@@ -28,6 +28,8 @@ const clock = (seconds) => {
 export const SleepTimer = ({ generator, running, onLeft = () => {} }) => {
     const [minutes, setMinutes] = useState(() => readPref(SLEEP_KEY, 0));
     const [endsAt, setEndsAt] = useState(null);
+    const [policyError,setPolicyError]=useState('');
+    useEffect(()=>{const seconds=minutes?Math.min(SLEEP_FADE,minutes*15)*5/7:0,release=generator.registerAutomaticFadePolicy?.('sleep-timer',seconds);try{generator.assertAutomaticFadePolicy?.(seconds);setPolicyError('');}catch(error){setPolicyError(error.message);}return release;},[generator,minutes]);
     const [now, setNow] = useState(Date.now());
     useEffect(() => writePref(SLEEP_KEY, minutes), [minutes]);
     useEffect(() => {
@@ -47,7 +49,7 @@ export const SleepTimer = ({ generator, running, onLeft = () => {} }) => {
         return () => {
             clearInterval(id);
             // a new time (or Off) while fading: back to full level
-            generator.cancelFadeOut();
+            try{const cancelled=generator.cancelFadeOut();cancelled?.catch?.(error=>{if(error.name!=='AbortError')setPolicyError(error.message);});}catch(error){setPolicyError(error.message);}
         };
     }, [endsAt, generator, minutes]);
     return (
@@ -55,9 +57,10 @@ export const SleepTimer = ({ generator, running, onLeft = () => {} }) => {
             <h3>Sleep timer</h3>
             <label className="gen-field">
                 <span>Stop after{left ? ` (${left} left)` : ''}</span>
-                <select value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} aria-label="Sleep timer">
+                <select value={minutes} onChange={(e) => {const next=Number(e.target.value);try{generator.assertAutomaticFadePolicy?.(next?Math.min(SLEEP_FADE,next*15)*5/7:0);generator.assertFadeCancelPolicy?.();setPolicyError('');setMinutes(next);}catch(error){setPolicyError(error.message);}}} aria-label="Sleep timer">
                     {SLEEP_MINUTES.map((m) => <option key={m} value={m}>{m ? `${m} min` : 'Off'}</option>)}
                 </select>
+                {policyError&&<small role="alert">{policyError}</small>}
                 <small>In the last minute the music comes to an end on its home chord and the ambience fades out. Counts from Play.</small>
             </label>
         </section>

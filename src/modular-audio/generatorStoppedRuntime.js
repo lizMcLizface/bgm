@@ -1,0 +1,29 @@
+import{assertAutomaticPreparedFadePolicy}from'./preparedStartPolicy.js';
+import{prepareStoppedRuntimeBundle}from'./stoppedRuntimeBundle.js';
+import{createDetachedRuntimeOwners}from'./stoppedRuntimeOwners.js';
+import{inspectStoppedRuntime}from'./stoppedRuntimeSnapshot.js';
+import{commitMainStoppedRuntime,isPublishedMainPreparedAmbience}from'./mainStoppedRuntimeBinding.js';
+import{selectCompleteAmbienceEnvironment}from'./completeAmbienceEnvironment.js';
+import{retireAudioActions}from'../audio/retireAudio.js';
+const candidates=new WeakMap();
+function coldAuthority(context,lease){const state=lease?.snapshot?.();if(!lease||lease.context!==context||lease.value?.profile!=='complete-ambience-cold-lease-v1'||lease.value?.coldPreparedFrame!==0||typeof lease.retain!=='function'||typeof lease.release!=='function'||state?.state!=='ready'||state.scope?.state!=='published')throw Object.assign(Error('Complete Ambience requires an explicitly retained cold bootstrap before Native wake'),{code:'COMPLETE_AMBIENCE_COLD_REQUIRED'});}
+/** Synchronous entry: the underlying registry reserves/wakes before any await.
+ * Complete preparation consumes a new candidate ref, never the bootstrap ref. */
+export function prepareGeneratorStoppedRuntime(generator,{prepareEnvironment,sourceClock,completeAmbienceLease,signal,isCurrent=()=>true,ownerFactories}={}){
+ if(generator.runtimeEnvironmentReady)throw Error('A Generator runtime publication is already pending');
+ if(generator.runtimeEnvironmentError)throw generator.runtimeEnvironmentError;
+ if(typeof prepareEnvironment!=='function'||typeof sourceClock!=='function'||typeof isCurrent!=='function')throw Error('Explicit Generator runtime preparation leases required');
+ if(completeAmbienceLease!==undefined){coldAuthority(generator.AC,completeAmbienceLease);assertAutomaticPreparedFadePolicy(generator);}
+ const entry={generator,bundle:null,result:null};
+ const environment=async context=>{let retained,base;try{if(completeAmbienceLease){coldAuthority(context,completeAmbienceLease);retained=await completeAmbienceLease.retain({label:'stopped-runtime-complete-candidate'});}base=await prepareEnvironment(context);if(base?.context!==context||!base.value||typeof base.release!=='function')throw Error('Explicit Generator environment lease required');if(!retained){if(base.value.ambienceFactory)throw Object.assign(Error('Complete Ambience selection requires its bootstrap option before wake'),{code:'COMPLETE_AMBIENCE_COLD_REQUIRED'});return base;}const value=selectCompleteAmbienceEnvironment(base.value,retained);let release;return{context,value,release:()=>release??=retireAudioActions([()=>base.release(),()=>retained.release()],'Selected runtime environment lease retirement failed')};}catch(error){try{await retireAudioActions([()=>base?.release?.(),()=>retained?.release?.()],'Incomplete selected runtime environment cleanup failed');}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}};
+ const transaction=prepareStoppedRuntimeBundle(generator,{prepareEnvironment:environment,sourceClock,signal,isCurrent,buildOwners:async options=>entry.bundle=await createDetachedRuntimeOwners({...options,factories:ownerFactories,completeAmbienceAdmission:owner=>isPublishedMainPreparedAmbience(generator,owner)})});
+ candidates.set(transaction,entry);return transaction;
+}
+/** Installed owners remain visible on prior-retirement failure; never emulate
+ * rollback after publication. Caller readiness includes scope registration+ACK. */
+export function commitGeneratorStoppedRuntime(generator,transaction){
+ const entry=candidates.get(transaction);if(!entry||entry.generator!==generator||inspectStoppedRuntime(transaction.snapshot).generator!==generator)throw Error('Stopped runtime candidate belongs to another Generator');
+ if(generator.runtimeEnvironmentReady)throw Error('A Generator runtime publication is already pending');
+ const work=(async()=>{await transaction.ready;try{const result=entry.result=await commitMainStoppedRuntime(transaction,entry.bundle);generator.runtimePublishedOwner=result;await result.previousRetirement;return result;}catch(error){const published=entry.result??error.publishedRuntime?.published;if(published){generator.runtimePublishedOwner=entry.result??{...published,binding:error.publishedRuntime.binding};generator.runtimeEnvironmentError??=error;}else if(transaction.describe().rollbackQuarantined||transaction.describe().partialCleanupQuarantined)generator.runtimeEnvironmentError??=error;throw error;}})();
+ generator.runtimeEnvironmentReady=work;work.catch(()=>{});work.finally(()=>{if(generator.runtimeEnvironmentReady===work)generator.runtimeEnvironmentReady=null;}).catch(()=>{});return work;
+}

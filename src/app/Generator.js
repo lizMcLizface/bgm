@@ -1,3 +1,7 @@
+import{assertPreparedFade,registerAutomaticFadePolicy,assertAutomaticPreparedFadePolicy,automaticFadePolicyStatus}from'../modular-audio/preparedStartPolicy.js';
+import{prepareGeneratorStoppedRuntime,commitGeneratorStoppedRuntime}from'../modular-audio/generatorStoppedRuntime.js';
+import{getPublishedMainPreparedAmbience,assertMainRuntimeSourceEdit,assertMainRuntimeSettings,assertMainRuntimeLazyReturn,hasPublishedMainRuntime}from'../modular-audio/mainStoppedRuntimeBinding.js';
+import{createSelectedPartsCoordinator}from'../modular-audio/selectedPartsCoordinator.js';
 import{preparedContextAllowsIdleSuspend}from'../modular-audio/contextLifecyclePolicy.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
 import {WasmRoomPool} from '../synth-lab/roomPool';
@@ -148,6 +152,8 @@ export const ROLES = {
     rhythm: { label: 'Rhythm layer', polyphony: 8, preset: ROLE_PRESETS.rhythm },
 };
 
+const selectedPartsCoordinators=new WeakMap(),preparedStartIntents=new WeakMap();
+const cancelPreparedIntent=g=>preparedStartIntents.set(g,(preparedStartIntents.get(g)??0)+1);
 class Generator {
     /** @param {object} [settings] - complete, valid settings (settings.js) */
     constructor(settings = defaultSettings(), {percussion = percussionFromSearch(globalThis.location?.search), roleWanderFactory = null, audioEnvironment = null} = {}) {
@@ -322,7 +328,11 @@ class Generator {
         this.planListeners.forEach((listener) => listener());
     }
 
-    async start() {
+    async start(options) {
+        if(this.runtimeEnvironmentReady){const intent=preparedStartIntents.get(this)??0;await this.runtimeEnvironmentReady;if(intent!==(preparedStartIntents.get(this)??0))throw Object.assign(Error('Playback start canceled during runtime publication'),{name:'AbortError'});}
+        if(this.runtimeEnvironmentError)throw this.runtimeEnvironmentError;
+        assertMainRuntimeSettings(this,this.settings,{checkPlan:true});
+        if(!options?.prepareOnly&&this.hasPreparedAmbienceStart())return this.startSelectedParts({music:true});
         this.audioEnvironment?.checkRuntime?.();
         if (this.roleWanderFactory) {
             if (this.AC.state !== 'running') await this.AC.resume();
@@ -344,6 +354,15 @@ class Generator {
         }
         this.ensurePlanned(this.resumeBar);
         const resumed = this.plan.get(this.resumeBar), resumeMeter = resumed.meter ?? this.meter;
+        if(options?.prepareOnly){
+            if(typeof options.isCurrent!=='function')throw Error('Explicit prepared music epoch admission required');
+            const transport=this.transport,resumeBar=this.resumeBar,settings=JSON.stringify(this.settings),sources=Object.values(this.roles).map(r=>[r.instrument,r.wander,JSON.stringify(r.instrument.preset)]);let closed=false,attempted=false,startAt=null;
+            return Object.freeze({get attempted(){return attempted;},get startAt(){return startAt;},cancel(){closed=true;},commitAt:when=>{
+                if(closed||options.signal?.aborted||!options.isCurrent()||this.transport!==transport||this.resumeBar!==resumeBar||this.plan.get(resumeBar)!==resumed||JSON.stringify(this.settings)!==settings||Object.values(this.roles).some((r,i)=>r.instrument!==sources[i][0]||r.wander!==sources[i][1]||JSON.stringify(r.instrument.preset)!==sources[i][2]))throw Object.assign(Error('Prepared music start was cancelled or changed'),{name:'AbortError'});
+                this.audioEnvironment?.checkRuntime?.();if(this.AC.state!=='running'||!Number.isFinite(when)||when<this.AC.currentTime)throw Object.assign(Error('Prepared music authored epoch was missed'),{code:'SELECTED_PARTS_START_DEADLINE'});
+                attempted=true;closed=true;startAt=when;transport.setBpm(unitsPerMinute(resumeMeter,resumed.bpm));transport.beatsPerBar=resumeMeter.units;this.startedAt=performance.now();transport.start(resumeBar*resumeMeter.units,when);this.notifyRunning();
+            }});
+        }
         this.transport.setBpm(unitsPerMinute(resumeMeter, resumed.bpm));
         this.transport.beatsPerBar = resumeMeter.units;
         this.startedAt = performance.now();
@@ -357,6 +376,7 @@ class Generator {
     syncPercussionVoice() {
         const r = this.roles.perc, voice = percussionVoice(this.settings.drums.kit);
         if (r.machine) return Promise.resolve(); // a drum machine (setPercussionSource) keeps the part
+        if(voice.wasmOnly&&this.percussionEngine!=='wasm')assertMainRuntimeSourceEdit(this,'percussion engine replacement');
         const revision = this.percussionRevision = (this.percussionRevision ?? 0) + 1;
         if (!voice.wasmOnly || this.percussionEngine === 'wasm') {
             r.instrument.setVoicePreset(voice.id);r.presetName = voice.name;this.percussionError = null;
@@ -392,6 +412,7 @@ class Generator {
     }
 
     async setAudioEngine(mode) {
+        assertMainRuntimeSourceEdit(this,'source engine replacement');
         if(mode!=='wasm'&&Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice))throw Error('This preset uses Wasm-only voices. Choose another sound or preset to compare engines.');
         mode=mode==='wasm'?'wasm':'legacy';const revision=(this.audioEngineRevision??0)+1;this.audioEngineRevision=revision;
         const work=(async()=>{
@@ -420,7 +441,29 @@ class Generator {
         try{await work;}finally{if(this.audioEngineReady===work)this.audioEngineReady=null;}
     }
 
+    registerAutomaticFadePolicy(name,seconds){return registerAutomaticFadePolicy(this,name,seconds);}
+    automaticFadePolicyStatus(){return automaticFadePolicyStatus(this);}
+    assertAutomaticFadePolicy(seconds){if(this.hasPreparedAmbienceStart())assertPreparedFade(seconds);}
+    assertFadeCancelPolicy(){const owner=getPublishedMainPreparedAmbience(this);if(owner&&this.fadeTimer&&(this.preparedFadeStop||owner.stoppedStatus().pendingStop))throw Object.assign(Error('Wait for the authored prepared fade to finish before restarting it'),{code:'PREPARED_AMBIENCE_FADE_CANCEL_UNSUPPORTED'});}
+    prepareStoppedRuntime(options){return prepareGeneratorStoppedRuntime(this,options);}
+    commitStoppedRuntime(candidate){return commitGeneratorStoppedRuntime(this,candidate);}
+    hasPreparedAmbienceStart(){return!!getPublishedMainPreparedAmbience(this);}
+    preparedAmbienceStatus(){return getPublishedMainPreparedAmbience(this)?.stoppedStatus()??null;}
+    preparedStartStatus(){return selectedPartsCoordinators.get(this)?.status()??{profile:'selected-parts-coordinator-v1',pending:null,last:null,error:null};}
+    selectedPartsCoordinator(){
+        let coordinator=selectedPartsCoordinators.get(this);if(!coordinator){coordinator=createSelectedPartsCoordinator({context:this.AC,getOwner:()=>getPublishedMainPreparedAmbience(this),prepareMusic:options=>this.start({...options,prepareOnly:true}),stopMusic:({force=false}={})=>{if(this.isRunning||force)return this.stop({preparedPartial:force});},onRunning:()=>this.notifyRunning(),isCurrent:()=>!this.runtimeEnvironmentError});selectedPartsCoordinators.set(this,coordinator);}return coordinator;
+    }
+    async cancelPreparedStart(parts={music:true,ambience:true}){cancelPreparedIntent(this);try{await selectedPartsCoordinators.get(this)?.cancel(parts);}catch(error){if(error.name!=='AbortError'||error.cleanupError)throw error;}return{cancelled:true};}
+    async startSelectedParts({music=false,ambience=false}={}){
+        if(this.runtimeEnvironmentReady){const intent=preparedStartIntents.get(this)??0;await this.runtimeEnvironmentReady;if(intent!==(preparedStartIntents.get(this)??0))throw Object.assign(Error('Playback start canceled during runtime publication'),{name:'AbortError'});}if(this.runtimeEnvironmentError)throw this.runtimeEnvironmentError;this.audioEnvironment?.checkRuntime?.();
+        if(!this.hasPreparedAmbienceStart())throw Error('Explicit prepared Ambience publication required');assertAutomaticPreparedFadePolicy(this);if(music)assertMainRuntimeSettings(this,this.settings,{checkPlan:true});
+        music=music&&!this.isRunning;ambience=ambience&&!this.ambienceRunning;if(!music&&!ambience)return null;
+        return this.selectedPartsCoordinator().start({music,ambience});
+    }
     async startAmbience() {
+        if(this.runtimeEnvironmentReady){const intent=preparedStartIntents.get(this)??0;await this.runtimeEnvironmentReady;if(intent!==(preparedStartIntents.get(this)??0))throw Object.assign(Error('Playback start canceled during runtime publication'),{name:'AbortError'});}if(this.runtimeEnvironmentError)throw this.runtimeEnvironmentError;
+        if(this.hasPreparedAmbienceStart())return this.startSelectedParts({ambience:true});
+
         this.audioEnvironment?.checkRuntime?.();
         if (this.ambienceRunning) return;
         if (this.AC.state !== 'running') await this.AC.resume();
@@ -429,6 +472,8 @@ class Generator {
     }
 
     stopAmbience(fade = 0.6) {
+        if(this.runtimeEnvironmentReady||this.hasPreparedAmbienceStart())cancelPreparedIntent(this);
+        if(this.hasPreparedAmbienceStart()){assertPreparedFade(fade);return this.selectedPartsCoordinator().stop({music:false,ambience:true,time:this.AC.currentTime,fade});}
         if (!this.ambienceRunning) return;
         this.ambience.stop(this.AC.currentTime, fade);
         this.notifyRunning();
@@ -436,10 +481,13 @@ class Generator {
 
     /** Music and ambience together (the main Play). */
     async startAll() {
+        if(this.hasPreparedAmbienceStart())return this.startSelectedParts({music:true,ambience:true});
         await Promise.all([this.isRunning ? null : this.start(), this.startAmbience()]);
     }
 
     stopAll() {
+        if(this.runtimeEnvironmentReady||this.hasPreparedAmbienceStart())cancelPreparedIntent(this);
+        if(this.hasPreparedAmbienceStart()){if(this.preparedFadeStop){clearTimeout(this.fadeTimer);clearTimeout(this.endTimer);this.fadeTimer=this.endTimer=null;this.fadeAmbience=false;}else this.cancelFadeOut({restartAmbience:false});return this.selectedPartsCoordinator().stop({music:this.isRunning||!!this.preparedStartStatus().pending?.music,ambience:true,time:this.AC.currentTime,fade:.6});}
         this.cancelFadeOut();
         if (this.isRunning) this.stop();
         this.stopAmbience();
@@ -488,6 +536,7 @@ class Generator {
      * then everything stops. Stop in the meantime cancels it.
      */
     fadeOut(seconds) {
+        const preparedOwner=getPublishedMainPreparedAmbience(this);if(preparedOwner)assertPreparedFade(seconds*5/7);
         if (!this.anyRunning) return;
         const now = this.AC.currentTime;
         if (this.isRunning) {
@@ -499,7 +548,7 @@ class Generator {
         }
         // the bed fades the same way and stops at the end
         this.fadeAmbience = this.ambienceRunning;
-        if (this.fadeAmbience) this.ambience.stop(now, seconds * 5 / 7);
+        if (this.fadeAmbience){if(preparedOwner){const stopped=this.preparedFadeStop=preparedOwner.stop({time:now,fade:seconds*5/7});stopped.catch(error=>{this.preparedFadeError??=error;});stopped.finally(()=>{if(this.preparedFadeStop===stopped)this.preparedFadeStop=null;}).catch(()=>{});}else this.ambience.stop(now, seconds * 5 / 7);}
         clearTimeout(this.fadeTimer);
         this.fadeTimer = setTimeout(() => {
             this.fadeTimer = null;
@@ -518,7 +567,8 @@ class Generator {
     }
 
     /** Back to full level from a fadeOut that is under way. */
-    cancelFadeOut() {
+    cancelFadeOut({restartAmbience=true}={}) {
+        this.assertFadeCancelPolicy();
         if (!this.fadeTimer) return;
         clearTimeout(this.fadeTimer);
         this.fadeTimer = null;
@@ -535,7 +585,8 @@ class Generator {
         gain.setTargetAtTime(1, this.AC.currentTime, 0.3);
         if (this.fadeAmbience) {
             this.fadeAmbience = false;
-            this.ambience.start(this.AC.currentTime + 0.05);
+            if(this.hasPreparedAmbienceStart()){if(restartAmbience)return this.startAmbience();}
+            else this.ambience.start(this.AC.currentTime + 0.05);
         }
     }
 
@@ -543,7 +594,10 @@ class Generator {
     // echoes: the output fades out, then the effects' tails are dropped and
     // the output is restored (for auditions and live play). Without it the
     // voices fade and the tails ring out.
-    stop() {
+    stop(options) {
+        if(this.runtimeEnvironmentReady||this.hasPreparedAmbienceStart())cancelPreparedIntent(this);
+        const pendingStart=selectedPartsCoordinators.get(this)?.cancel({music:true,ambience:false});
+        if(this.hasPreparedAmbienceStart()&&!this.isRunning&&!options?.preparedPartial)return pendingStart??Promise.resolve();
         this.emitVisualNote({ type: 'clear' });
         const heard = this.position();
         this.transport.stop();
@@ -651,7 +705,9 @@ class Generator {
         for (const { instrument } of Object.values(this.roles)) instrument.reverb?.hear?.();
     }
 
+    assertRuntimeSettingEdit(patch){if(!hasPublishedMainRuntime(this))return;assertMainRuntimeSettings(this,{...this.settings,...patch});if('generation'in patch&&patch.generation!==this.settings.generation&&Object.values(this.roles).some(r=>r.stringPatchBase))assertMainRuntimeSourceEdit(this,'physical generation replacement');if(patch.drums&&!this.roles.perc.machine&&percussionVoice(patch.drums.kit).wasmOnly&&this.percussionEngine!=='wasm')assertMainRuntimeSourceEdit(this,'percussion engine replacement');}
     set(key, value) {
+        this.assertRuntimeSettingEdit({[key]:value});
         const soundOnlyDrums = key === 'drums' && Object.keys(value).every(k => k === 'kit' || value[k] === this.settings.drums[k]);
         this.settings[key] = value;
         if (key === 'generation') this.refreshStringPatches();
@@ -717,6 +773,7 @@ class Generator {
      * settings, "keep this"). A meter change restarts playback as in set().
      */
     setMany(patch) {
+        this.assertRuntimeSettingEdit(patch);
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         const soundOnlyDrums = patch.drums && Object.keys(patch.drums).every(k => k === 'kit' || patch.drums[k] === this.settings.drums[k]);
         Object.assign(this.settings, patch);
@@ -822,6 +879,7 @@ class Generator {
         const wants = active && ['filter.lowpass', 'filter.highpass', 'filter.resonance'].some((key) => key in active);
         if (!wants && !this.sweep) return;
         if (!this.sweep) {
+            assertMainRuntimeSourceEdit(this,'a new master sweep');
             // between the master fade and the loudness trim, wide open at first so joining the chain is silent
             this.sweep = new SweepFilter(this.AC);
             this.output.disconnect(this.levelTrim);
@@ -835,6 +893,7 @@ class Generator {
     // is loading. Resolve their destinations at completion, rather than keeping
     // the destination captured before the asynchronous work began.
     routeSharedEffects() {
+        assertMainRuntimeSourceEdit(this,'shared-return rerouting');
         for (const [rack, key, sourceKey] of [[this.busRack, 'send', 'sendSource'], [this.spaceRack, 'spaceSend', 'spaceSendSource']]) {
             if (!rack) continue;
             rack.node.disconnect();
@@ -887,7 +946,7 @@ class Generator {
         if (this.sharedEffectsClosed) return;
         const bus = this.settings.bus, moves = this.moveState ?? {}, wantsMoves = this.settings.sequencer?.on && Object.keys(this.settings.sequencer.moves ?? {}).length > 0;
         if (!this.busRack) {
-            if (!(busActive(bus) || wantsMoves) || this.busLoading) return;
+            if (!(busActive(bus) || wantsMoves) || this.busLoading) return;assertMainRuntimeLazyReturn(this,'bus');
             this.busError = null;
             this.busLoading = createBusRack(this.AC, bus.rack, this.mixReturn ?? this.output, this.sharedRackOptions('bus')).then(async (rack) => {
                 if (this.sharedEffectsClosed) { await rack.dispose(); return; }
@@ -927,7 +986,7 @@ class Generator {
     applySpace(level, time, barSeconds) {
         if (this.sharedEffectsClosed) return;
         if (!this.spaceRack) {
-            if (!(level > 0) || this.spaceLoading) return;
+            if (!(level > 0) || this.spaceLoading) return;assertMainRuntimeLazyReturn(this,'space');
             this.spaceError = null;
             this.spaceLoading = createBusRack(this.AC, SPACE_RACK, this.mixReturn ?? this.output, this.sharedRackOptions('space')).then(async (rack) => {
                 if (this.sharedEffectsClosed) { await rack.dispose(); return; }
@@ -965,6 +1024,7 @@ class Generator {
     }
 
     async setRoleSource(role, source, name) {
+        assertMainRuntimeSourceEdit(this,'role source replacement');
         if(!ROLES[role])throw Error('Unknown melodic role');
         const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
         const pending=(async()=>{
@@ -999,6 +1059,7 @@ class Generator {
      * settings. The pattern and its bookings carry on; only the sound changes.
      */
     async setPercussionSource(source) {
+        if(source?.classics||this.roles.perc.machine)assertMainRuntimeSourceEdit(this,'percussion source replacement');
         const r = this.roles.perc, revision = r.sourceRevision = (r.sourceRevision ?? 0) + 1;
         let instrument, nextEngine = this.percussionEngine;
         if (source?.classics) {
@@ -1027,7 +1088,7 @@ class Generator {
 
     /** Loads a preset onto a role; `preset` defaults to looking `name` up. */
     loadRolePreset(role, name, preset = findPreset(name), morphSeconds = 0) {
-        if (!preset) return false;
+        if (!preset) return false;assertMainRuntimeSourceEdit(this,'preset selection');
         if (this.pendingVoices) this.pendingVoices = this.pendingVoices.filter((p) => p.role !== role || p.preset === preset);
         const r = this.roles[role];
         r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name) || isBreathPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
@@ -1055,7 +1116,7 @@ class Generator {
      * @returns {boolean} whether the preset exists
      */
     loadRolePresetAtBar(role, name, preset = findPreset(name), applied, { morph = false } = {}) {
-        if (!preset) return false;
+        if (!preset) return false;assertMainRuntimeSourceEdit(this,'queued preset selection');
         this.pendingVoices = (this.pendingVoices || []).filter((p) => p.role !== role);
         if (!this.isRunning) {
             this.loadRolePreset(role, name, preset);
@@ -1110,6 +1171,7 @@ class Generator {
     /** One synth parameter, live (the editor's knobs). */
     setRoleParam(role, key, value) {
         const r=this.roles[role],next={...r.instrument.preset,[key]:value};
+        if(this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC))assertMainRuntimeSourceEdit(this,'source-family parameter change');
         const pending=this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC)?this.setRoleSource(role,next,r.presetName):null;
         if(!pending)r.instrument.set(key,value);
         r.edited=true;return pending;
@@ -1237,6 +1299,7 @@ class Generator {
     }
 
     async awaitSourceReady() {
+        if(this.runtimeEnvironmentReady){const intent=preparedStartIntents.get(this)??0;await this.runtimeEnvironmentReady;if(intent!==(preparedStartIntents.get(this)??0))throw Object.assign(Error('Playback start canceled during runtime publication'),{name:'AbortError'});}if(this.runtimeEnvironmentError)throw this.runtimeEnvironmentError;
         this.audioEnvironment?.checkRuntime?.();
         await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; await i.armRuntime?.(); if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
         await this.awaitSharedEffectsReady?.();
@@ -1315,6 +1378,7 @@ class Generator {
      * the playing), apart from the music's roles and mix. Made on first use; a MIDI connection makes it ahead.
      */
     midiPiano() {
+        if(!this.midi)assertMainRuntimeSourceEdit(this,'standalone MIDI source creation');
         if (!this.midi) {
             const instrument = new Instrument({ ...nativeInstrumentEnvironment(this.audioEnvironment,findPreset(MIDI_PIANO),this.AC), context: this.AC, polyphony: 12, preset: findPreset(MIDI_PIANO), reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
@@ -1342,6 +1406,8 @@ class Generator {
     }
 
     liveNoteOn(role, midi, velocity = 0.8) {
+        if(role==='midi'&&!this.midi)assertMainRuntimeSourceEdit(this,'standalone MIDI source creation');
+        if(this.runtimeEnvironmentReady)throw Object.assign(Error('Wait for stopped runtime publication before live input'),{code:'GENERATOR_RUNTIME_PENDING'});if(this.runtimeEnvironmentError)throw this.runtimeEnvironmentError;
         this.audioEnvironment?.checkRuntime?.();
         if (this.roleWanderFactory) {
             if (!this.roleMotionPrepared) throw Error('Prepare role motion before playing live notes');

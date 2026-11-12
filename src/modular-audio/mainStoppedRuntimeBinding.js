@@ -1,3 +1,4 @@
+import{assertAutomaticPreparedFadePolicy}from'./preparedStartPolicy.js';
 import{STOPPED_RUNTIME_ROLES,assertStoppedRuntime,inspectStoppedRuntime}from'./stoppedRuntimeSnapshot.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
 // Routing metadata never substitutes for the caller's explicit published scope.
@@ -24,9 +25,11 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
   if(installed||closed)throw Error('Main binding is no longer an unpublished candidate');assertStoppedRuntime(snapshot);if(installedMain.get(g)!==previousRuntime)throw Error('Main return authority changed during preparation');if(previousRuntime&&(previousRuntime.quarantined||!previousRuntime.scope||previousRuntime.scope.snapshot().state!=='published'||STOPPED_RUNTIME_ROLES.some(id=>previousRuntime.bundle.roles[id].instrument!==old[id].instrument||previousRuntime.bundle.roles[id].wander!==old[id].wander)||previousRuntime.bundle.ambience!==identities.ambience))throw Error('Explicit previous Main publication scope required');if(g.mixReturn||Object.values(g.roles).some(r=>r.mixOutput))throw Error('Main binding does not own All desk routes');
   if(!records.every(same))throw Error('Main runtime binding field changed during preparation');
   if(g.reverbHub||g.wasmRoomPool||Object.values(old).some(r=>r.roomRoute))throw Error('Main binding requires explicit private shared-room ownership');
+  if(previousRuntime?.bundle.preparedAmbienceOwner&&previousRuntime.bundle.preparedAmbienceOwner.stoppedStatus().stopped!==true)throw Error('Complete Ambience must finish its actual stopped drain before Main replacement');
   const weather=identities.ambience?.weatherRoute;if(weather&&typeof weather.dispose!=='function'&&(weather.revision>0||weather.node))throw Error('Previously started Native Ambience has no explicit terminal retirement authority');
-  if(Object.keys(identities.ambience?.playing??{}).length||identities.ambience?.sourcePreparations?.size||identities.ambience?.sourceRetirements?.size)throw Error('Old Ambience source/fade retirement must finish before Main replacement');
+  if((identities.ambience?.playing instanceof Map?identities.ambience.playing.size:Object.keys(identities.ambience?.playing??{}).length)||identities.ambience?.sourcePreparations?.size||identities.ambience?.sourceRetirements?.size)throw Error('Old Ambience source/fade retirement must finish before Main replacement');
   if(!bundle?.environment||bundle.environment.context!==context||typeof bundle.dispose!=='function'||typeof bundle.check!=='function')throw Error('Complete same-context detached Main owners required');bundle.check();
+  if(bundle.preparedAmbienceOwner)assertAutomaticPreparedFadePolicy(g);
   const resources=new Set();for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles?.[id],destination=r.tone??r.gain;if(!next||next.instrument===r.instrument||next.wander===r.wander||typeof next.instrument.connect!=='function')throw Error('Independent candidate source and Wander required: '+id);native(context,output(next.instrument));native(context,next.wander.input);native(context,next.wander.output);native(context,destination);native(context,id==='perc'?r.gain:r.duck);if(next.instrument.destinations?.length)throw Error('Candidate already has a logical source destination: '+id);for(const owner of[next.instrument,next.wander]){if(resources.has(owner))throw Error('Duplicate Main candidate owner');resources.add(owner);}for(const[key,source]of[['send','sendSource'],['spaceSend','spaceSendSource']])if(r[key]&&(r[source]??r.wander.output)!==r.wander.output)throw Error('Main shared send has foreign source authority: '+id);}
   native(context,bundle.sharedReturn);native(context,bundle.ambienceReturn);native(context,g.output);native(context,g.ambienceOut);
  }
@@ -53,7 +56,7 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
  function retirePrevious(){if(!installed)throw Error('Cannot retire unpublished Main owners');if(retirement)return retirement;
   const tracked=(owner,label,close)=>{const sourceNode=owner?.voice?.backend?.node??owner?.player?.node??owner?.node,health=()=>owner?.disposalStatus?.()??owner?.player?.disposalStatus?.()??sourceNode?.sourceDisposalStatus?.()??null;return async()=>{const record={label,settled:false,error:null,health:null};retirementHealth.push(record);try{const receipt=await close();record.health=health();if(receipt?.clean===false||receipt?.released===false||receipt?.quarantined===true||record.health?.quarantined||record.health?.error||record.health?.profile==='source-terminal-receipt-v1'&&!record.health.released)throw Error('Previous Main owner has no clean terminal release: '+label);record.settled=true;}catch(error){record.error=String(error);throw error;}finally{record.health=health();}};};
   const actions=[];for(const id of STOPPED_RUNTIME_ROLES){const r=old[id];actions.push(tracked(r.instrument,id+' source',()=>typeof g.retireInstrument==='function'?g.retireInstrument(r.instrument):r.instrument.dispose()),tracked(r.wander,id+' Wander',()=>r.wander.dispose()));if(r.send)actions.push(()=>r.send.disconnect());if(r.spaceSend)actions.push(()=>r.spaceSend.disconnect());}
-  for(const[kind,owner]of[['ambience',identities.ambience],['bus',identities.busRack],['space',identities.spaceRack]])if(owner)actions.push(tracked(owner,kind,()=>kind==='ambience'?retireAudioActions([()=>owner.dispose(),()=>owner.weatherRoute?.dispose?.(),async()=>{const result=await owner.sourceDisposal;if(result?.error)throw Error(result.error);}],'Previous Main Ambience retirement failed'):owner.dispose()));
+  for(const[kind,owner]of[['ambience',previousRuntime?.bundle.preparedAmbienceOwner??identities.ambience],['bus',identities.busRack],['space',identities.spaceRack]])if(owner)actions.push(tracked(owner,kind,()=>kind==='ambience'&&!previousRuntime?.bundle.preparedAmbienceOwner?retireAudioActions([()=>owner.dispose(),()=>owner.weatherRoute?.dispose?.(),async()=>{const result=await owner.sourceDisposal;if(result?.error)throw Error(result.error);}],'Previous Main Ambience retirement failed'):owner.dispose()));
   if(previousRuntime)actions.push(tracked(previousRuntime.scope,'previous published scope',()=>previousRuntime.scope.retire()));
   retirement=retireAudioActions(actions,'Previous Main runtime retirement failed').then(()=>{if(previousRuntime){previousScopeReport=previousRuntime.scope.snapshot();previousRuntime=null;}});return retirement;
  }
@@ -72,3 +75,19 @@ export async function commitMainStoppedRuntime(transaction,bundle){
  try{binding.registerPublishedScope(published.scope);}catch(error){binding.quarantinePublication(error);error.code='MAIN_RUNTIME_PUBLICATION_QUARANTINED';error.publishedRuntime={published,binding};throw error;}
  return Object.freeze({...published,binding});
 }
+
+/** Only an explicit registered publication may authorize prepared source birth. */
+export function isPublishedMainPreparedAmbience(generator,owner){const a=installedMain.get(generator);return!!(a&&!a.quarantined&&a.scope?.snapshot().state==='published'&&a.bundle.preparedAmbienceOwner===owner&&generator.ambience===owner?.ambience&&generator.audioEnvironment===a.bundle.environment);}
+export function getPublishedMainPreparedAmbience(generator){const a=installedMain.get(generator),owner=a?.bundle.preparedAmbienceOwner;if(!owner)return null;if(!isPublishedMainPreparedAmbience(generator,owner))throw Object.assign(Error('Prepared Ambience publication is unbound or quarantined'),{code:'MAIN_RUNTIME_PUBLICATION_QUARANTINED'});return owner;}
+
+function editRefusal(operation){throw Object.assign(Error('This prepared Main profile keeps source and shared-return ownership fixed; rebuild the stopped runtime for '+operation),{code:'MAIN_RUNTIME_EDIT_UNSUPPORTED',operation});}
+export function assertMainRuntimeSourceEdit(generator,operation){if(installedMain.has(generator))editRefusal(operation);}
+export function assertMainRuntimeSettings(generator,settings,{checkPlan=false}={}){const a=installedMain.get(generator);if(!a)return true;const b=a.bundle;if(a.quarantined||!a.scope||a.scope.snapshot().state!=='published'||generator.audioEnvironment!==b.environment||generator.ambience!==b.ambience||Object.entries(b.roles).some(([id,r])=>generator.roles[id].instrument!==r.instrument||generator.roles[id].wander!==r.wander)||generator.busRack!==b.busRack||generator.spaceRack!==b.spaceRack)editRefusal('changed runtime authority');
+ const wantsBus=Object.values(settings.bus?.sends??{}).some(value=>value>0)||settings.sequencer?.on&&Object.keys(settings.sequencer.moves??{}).length>0;
+ const wantsSpace=(settings.sectionSpace??0)>0||settings.arc?.shape&&settings.arc.shape!=='off'||checkPlan&&[...generator.plan.values()].some(bar=>(bar.space??0)>0);
+ const wantsSweep=settings.sequencer?.on&&Object.keys(settings.sequencer.moves??{}).some(key=>key.startsWith('filter.'));
+ if(wantsSweep&&!generator.sweep)editRefusal('a new master sweep');if(wantsBus&&!b.busRack)editRefusal('a new shared bus');if(wantsSpace&&!b.spaceRack)editRefusal('a new section-space return');return true;
+}
+export function assertMainRuntimeLazyReturn(generator,kind){const a=installedMain.get(generator);if(a&&!a.bundle[kind==='bus'?'busRack':'spaceRack'])editRefusal('a new '+kind+' return');}
+
+export function hasPublishedMainRuntime(generator){return installedMain.has(generator);}
