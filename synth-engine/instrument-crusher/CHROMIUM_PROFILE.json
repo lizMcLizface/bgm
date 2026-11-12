@@ -1,0 +1,23 @@
+{
+  "profile": "original-instrument-bitcrusher-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Original worklet f64 phaser/hold/quantizer, four independent Native gain/parameter timelines; restricted pinned fdlibm pow(.75,bits) for Float32 bits in[1,16]. No ScriptProcessor fallback or automatic demand equivalence.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/bitcrusher.js",
+    "public/bitcrusher-processor.js",
+    "src/nodes/gain.js"
+  ],
+  "power": {
+    "source": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/ieee754.cc",
+    "sourceSha256": "661b229dd99d262594df7a25d1c709d63f0af202c9bae252b3cabbaeb27d7d2f",
+    "excerpt": "reference/ieee754-pow.cc",
+    "excerptSha256": "68b1301a8e43ed7a983c9ce4322727d8f20281aa19fb2743e6ef9504fe2cca16",
+    "domain": "base exactly.75, exponent Float32 clamped[1,16]; .75 normalizes exactly1.5, so source log polynomial terms are exactlyzero; retain split-log/exponential arithmetic, exponent1/2 special cases, original explicit operations (no FMA). Actual browser validation required."
+  }
+}

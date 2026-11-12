@@ -1,0 +1,19 @@
+{
+  "api": 1,
+  "profile": "unchanged-original-nodes-bitcrusher-reference-v1",
+  "source": "cdc06479883f757483b54e1d2213fcd6d744d1984abfae191e437f49489060cb",
+  "files": [
+    "src/nodes/bitcrusher.js",
+    "src/nodes/gain.js",
+    "public/bitcrusher-processor.js",
+    "src/audio/processorRetirements.js",
+    "src/audio/constructorJournal.js",
+    "src/audio/processorModuleObservation.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "tools/buildInstrumentCrusherReference.mjs"
+  ],
+  "wrapper": "b0d75646cd35da7707b3fcf104d818c15edfb5b8870d47ac8c0f42b2473e91cf",
+  "processor": "d368128edd1c48cbc60f39f69928ebbebe1da45dbfa7dc616859d2a0746e0446",
+  "version": "2577919e45e9076b",
+  "scope": "Original application class bundled by esbuild; original worklet source verbatim normalizedLF. No algorithm edits, no ScriptProcessor fallback acceptance. Original class requests canonical /bitcrusher-processor.js and review verifies its bytes before rendering."
+}

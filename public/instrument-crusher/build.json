@@ -1,0 +1,29 @@
+{
+  "api": 1,
+  "profile": "original-instrument-bitcrusher-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "c29fe5d2c248b2be",
+  "source": "a401fe980a75ef35144a1d1be1552bcbaa978bba64f05350d6ddfcf326834c75",
+  "wasm": "3041ece0d20a1ad2b5ba0a849d7d79bc11850f19032b3b20d4f931611e67494f",
+  "bytes": 38038,
+  "files": [
+    "synth-engine/instrument-crusher/Cargo.toml",
+    "synth-engine/instrument-crusher/Cargo.lock",
+    "synth-engine/instrument-crusher/src/lib.rs",
+    "synth-engine/instrument-crusher/src/power.rs",
+    "synth-engine/instrument-crusher/src/allocation.rs",
+    "synth-engine/instrument-crusher/reference/ieee754-pow.cc",
+    "synth-engine/instrument-crusher/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-crusher/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "src/nodes/bitcrusher.js",
+    "public/bitcrusher-processor.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentCrusher.js",
+    "tools/buildInstrumentCrusher.mjs"
+  ],
+  "scope": "Original worklet f64 phaser/hold/quantizer, four independent Native gain/parameter timelines; restricted pinned fdlibm pow(.75,bits) for Float32 bits in[1,16]. No ScriptProcessor fallback or automatic demand equivalence.",
+  "profileSha256": "9918d27d05122a9ace3b24ce3b50c57c1117b82748c41a34b2aabe9059bb9803",
+  "notices": "abc3b800aa15ec334e3a5936538f2882442d8688efc608c7d628af37a6aa581c"
+}
