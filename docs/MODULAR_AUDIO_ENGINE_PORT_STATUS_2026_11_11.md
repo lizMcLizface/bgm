@@ -27,16 +27,17 @@ accepted results refer to the exact artifacts and cases in the linked records.
 
 ## Current live-host continuation
 
-Update12 November: Tape now has separately accepted36-case live kernel and
-36-case actual audio facade, bounded resources and a Rust curve preparer with
-4,161,519 exact Float32 comparisons. Automatic Native-tail policy and normal
-adoption remain separate gates. Live Ambience spatial now passes14 cold/reused
-cases at seven rates plus the full six-layer lifecycle with exact wet output;
-normal adoption and startup-failure hardening remain. Actual active Width/Ring
-clock lag is causally reproduced using two independent Native markers under
-graph churn; a new authoritative clock adapter is in progress. No all-Rust
-application completion or default-backend change is implied. The current
-PLAN/HANDOFF and component documents bind these newer checkpoints.
+Update12 November: the current plan/handoff records the exact newer artifacts.
+The separate authoritative context clock and Width/Ring host now pass72 Native
+comparisons, actual live graph churn and cold replay. Clocked dynamics passes
+its Native and live gates; the explicit All Native/owned/restored group has
+six clean Width/Ring and45 clean dynamics owners. Normal retained-player
+pause/resume remains blocked by a proved Native no-pull stop-drain gap; a
+separate explicit lifecycle protocol is under review. Tape Rust READY/curve
+resources and explicit lifecycle contracts, plus Ambience recipe/session and
+fenced loop/spatial composition, have further accepted component checks. Their
+normal adoption still requires the remaining endpoint/lifecycle contracts.
+No all-Rust application completion or default-backend change is implied.
 
 
 The explicit [prepared environment](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now

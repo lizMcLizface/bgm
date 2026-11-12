@@ -23,3 +23,21 @@ Successor `05a08378b25fb735` adds a bounded typed clock-binding MessagePort rece
 The assembled All Native-desk/owned-desk/restored three-case batch also passed with this exact Dynamics host. Its existing motionReview.rackOwners observer records 45 nonempty Dynamics owners, all version `4fa241e23ed0af99`, all disposed with nodeReleased true and errors null. Evidence: `reports/modular_audio/clocked-all-3ff9-4fa-final.json`. This is routed functional and lifecycle acceptance, not cross-backend PCM identity. Earlier six-rate results remain bound to their own revisions.
 
 No physical listening, callback deadline, main player resume, or default adoption claim is made.
+
+
+## Shared-reference provenance and built host
+
+The shared rack initial-preparation fix changes the recorded original-reference
+source identity. Rebuilding preserves the exact81,473-byte numeric Wasm SHA
+db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6.
+The new numeric build metadata is2411d98ba0c76a88; the unchanged clocked host
+logic receives provenance identity9207c183df3376f0. The accepted4fa assets are
+retained under reports/scripts/clocked-dynamics-4fa-accepted and in commit6c28eb8.
+The new built48k ten-case Native batch passes with maximum PCM error0. Actual
+built All Native/owned/restored checks pass all three hosts,45 clean dynamics
+and six clean Width/Ring owners. The earlier concurrent full-regression/audio
+run hit the unchanged actual-host clock deadline; its negative is retained.
+The successful repeat ran alone. This is functional built integration evidence,
+not a physical deadline guarantee or proof attributing the first failure.
+Reports: clocked-dynamics-9207-built-48000-final.json,
+clocked-all-9207-built-final.json and clocked-all-built-busy-first-negative.json.
