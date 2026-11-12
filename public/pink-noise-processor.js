@@ -3,7 +3,13 @@ class PinkNoiseProcessor extends AudioWorkletProcessor {
         super();
         // 'stop' ends the processor for good (process() returns false)
         this.stopped = false;
-        this.port.onmessage = (e) => { if (e.data === 'stop') this.stopped = true; };
+        this.port.onmessage = (e) => {
+            if (e.data === 'stop') this.stopped = true;
+            else if (e.data?.type === 'dispose') {
+                this.stopped = true;
+                this.port.postMessage({type:'disposed',version:1,released:true,clean:true,reason:'js-render-guard-terminal',renderQuiescent:true,heapFreed:false});
+            }
+        };
         
         // Pink noise filter state variables
         this.b0 = 0;

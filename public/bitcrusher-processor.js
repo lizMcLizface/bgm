@@ -15,7 +15,13 @@ class BitcrusherProcessor extends AudioWorkletProcessor {
         this.phaser = 0;
         this.last = 0;
         this.stopped = false;
-        this.port.onmessage = (e) => { if (e.data === 'stop') this.stopped = true; };
+        this.port.onmessage = (e) => {
+            if (e.data === 'stop') this.stopped = true;
+            else if (e.data?.type === 'dispose') {
+                this.stopped = true;
+                this.port.postMessage({type:'disposed',version:1,released:true,clean:true,reason:'js-render-guard-terminal',renderQuiescent:true,heapFreed:false});
+            }
+        };
     }
 
     process(inputs, outputs, parameters) {

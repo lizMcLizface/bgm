@@ -1,11 +1,11 @@
 {
   "api": 1,
   "profile": "original-tape-explicit-audio-candidate-v1",
-  "version": "67c4c16fb555b3f3",
-  "kernelVersion": "7e165c5616e8d55a",
+  "version": "a41e84778cd242a0",
+  "kernelVersion": "e68ef063400479f0",
   "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
   "runtime": "143f5162e36525f3bc8ce2f44e3b8597f378322ad0fffb6d9b12884421a416cb",
-  "processor": "b53c0d46584081b9773c806623077e1a9b1413084bd3b5c8fa3e4b0a132828ba",
+  "processor": "280814b4df302274bc77f4662d3693351ad7e441dcf876650056ac06d4e6075c",
   "sources": [
     "tools/buildTapeLiveAudioHost.mjs",
     "src/modular-audio/tapeLiveAudioProcessor.js",

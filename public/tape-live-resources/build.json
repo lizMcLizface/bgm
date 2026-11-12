@@ -1,11 +1,11 @@
 {
   "api": 1,
   "profile": "tape-live-two-credit-resources-v1",
-  "version": "ce36219935010076",
-  "kernelVersion": "7e165c5616e8d55a",
+  "version": "053bce7020548e35",
+  "kernelVersion": "e68ef063400479f0",
   "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
   "runtime": "cf6f3eabf641af633516fa466670da399a4963f8afe000cb21d7682b9c2922b7",
-  "processor": "8f7d2ac1da5b433226a4f49a1f62402e21e03b76c478a7e02067f368798dd19e",
+  "processor": "ac612d881b8313ed0d639e43be5bce60a1d924ef1b5c8d3d86ffa0b7f6dd0199",
   "sources": [
     "tools/buildTapeCurveResources.mjs",
     "src/modular-audio/tapeCurveResourceProcessor.js",

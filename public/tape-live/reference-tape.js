@@ -1,3 +1,4 @@
+import {AudioConstructorJournal,settleAudioCleanup} from '../audio/constructorJournal.js';
 // Tape: wow (a slow, drifting pitch sway), flutter (a fast shimmer of pitch), soft saturation and
 // the high end a tape loses. The wobble is a short delay line whose time sways with a few sine
 // LFOs; it is a pitch effect, not a mix, so the whole sound goes through it. The Instrument routes
@@ -19,27 +20,29 @@ const driveCurve = (drive) => {
 
 class Tape {
     constructor(AC) {
+        this.ownership=new AudioConstructorJournal({capacity:12,label:'Native Tape'});this.startedSources=new Set();
+        try {
         this.AC = AC;
-        this.input = AC.createGain();
-        this.shaper = AC.createWaveShaper();
+        this.input = this.ownership.create('node-0',()=>AC.createGain(),node=>node.disconnect());
+        this.shaper = this.ownership.create('node-1',()=>AC.createWaveShaper(),node=>node.disconnect());
         this.shaper.oversample = '2x';
-        this.tone = AC.createBiquadFilter();
+        this.tone = this.ownership.create('node-2',()=>AC.createBiquadFilter(),node=>node.disconnect());
         this.tone.type = 'lowpass';
         this.tone.Q.value = 0.5;
-        this.delay = AC.createDelay(0.02);
+        this.delay = this.ownership.create('node-3',()=>AC.createDelay(0.02),node=>node.disconnect());
         this.delay.delayTime.value = BASE_DELAY;
         this.input.connect(this.shaper);
         this.shaper.connect(this.tone);
         this.tone.connect(this.delay);
 
         const lfo = (hz) => {
-            const osc = AC.createOscillator();
-            const depth = AC.createGain();
+            const osc = this.ownership.create('LFO',()=>AC.createOscillator(),node=>settleAudioCleanup('Native Tape LFO',[()=>{if(this.startedSources.has(node))node.stop();},()=>node.disconnect()]));
+            const depth = this.ownership.create('node-4',()=>AC.createGain(),node=>node.disconnect());
             osc.frequency.value = hz;
             depth.gain.value = 0;
             osc.connect(depth);
             depth.connect(this.delay.delayTime);
-            osc.start();
+            osc.start();this.startedSources.add(osc);
             return { osc, depth };
         };
         this.wow = lfo(0.6);
@@ -48,7 +51,11 @@ class Tape {
         this.flutter2 = lfo(11.7);
         this.setDrive(0);
         this.setTone(9000);
+        }catch(error){throw this.ownership.failure(error);}
     }
+
+    dispose = () => this.ownership.retire();
+    cleanupStatus = () => this.ownership.status();
 
     getNode = () => this.input;
     connect = (destination) => [].concat(destination).forEach((d) => this.delay.connect(d));

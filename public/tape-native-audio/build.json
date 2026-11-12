@@ -1,8 +1,8 @@
 {
   "api": 1,
   "profile": "original-tape-native-stage-policy-audio-v1",
-  "version": "90cb8b8dbc8d9d8d",
-  "kernelVersion": "7e165c5616e8d55a",
+  "version": "27b201d39552cbf6",
+  "kernelVersion": "e68ef063400479f0",
   "stagePolicy": {
     "profile": "original-tape-connection-tail-policy-v2",
     "version": "33f009f5e5b66c0c",
@@ -10,12 +10,12 @@
   },
   "curvePreparation": {
     "profile": "original-tape-std-f64-tanh-final-f32-v1",
-    "version": "dcad5770a9397205",
+    "version": "ae09f8e656b87179",
     "wasm": "c8ff22b8fae7701be5ee70b844ad817d0ec991f79f0727617d87f93e8617362e"
   },
   "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
   "runtime": "d0da16682502669b6d3b49a6bfe20bb74a15cd88e896d662c8a51f7270484e16",
-  "processor": "89558fb3608a17f4f0eeed337f2259e0454f2ecd806cae80d7c668c083525f35",
+  "processor": "493faa771ce51fc5ff3e31ff776858552bf208e1b91e29d6e0e42c90e4a70401",
   "sources": [
     "tools/buildTapeNativeAudioHost.mjs",
     "src/modular-audio/tapeNativeAudioProcessor.js",
