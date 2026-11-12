@@ -6,6 +6,82 @@ port is not complete. Native defaults remain operational. The requested push
 through 111d282 completed using lizMcLizface; subsequent verified checkpoints
 are local commits with the same author and committer. No deployment occurred.
 
+Latest leaf checkpoints (read before the older history below):
+
+- Complete cold Room `be3bdf1dc8315dd8` passes 24 Full/Light mono/stereo
+  cases across six rates, two owners and true cold reload. Maximum absolute
+  Native PCM error is 4.470348358154297e-8. Its separate Rust mix allocation
+  audit passes. See [complete offline Room](MODULAR_AUDIO_ENGINE_OFFLINE_ROOM_COMPLETE.md).
+  Live prepared Room now passes all 24 six-rate cases, 48 Native comparisons,
+  exact input/independent PCM and true 192k cold replay. Preflight-only successor
+  `500e21b661710c7e` preserves pinned render bodies and passes its actual 48k
+  recheck plus three reused source7a generations, real two-owner quotas and
+  all ten terminal transport ACK/Worker termination releases. See
+  [complete live Room](MODULAR_AUDIO_ENGINE_LIVE_ROOM_COMPLETE.md).
+  Mutable live controls and normal routing adoption remain separate.
+- Tape's former 8k independence failure was isolated to Native ChannelMerger
+  slot-specific subnormal flushing: swapping slots moves the difference.
+  Identical separate logical captures now prove all 36 six-rate cases exact
+  between owned instances; maximum Native error is 4.24310564994812e-6.
+  Production `3b17c3eb4ede0c9d` is unchanged; no PCM normalization or wider
+  tolerance was used. Automatic Native source-end equivalence remains open.
+- [Selected complete Ambience](MODULAR_AUDIO_ENGINE_AMBIENCE_SELECTED_START.md)
+  passes actual cold/running three-owner starts, cancellation, all 12 wet stems
+  and acknowledged cleanup. The third running owner takes about 8.76s of bounded
+  fresh PCM upload; this does not certify ordinary low-latency startup.
+- [Stopped Main publication](MODULAR_AUDIO_ENGINE_MAIN_STOPPED_RUNTIME.md)
+  passes two actual owned generations, injected third-candidate rollback and
+  surviving audio, retaining the same Generator/Transport/settings/controls.
+  The separate explicit Ambience owner now passes actual authored fade,
+  ended/cursor/spatial/weather acknowledgements and stopped-source admission.
+  Its shutdown observer preserves primary failure while releasing resources
+  and bounds hung cleanup; the earlier reviewed deadlock is retained as negative
+  evidence. Coordinated music/Ambience integration is the next shared gate. Ownership publication does not replace Native Main control DSP.
+- [Physical Stage A](MODULAR_AUDIO_ENGINE_PHYSICAL_SOURCE_LIFECYCLE.md)
+  passes three actual piano/KS actors with independent playback/replacement,
+  terminal fences and partial preparation-worker cleanup. The numeric physical
+  Wasm is unchanged. Whole Instrument/MonoSynth constructor cleanup and family
+  admission are separate work; hidden measured cello remains deferred.
+- [Prepared Main strip](MODULAR_AUDIO_ENGINE_MAIN_STRIP.md)
+  `2a3e701cfe6db655` implements low-pass tone, volume and duck in Rust.
+  All 60 actual Native six-rate mono/stereo comparisons are Float32 bit-exact,
+  including persistence and irregular blocks; true HTML reload reproduces every
+  fixture/input/output hash. Nine tests and 49,152 audited render callbacks pass
+  with zero Rust allocation/reallocation/deallocation or memory growth. It is
+  a finite continuous reference, not yet a live Main replacement.
+
+The [coordinated Main start](MODULAR_AUDIO_ENGINE_MAIN_PREPARED_PARTS.md)
+now passes its actual two-publication/cancel-before-birth/start/drain/failed-third
+rollback group with no errors and an empty final ownership registry. The same
+future epoch is authored to Transport and complete Ambience. This fixed-owner
+profile refuses source/MIDI edits and lazy bus/space/sweep policies before
+mutation, bounds authored fades at5s, and does not undo an active authored fade.
+It is not a general editable UI/default profile or source-onset parity proof.
+
+The separate [clocked Core/FM source](MODULAR_AUDIO_ENGINE_CLOCKED_CORE_FM.md)
+`a20fefe1bf89996a` now uses Native source7a frames instead of a raw-global
+callback-count anchor. It passes 23 focused checks (39 with adjacent regressions)
+and actual48k/192k three-generation/two-owner captures, all bit-exact against
+independent unchanged Rust kernel instances at the observed Native frames.
+Suspend failures remain explicit while every actual source/clock release is
+acknowledged. No default or automatic Main environment switch was made.
+
+Verification of this assembled checkpoint: the fresh public build passes in
+38.43s and its static asset inventory passes. The full committed regression
+suite passes690 files /5748 checks, with4 skipped, in210.96s. Unfinished
+untracked parallel prototypes were excluded explicitly by the ignored test
+configuration; their focused results are not represented as committed gates.
+All nine accepted numerical Wasm binaries are byte-identical across the
+source-reference refresh. Logs are `reports/modular_audio/port-main-room-source-public-build.log`
+and `port-main-room-source-full-suite.log`. No deployment or additional push occurred.
+
+The all-Rust application port remains open. Remaining adoption gates include
+whole source-family ownership, clocked live Main tone/gain controls, selected
+Ambience lifecycle, live Room routing/controls and a coherent prepared runtime
+through normal Play/Stop/save/reload. Native defaults and legacy paths remain
+operational while those gates are closed separately. No deployment occurred.
+
+
 The new Native context-clock authority7a0838a735108706 recovers actual render
 frames independently of stale worklet globals. Separate Width/Ring3ff9323c4bcce2f2
 and compressor/limiter4fa241e23ed0af99 hosts preserve the original numeric DSP
