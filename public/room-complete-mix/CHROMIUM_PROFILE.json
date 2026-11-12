@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "profile": "original-room-unsmoothed-drywet-step-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/rack-native-normal/src/timeline.rs",
+  "timelineSha256": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020",
+  "timelineScope": "Exact accepted Native timeline copy, only captured setValueAtTime events used; no live/cancel/target subset claim.",
+  "sourceReferences": [
+    "src/nodes/reverb.js",
+    "src/nodes/gain.js"
+  ],
+  "law": "Original f64 amount branch, Float32 gain target and independent dry/wet original seconds. Float32 dry product then Float32 wet product then dry-first addition. Speaker mono duplication is explicit.",
+  "bounds": {
+    "amount": [
+      0,
+      1
+    ],
+    "eventsPerLane": 255,
+    "seconds": [
+      0,
+      3600
+    ],
+    "sourceChannels": [
+      1,
+      2
+    ],
+    "wetChannels": [
+      1,
+      2
+    ],
+    "blockFrames": 2048
+  },
+  "nativeDefaultChanged": false
+}

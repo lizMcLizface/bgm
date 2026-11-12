@@ -1,0 +1,63 @@
+{
+  "api": 1,
+  "profile": "offline-room-colour-convolution-drywet-v1",
+  "version": "be3bdf1dc8315dd8",
+  "source": "164510b80cc49a23cf8887892379907d10c4b9c7c5571bcadbae12cf45d4ba7c",
+  "processor": "1d7d3bab33f951e76ec7c1f5c15ea3b212b239e274e9d0c97889101e6e91bf74",
+  "processorName": "owned-offline-complete-room-be3bdf1dc8315dd8",
+  "components": {
+    "convolver": {
+      "version": "c5dbde0540bfdf83",
+      "profile": "static-f64-nonuniform-128-8192-v1",
+      "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+      "bytes": 40857
+    },
+    "colour": {
+      "version": "7725ec44e5572cf0",
+      "profile": "chromium-room-colour-f32-128-target-v1",
+      "wasm": "87ce5dd8576f1703de406f3248f574a445dbaeff0151619ab433a26d5f8f1244",
+      "bytes": 75718
+    },
+    "mix": {
+      "version": "c7b4ee0c1094a319",
+      "profile": "original-room-unsmoothed-drywet-step-v1",
+      "wasm": "5dacd43ff02ca8e9fac04a5a24b2fa3b536f3ec7e561186acd61dc6a75a0426d",
+      "bytes": 35297
+    }
+  },
+  "textEncoding": "utf-8-normalized-LF",
+  "files": [
+    "public/convolver/build.json",
+    "public/room-colour/build.json",
+    "public/room-complete-mix/build.json",
+    "src/modular-audio/offlineRoomCompleteNode.js",
+    "src/modular-audio/offlineRoomCompleteProcessor.js",
+    "src/modular-audio/ownedConvolver.js",
+    "src/modular-audio/ownedOfflineRoomComplete.js",
+    "src/modular-audio/ownedRoomColour.js",
+    "src/modular-audio/ownedRoomColourActivity.js",
+    "src/modular-audio/ownedRoomColourFramed.js",
+    "src/modular-audio/ownedRoomCompleteMix.js",
+    "src/modular-audio/ownedRoomConvolver.js",
+    "src/nodes/gain.js",
+    "src/nodes/reverb.js",
+    "tools/buildOfflineRoomCompleteHost.mjs"
+  ],
+  "notices": "791978942ea3facd827c48d7cf690ee3dc247189fe9473c8a8d77f2156d8f223",
+  "quota": 2,
+  "adapterLatencyFrames": 0,
+  "execution": "cold-fixed-fully-pulled-offline-program-only",
+  "normalDefault": false,
+  "referenceSources": [
+    {
+      "file": "src/nodes/reverb.js",
+      "sha256": "026001922dd71c46ccc052a18830a62eecdc04c5eecb7fb30a29c2d0d2ab1366"
+    },
+    {
+      "file": "src/nodes/gain.js",
+      "sha256": "00b9082c3fdff358be1d7f676a8b99f9641cb97f7debb8e25699929add5cc8d9"
+    }
+  ],
+  "referenceSourcesSha256": "ac3acad72c653cdb2371bc35cf85fcaf03f13ccbbaec641ca406d6fcb60de282",
+  "scope": "Unchanged owned RoomColour and long convolution, plus original unsmoothed two-clock dry/wet Rust gain law. Light downmix follows colour, dry remains uncoloured. No live or automatic demand/IR replacement/render-allocation deadline claim."
+}

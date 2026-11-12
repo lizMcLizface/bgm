@@ -1,0 +1,27 @@
+{
+  "api": 1,
+  "profile": "original-room-unsmoothed-drywet-step-v1",
+  "textEncoding": "utf-8-normalized-LF",
+  "audited": false,
+  "version": "c7b4ee0c1094a319",
+  "source": "93e303b045c7b56bccca10518648f0f021ce9dfd33086cf370a586eb731b324d",
+  "wasm": "5dacd43ff02ca8e9fac04a5a24b2fa3b536f3ec7e561186acd61dc6a75a0426d",
+  "bytes": 35297,
+  "files": [
+    "tools/buildRoomCompleteMix.mjs",
+    "synth-engine/room-complete-mix/Cargo.toml",
+    "synth-engine/room-complete-mix/Cargo.lock",
+    "synth-engine/room-complete-mix/CHROMIUM_PROFILE.json",
+    "synth-engine/room-complete-mix/CHROMIUM_NOTICES.txt",
+    "synth-engine/room-complete-mix/src/lib.rs",
+    "synth-engine/room-complete-mix/src/timeline.rs",
+    "synth-engine/room-complete-mix/src/allocation.rs",
+    "src/modular-audio/ownedRoomCompleteMix.js",
+    "src/nodes/reverb.js",
+    "src/nodes/gain.js"
+  ],
+  "timelineSha256": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020",
+  "profileSha256": "e13a86ba69562181c778225d5b94da8bf8e3fc3f66f7aa6a39aee6c1cf297f60",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "scope": "Original Room amount mapping and independently captured unsmoothed Native gain steps. Float32 branch products and dry-first sum, explicit speaker mono duplication. Source-local prepared program only; no app/live/default adoption."
+}
