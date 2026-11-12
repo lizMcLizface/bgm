@@ -69,3 +69,58 @@ coordinated-start checkpoint, with actual scheduler note/control timing and
 replacement tests. Other source families still need their own clock/admission
 proofs. This checkpoint does not certify whole-source-family construction,
 normal Main DSP, mutable Room routing or general live suspension/restart.
+
+## Optional live-input lead successor
+
+The explicit factory now accepts
+`prepareClockedCoreLive(context,{liveInputLeadSeconds:.128})`.
+Its source provenance is `94c404b7017c5477`; the omitted-option path retains the
+complete earlier factory body and original WasmBackend implementation. The
+accepted processor, Source7a, Rust algorithms and Wasm bytes are unchanged.
+The previous identities and component receipts above remain historical evidence.
+
+The optional value must be a finite number from 0.001 through 2 seconds. Its frozen
+policy is `clocked-core-explicit-live-input-lead-v1`. It replaces only omitted
+live on/off/retune timestamps with the actual call's `context.currentTime + lead`.
+Explicit timestamps, including 0, and explicitly scheduled event batches retain
+their original values. Off retains its original start-frame+1 minimum. Selected
+`sustain(on,time?)` and `pressure(value,id?,time?)` add an optional final timestamp;
+when absent they use the same selected lead and preserve the original event rows.
+The default API continues to use the original 25 ms on/retune and 10 ms
+off/sustain/pressure expressions. No transport or delivery deadline is promised.
+
+`factory.policy` and `backend.liveInputTiming` expose the immutable policy.
+`backend.liveInputTimingStatus()` returns at most 64 immutable records containing
+method, defaulted flag, requested seconds and the actual dispatched event row.
+It records dispatch, not processor consumption; actual same-port Native/FIFO
+receipts remain necessary. Metadata cannot clear a late counter, acknowledge a
+note, certify replacement, or turn elapsed main-thread time into a source frame.
+Twenty focused factory tests use the actual extracted WasmBackend class and pin
+the complete pre-policy factory body. They cover omitted/default and selected
+profiles, explicit times/payloads/order, bounds, readiness, independence and
+bounded observational metadata. The original default-body SHA256 is
+`19ef33339f1a3ab4e3c3365212bafb333784c5692501f194d93117aec6a82914`.
+
+Actual 48k desktop application receipt
+`reports/modular_audio/main-cold-root-live128-first-pass.json` passes with no
+errors (SHA256 `e71edb8642b16813f32852e03aecec29c6c94b370e7f7e75f8f07ea1228eaffb`).
+All five pitched live on calls report requested 2.6373333333333333 seconds and
+actual frame 126592 with the explicit 128 ms policy. Fourteen scheduled batch rows
+remain separate explicit frames. Strict source confirmations at 171392 and 204032
+leave every pitched ledger with no pending host/delivery/future/held records,
+matching actual ACK sequences and positive FIFO panic receipts. Six role peaks
+range 0.0681554..0.3813535; master peak is 0.4756564. Stopped source replacement and
+whole-runtime successor retain the stable six-role Root; 14 previous-owner
+retirement records settle. Five incumbent source/consumer pairs and all six Main
+control actors have clean terminal ACKs. Final Root borrows, reservation tickets
+and shared leases are 0 before closing the still-running context.
+Independent assertions are saved in
+`reports/modular_audio/main-cold-root-live128-independent-audit.json`.
+
+This is one application's 48k scheduling, routing and ownership pilot, not a new
+Native waveform comparison, all-rate GUI delivery guarantee, or default UI
+selection. The earlier actual late-event negative
+`main-cold-root-v2-late-negative.json` remains valid: the original shorter
+headroom produced a real late counter 1 with matching source/clock identities.
+The scheduling ledger remains strict. Explicit terminal destruction after such
+a failure is a separate lifecycle contract and cannot authorize replacement.
