@@ -1,0 +1,25 @@
+{
+  "api": 1,
+  "profile": "owned-freeze-worker-continuous-v1",
+  "version": "adebdd9fe675effa",
+  "source": "6503e6cea05706622cbac4379e1399d6c8c09fa2bd5aa3c9babafee54320ee7f",
+  "kernelVersion": "7b490244eb5cd194",
+  "wasm": "3f52f16c9ce26e4fe37907f22b984625c6e71d04bec054cab7d3dc52363085b5",
+  "wasmBytes": 47438,
+  "processor": "a7168e594b20557bd1d63061254f7e7f75eb7f49a984eb75a842b3b68040f42a",
+  "processorName": "owned-freeze-worker-adebdd9fe675effa",
+  "files": [
+    "tools/buildFreezeStream.mjs",
+    "src/modular-audio/freezeStreamProtocol.js",
+    "src/modular-audio/freezeStreamOwnership.js",
+    "src/modular-audio/freezeStreamObservation.js",
+    "src/modular-audio/freezeStreamWorker.js",
+    "src/modular-audio/freezeStream.worker.js",
+    "src/modular-audio/freezeStreamProcessor.js",
+    "src/modular-audio/freezeStream.worklet.js",
+    "src/modular-audio/freezeStreamNode.js",
+    "src/nodes/freezeWorker.js",
+    "src/modular-audio/ownedVoiceFx.js"
+  ],
+  "scope": "NEW continuous live worker Freeze; explicit per-owner seed and caller latency contract; fixed half-second canonical dry/wet delay, no cross-rolePDC or Native unseeded/default/lazy-host admission"
+}
