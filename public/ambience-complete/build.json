@@ -1,0 +1,17 @@
+{
+  "api": 1,
+  "profile": "complete-live-ambience-host-v1",
+  "source": "7c1d10dd2f68f57b2aa9b2546c9405739131123bdf4b6dfa684d645bea66e4dc",
+  "inherited": "e74ffa88ad1c596782e5c281a8b32a3d3452b7746363c58c87f5f07159ada835",
+  "reference": "9794c771e7e27a689897926d1b15c4e2d2a6a4a7a41d8996cff7b265f6ae3f9d",
+  "worker": "aa379af5133be7cacdef907395645813127af9d21497465d72f75a43b52adc99",
+  "topologyVersion": "8a2063d30442e67d",
+  "topologyWasm": "343374ed990d85f9ade82526ba7d152f3bdbbe110a571bebfc8888a5adc1aa1b",
+  "bankVersion": "146ff0774233a61c",
+  "bankWasm": "01d0f5bd1b3f16f0f3a0b9fe0924b72d35b7dfc3f4eecb3daeaee508d84e4286",
+  "weatherVersion": "b645e01e918b9cdc",
+  "weatherWasm": "0528df540bfb0d4cf9c817118005455d90b04cb69a87b6c28dd4b273d190b8f2",
+  "receiptCapacity": 256,
+  "weatherOverlapCapacity": 4,
+  "version": "eacd215ec7d49700"
+}
