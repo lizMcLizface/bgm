@@ -1,0 +1,10 @@
+{
+  "profile": "literal-original-44100-f64-factor-abs-le-v1",
+  "points": 44100,
+  "stride": 16,
+  "bytes": 705600,
+  "sha256": "a2ea85dca2187e93b6f9ee8ef5c0af7d77ea2c2ad23c8e8bada00a8962ed5da0",
+  "preparationSource": "1807a67354a87f518d029f0466649649a17a9197329af01d938ea8fd99fdc09e",
+  "preparationWasm": "f45daa99cea24922b448a070331008b7afe95b473b36ff503b93c28f125e1a27",
+  "scope": "Separate Rust/Wasm build preparation, same f64 expression/grid as accepted17c9; audio binary imports immutable bytes and contains no runtime sinh/atan table generation."
+}

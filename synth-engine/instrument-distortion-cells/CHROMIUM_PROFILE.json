@@ -1,0 +1,27 @@
+{
+  "profile": "original-instrument-distortion-literal-cells-v1",
+  "scope": "Exact sampled44100grid cell factorization; each lo/hi cell narrowed to f32 BEFORE original interpolation. Immutable build-prepared f64 factor/abs table; no runtime transcendental preparation. NEW profile; not yet Native/browser or normal-host adoption evidence.",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "pins": [
+    {
+      "path": "synth-engine/instrument-distortion/src/lib.rs",
+      "sha256": "b4d9212b6c17843833faf47d2e7a545d74f632dd3ff5efa9baa5edb1d3c2a2d3"
+    },
+    {
+      "path": "synth-engine/instrument-distortion/CHROMIUM_PROFILE.json",
+      "sha256": "1705ce3d334889a9088e932991577655a7326eaa5fbff37308e500c3ed293378"
+    },
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "src/nodes/distortion.js",
+      "sha256": "d2563aa11724739fa86eba53c11547dfa271842fd5812129d60add932d17ee6c"
+    },
+    {
+      "path": "src/nodes/gain.js",
+      "sha256": "00b9082c3fdff358be1d7f676a8b99f9641cb97f7debb8e25699929add5cc8d9"
+    }
+  ]
+}

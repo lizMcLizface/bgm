@@ -1,0 +1,42 @@
+{
+  "api": 1,
+  "profile": "original-instrument-distortion-literal-cells-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "source": "6ea1d552d072b355be21108ae578a683734a6e5732aafcf8b33e02cd68c13bdb",
+  "wasm": "2a07497538085d7a00f25ac105864949835399a1525f30b9da10336bcedbf350",
+  "bytes": 745734,
+  "version": "3d8d6885812e089c",
+  "profileSha256": "f102078a848648e59ad8a0423dc256886cf967fc8af98e24750d8d207ac23d89",
+  "noticesSha256": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71",
+  "basis": {
+    "profile": "literal-original-44100-f64-factor-abs-le-v1",
+    "points": 44100,
+    "stride": 16,
+    "bytes": 705600,
+    "sha256": "a2ea85dca2187e93b6f9ee8ef5c0af7d77ea2c2ad23c8e8bada00a8962ed5da0",
+    "preparationSource": "1807a67354a87f518d029f0466649649a17a9197329af01d938ea8fd99fdc09e",
+    "preparationWasm": "f45daa99cea24922b448a070331008b7afe95b473b36ff503b93c28f125e1a27",
+    "scope": "Separate Rust/Wasm build preparation, same f64 expression/grid as accepted17c9; audio binary imports immutable bytes and contains no runtime sinh/atan table generation."
+  },
+  "files": [
+    "synth-engine/instrument-distortion-cells/Cargo.toml",
+    "synth-engine/instrument-distortion-cells/Cargo.lock",
+    "synth-engine/instrument-distortion-cells/src/lib.rs",
+    "synth-engine/instrument-distortion-cells/src/engine.rs",
+    "synth-engine/instrument-distortion-cells/src/preparation.rs",
+    "synth-engine/instrument-distortion-cells/src/allocation.rs",
+    "synth-engine/instrument-distortion-cells/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-distortion-cells/CHROMIUM_NOTICES.txt",
+    "synth-engine/instrument-distortion-cells/basis.json",
+    "synth-engine/instrument-distortion/src/lib.rs",
+    "synth-engine/instrument-distortion/CHROMIUM_PROFILE.json",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentDistortionCells.js",
+    "src/modular-audio/instrumentDistortionCellsBrowser.js",
+    "tools/buildInstrumentDistortionCells.mjs"
+  ],
+  "scope": "Exact sampled44100grid cell factorization; each lo/hi cell narrowed to f32 BEFORE original interpolation. Immutable build-prepared f64 factor/abs table; no runtime transcendental preparation. NEW profile; not yet Native/browser or normal-host adoption evidence."
+}
