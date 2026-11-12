@@ -1,5 +1,5 @@
 import {prepareNativeContextClock} from './nativeContextClock.js';
-import {NativeRackExtraStage} from './nativeRackNormalExtra.js';
+import {ClockedRackExtraStage} from './nativeClockedRackExtra.js';
 const prepared = new WeakMap(), assetLoads = new WeakMap();
 const identifier = /^[a-f0-9]{16}$/;
 const hash = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -25,6 +25,18 @@ function assets(context){
  attempt.catch(()=>{if(assetLoads.get(context)===attempt)assetLoads.delete(context);});
  return attempt;
 }
+/** Preserve an independent disposal ACK after a typed primary clock failure. */
+export function attachClockRetirementReceiver(stage,getLease){
+ const receive=stage.inner.receive?.bind(stage.inner);
+ if(receive)stage.inner.receive=data=>{
+  if(data?.kind!=='native-clock-retired')return receive(data);
+  if(data.generation!==getLease()?.spec.generation){stage.cleanupError='Retired clock acknowledgement generation differs';stage.fail(Error(stage.cleanupError));return;}
+  stage.inner.clockRetirement={generation:data.generation,error:data.error};
+  stage.inner.error??=data.error;
+  if(data.stats){stage.inner.cached=data.stats;stage.inner.failureState??=data.stats.failureState;}
+  if(!stage.disposed)stage.fail(Error(data.error));
+ };
+}
 /** NEW opt-in facade. The preserved outer stage and numeric Wasm remain original.
  * The context clock is shared by owners; each owner releases only its own links. */
 export function prepareClockedRackNative(context) {
@@ -42,21 +54,25 @@ export function prepareClockedRackNative(context) {
   const factory=(ac,options={})=>{
    if(ac!==context)throw Error('Clocked rack factory belongs to another context');
    clock.check();
-   const stage=new NativeRackExtraStage(ac,verified,{...options,facadeVersion:verified.host.version});
+   const stage=new ClockedRackExtraStage(ac,verified,{...options,facadeVersion:verified.host.version});
    const originalDispose=stage.dispose.bind(stage);
    let lease,disposal;
    stage.dispose=()=>{
     if(disposal)return disposal;
-    const closes=[];
-    for(const close of[()=>originalDispose(),()=>lease?.release()])try{closes.push(Promise.resolve(close()));}catch(error){closes.push(Promise.reject(error));}
-    disposal=Promise.allSettled(closes).then(results=>{
-     const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason);
+    let closed;try{closed=Promise.resolve(originalDispose());}catch(error){closed=Promise.reject(error);}
+    disposal=(async()=>{
+     const errors=[];try{await closed;}catch(error){errors.push(error);}
+     // Clock inputs remain valid until the processor independently acknowledges release.
+     try{await lease?.release();}catch(error){errors.push(error);}
      for(const error of[stage.cleanupError,stage.inner?.cleanupError])if(error)errors.push(Error(error));
      if(errors.length)throw new AggregateError(errors,'Clocked rack owner cleanup failed');
-    });
+    })();
     disposal.catch(()=>{});
     return disposal;
    };
+   const prepareInput=stage.prepareInitial.bind(stage);stage.clockedProgramConnected=false;
+   stage.prepareInitial=async()=>{await prepareInput();stage.alive?.();if(!stage.clockedProgramConnected){try{stage.input.connect(stage.inner.input);stage.clockedProgramConnected=true;}catch(error){stage.fail(error);throw error;}}return stage;};
+   attachClockRetirementReceiver(stage,()=>lease);
    try {
     lease=clock.connect(stage.inner.node,{onError:error=>stage.fail(error)});
     for(const key of['patch','prepareInitial','arm','setHostAwake']){
