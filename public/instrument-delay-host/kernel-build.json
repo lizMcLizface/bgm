@@ -1,0 +1,30 @@
+{
+  "api": 1,
+  "profile": "original-instrument-delay-numerical-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "171ea28c2195d17b",
+  "source": "ca7453b98e55e0cc599f7ac78ab8b5b6369f37a9ad3f8b1adf9902d0ec04115b",
+  "wasm": "30d761d4c38d9da66f4cbad58868bc16962ea6647383d64a75d897c10961d891",
+  "bytes": 86977,
+  "files": [
+    "synth-engine/instrument-delay/Cargo.toml",
+    "synth-engine/instrument-delay/Cargo.lock",
+    "synth-engine/instrument-delay/src/lib.rs",
+    "synth-engine/instrument-delay/src/allocation.rs",
+    "synth-engine/instrument-delay/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-delay/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/instrument-tone/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/nodes/delay.js",
+    "src/nodes/pingPongDelay.js",
+    "src/nodes/filter.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentDelay.js",
+    "tools/buildInstrumentDelay.mjs"
+  ],
+  "scope": "Literal original Nodes.Delay and Nodes.PingPongDelay, fixed mono/stereo continuous program, captured setter insertion epochs, default one-second rings, native128 cycle traversal and original wet/feedback/merger graph. No Native Echo substitution, live AudioWorklet, automatic tail/layout, synchronous getter or app selection claim.",
+  "profileSha256": "c29ef1ee0db55ffe5441728a0d11c1db7c2595675c3fe371a61fcbffa4008c07",
+  "notices": "9d00afffa76e9aeac0ea8f29596136750c98f1ab576270e10fa3ab813c5ebb71"
+}

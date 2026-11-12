@@ -1,0 +1,66 @@
+{
+  "api": 1,
+  "profile": "original-instrument-delay-numerical-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Literal original Nodes.Delay and Nodes.PingPongDelay, fixed mono/stereo continuous program, captured setter insertion epochs, default one-second rings, native128 cycle traversal and original wet/feedback/merger graph. No Native Echo substitution, live AudioWorklet, automatic tail/layout, synchronous getter or app selection claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "synth-engine/instrument-tone/src/biquad.rs",
+      "sha256": "4a9053fdf78d334c63482a6af6465fe6d96c4bf559e489ec2d30603618b6d053"
+    },
+    {
+      "path": "synth-engine/rack-native/src/tail.rs",
+      "sha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/delay.js",
+    "src/nodes/pingPongDelay.js",
+    "src/nodes/filter.js",
+    "src/nodes/gain.js"
+  ],
+  "resourceBounds": {
+    "handlesPerWasm": 8,
+    "bytesPerHandleUpperBound": 8388608,
+    "eventCapacityPerLane": 256,
+    "controlLanes": 11,
+    "quantum": 128,
+    "maximumDelaySeconds": 1
+  },
+  "nativeAuthoritySources": [
+    {
+      "file": "third_party/blink/renderer/platform/audio/delay.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/delay.cc",
+      "bytes": 10149,
+      "sha256": "d8a1b966dc49fb24b0c4fc83c3296a138c2e35bfd19b39666b3baa8d8f4deb0a"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "bytes": 5550,
+      "sha256": "d93659d64b5a6bc056bb5b3a1059145ef466c9e3d4f092aee6f076be21b10f3a"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "bytes": 8240,
+      "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/delay_node.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_node.cc",
+      "sha256": "a7a425c029c5641fef3260ff589fd28ce9080bb12c57cd7d9a102ccf27bba5d6",
+      "bytes": 4562
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/channel_merger_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/channel_merger_handler.cc",
+      "sha256": "08626e491c9ae1c1ad2ec35f1717b9ac89717b0f6c1afa0f42c78067fdaf53c4",
+      "bytes": 4000
+    }
+  ]
+}
