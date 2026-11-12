@@ -211,13 +211,13 @@
       this.view = new DataView(this.buffer);
     }
     encode(value, words, offset = 0) {
-      if (typeof value !== "number" || !words || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word destination");
+      if (typeof value !== "number" || !words || !Number.isInteger(offset) || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word destination");
       this.view.setFloat64(0, value, true);
       for (let i = 0; i < 4; i++) words[offset + i] = this.view.getUint16(i * 2, true);
       return words;
     }
     decode(words, offset = 0) {
-      if (!words || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word source");
+      if (!words || !Number.isInteger(offset) || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word source");
       for (let i = 0; i < 4; i++) {
         const x = words[offset + i];
         if (!Number.isInteger(x) || x < 0 || x > 65535) throw Error("Invalid Float64 raw word");
@@ -467,7 +467,7 @@
       this.mode = 0;
       port.onmessage = ({ data }) => this.message(data);
       try {
-        if (p.identity?.hostVersion !== "c7405046a5686fc5" || p.identity?.kernelVersion !== "fcaa051b59881695" || p.identity?.clockVersion !== "7a0838a735108706" || !(p.module instanceof WebAssembly.Module) || p.configuration?.sampleRate !== rate) throw Error("Room output controller identity differs");
+        if (p.identity?.hostVersion !== "c0d7d48849cd5e9a" || p.identity?.kernelVersion !== "fad3957360bc0aa1" || p.identity?.clockVersion !== "7a0838a735108706" || !(p.module instanceof WebAssembly.Module) || p.configuration?.sampleRate !== rate) throw Error("Room output controller identity differs");
         this.configuration = p.configuration;
         this.core = new RoomControlCore(p.module, p.configuration, { emit: (d) => this.emit(d) });
         this.emit({ kind: "ready", stats: this.snapshot() });
@@ -602,5 +602,5 @@
       return this.unit.process(a, b, c, currentFrame);
     }
   };
-  registerProcessor("original-room-live-gains-c7405046a5686fc5", OriginalRoomGains);
+  registerProcessor("original-room-live-gains-c0d7d48849cd5e9a", OriginalRoomGains);
 })();

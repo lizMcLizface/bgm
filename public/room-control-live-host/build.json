@@ -1,11 +1,11 @@
 {
   "api": 1,
   "profile": "original-room-output-clock-controller-host-v1",
-  "version": "c7405046a5686fc5",
-  "source": "47fb45546addfeb714db1dab4b2fec73cbfd3f7d0b36077e85328e6c1cc79e6c",
-  "processor": "21069d0f53e29e7de376072129399ec9c4f406524cdc3d3a21e5a31ce695aa5d",
-  "processorName": "original-room-live-gains-c7405046a5686fc5",
-  "kernelVersion": "fcaa051b59881695",
+  "version": "c0d7d48849cd5e9a",
+  "source": "a8b2b44896ac32e34a9778af20814b6fce81d4c1ba7740568d04be39df02dd1e",
+  "processor": "55ba46c5b0c279353b92d5975bfe4b1c25dcb55a5af52d02f462723f2062de72",
+  "processorName": "original-room-live-gains-c0d7d48849cd5e9a",
+  "kernelVersion": "fad3957360bc0aa1",
   "wasm": "4a685c9a1c3ba1eba148eb713349c25266c065e4edd81f23cf3497392c782ed8",
   "clockVersion": "7a0838a735108706",
   "files": [

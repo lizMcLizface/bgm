@@ -1,12 +1,12 @@
 {
   "api": 1,
   "profile": "room-split-worker-output-clock-controller-v1",
-  "version": "13629fa3a440d127",
-  "source": "09b9e985f535ba26eff85f171be25618c3fe1719d0519c58a74e9245068f4d65",
-  "kernelVersion": "fcaa051b59881695",
+  "version": "d816a0dcaf998eec",
+  "source": "d9177cdfb9e5782cec9cbe3a6f36cadff202a7ebbbe56115d0f1269e6aed5f29",
+  "kernelVersion": "fad3957360bc0aa1",
   "clockVersion": "7a0838a735108706",
-  "processorName": "room-split-live-13629fa3a440d127",
-  "processor": "adcc9884dc3e915ccee58f06168ef5fdcb8d6c74cedf5a13c67dfd03ef392b23",
+  "processorName": "room-split-live-d816a0dcaf998eec",
+  "processor": "9db5a9a8434be56ecc5e9fd8fef18aeaac3aeb5afd36861c425e3fc6bf168db6",
   "worker": "3d620f0e761f8bccc0c6b88a76221e66383028229ef30d62f767b6daa8506582",
   "components": {
     "colour": {
@@ -22,7 +22,7 @@
       "bytes": 40857
     },
     "control": {
-      "version": "fcaa051b59881695",
+      "version": "fad3957360bc0aa1",
       "profile": "original-room-output-clock-live-gains-v1",
       "wasm": "4a685c9a1c3ba1eba148eb713349c25266c065e4edd81f23cf3497392c782ed8",
       "bytes": 39367
