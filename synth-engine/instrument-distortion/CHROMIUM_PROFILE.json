@@ -1,0 +1,21 @@
+{
+  "profile": "original-instrument-distortion-captured-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Literal original Nodes.Distortion44100-cell law and None shaper. Rust std f64 sinh/atan, finalFloat32 resource preparation requires independent actual-JS/native proof. Captured/frozen complete amount steps/curve assignment epochs only; immutable resources, no live UI timing/automatic tail retirement/getter claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js"
+  ],
+  "shaperSource": {
+    "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+    "path": "reference/wave_shaper_handler.cc",
+    "sha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12",
+    "scope": "Exact Vsadd1;Vsmul((N-1)/2);clip;separateVsub/Vmul/Vadd. Original even-length curve mapszero to nonzero; pinnedSetCurve reports infiniteTailTime."
+  }
+}

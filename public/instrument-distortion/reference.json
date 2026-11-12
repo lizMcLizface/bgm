@@ -1,0 +1,14 @@
+{
+  "api": 1,
+  "profile": "unchanged-original-nodes-distortion-reference-v1",
+  "source": "b243d170be3b7f52aa04a4f2ce0cabfc68b2382df7879772a257e8f8ac2dbb45",
+  "files": [
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js",
+    "src/audio/constructorJournal.js",
+    "tools/buildInstrumentDistortionReference.mjs"
+  ],
+  "wrapper": "a7b6548c9e2908e16c2ee352e0bb8a5abdd03ddd64b1e50675953e46496346ed",
+  "version": "49da896bffbcc155",
+  "scope": "Unchanged application class bundled by esbuild; literal44100-point Math.sinh/atan curve, None oversampling, two constructorcurve0 assignments and independent dry/wet NativeGain setValueAtTime calls. No gain getter substitution."
+}

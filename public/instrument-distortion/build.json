@@ -1,0 +1,27 @@
+{
+  "api": 1,
+  "profile": "original-instrument-distortion-captured-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "17c9f3dbeaa6c678",
+  "source": "6bd72640df79c526e74d0fa311acff2faaeecd2e7a2d64dd34b9c06bbccc0a2b",
+  "wasm": "48e2603807c3feb6c92d8e6d3ba0c773d250c43aa3fec58a683027f1a4c8a42a",
+  "bytes": 39118,
+  "files": [
+    "synth-engine/instrument-distortion/Cargo.toml",
+    "synth-engine/instrument-distortion/Cargo.lock",
+    "synth-engine/instrument-distortion/src/lib.rs",
+    "synth-engine/instrument-distortion/src/allocation.rs",
+    "synth-engine/instrument-distortion/reference/wave_shaper_handler.cc",
+    "synth-engine/instrument-distortion/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-distortion/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "src/nodes/distortion.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentDistortion.js",
+    "tools/buildInstrumentDistortion.mjs"
+  ],
+  "scope": "Literal original Nodes.Distortion44100-cell law and None shaper. Rust std f64 sinh/atan, finalFloat32 resource preparation requires independent actual-JS/native proof. Captured/frozen complete amount steps/curve assignment epochs only; immutable resources, no live UI timing/automatic tail retirement/getter claim.",
+  "profileSha256": "1705ce3d334889a9088e932991577655a7326eaa5fbff37308e500c3ed293378",
+  "notices": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71"
+}

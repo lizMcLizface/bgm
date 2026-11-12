@@ -1,0 +1,4 @@
+import{OwnedInstrumentDistortion,INSTRUMENT_DISTORTION_PROFILE}from'./ownedInstrumentDistortion.js';
+const BASE=(import.meta.env?.BASE_URL??'/')+'instrument-distortion/';
+const sha=async bytes=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');
+export async function loadInstrumentDistortion(){const manifest=await(await fetch(BASE+'build.json',{cache:'no-store'})).json(),bytes=await(await fetch(BASE+'distortion.wasm?v='+manifest.version,{cache:'no-store'})).arrayBuffer();if(manifest.api!==1||manifest.audited!==false||manifest.profile!==INSTRUMENT_DISTORTION_PROFILE||bytes.byteLength!==manifest.bytes||await sha(bytes)!==manifest.wasm)throw Error('Original Distortion kernel identity differs');const module=await WebAssembly.compile(bytes);return Object.freeze({manifest,create:(rate,options)=>new OwnedInstrumentDistortion(new WebAssembly.Instance(module,{}).exports,rate,options)});}
