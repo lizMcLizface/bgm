@@ -1,6 +1,52 @@
 # Modular audio engine handoff
 
-Current continuation — 11 November 2026:
+Current continuation — 12 November 2026:
+The explicit prepared environment is still a hybrid; the all-Rust application
+port is not complete. Native defaults remain operational. The requested push
+through 111d282 completed using lizMcLizface; later verified checkpoints are
+local commits under the same author and committer. No deployment occurred.
+
+Original Tape now has an owned portable live kernel, bounded two-credit curve
+resources, and a real AudioWorklet audio facade. Kernel7e165c5616e8d55a and
+facade67c4c16fb555b3f3 each pass36 actual Native cases across8/24/44.1/48/96/192k,
+including independent owners and acknowledged disposal. Facade67 uses explicit
+per-node activity and original JS curve preparation. A separate Rust preparer,
+dcad5770a9397205 / host31626328e392ee29, matches4,161,519 original Float32 values
+exactly in desktop Wasm and Chrome157; measured preparation has zero allocation
+or memory growth and no host math imports. These are separate accepted profiles;
+Native tail-policy and Rust-preparer audio integration remain next gates. See
+MODULAR_AUDIO_ENGINE_TAPE_LIVE.md and
+MODULAR_AUDIO_ENGINE_TAPE_CURVE_PREPARATION.md.
+
+The live Ambience spatial host df07388db386f9a0 passes14 cold/reused cases at
+8/24/44.1/48/88.2/96/192k. All wet channels are bit exact; aggregate maximum is
+7.450580596923828e-9. The full six-layer lifecycle also passes exact wet output:
+running late birth, contributor crossfade/cancel, unpulled controls and rejoin,
+independent clocks and primary disposal. Its aggregate maximum is
+1.1175870895385742e-8. Resources remain immutable and bounded; normal Ambience
+adoption and startup-failure hardening are separate work. See
+MODULAR_AUDIO_ENGINE_AMBIENCE_SPATIAL_LIVE.md.
+
+The active rack publication failure now has actual causal clock evidence.
+During dummy Native graph churn, independent original BufferSource and booked
+AudioParam markers both report61440 while the failing Width and Ring callbacks'
+global currentFrame is61056; active input/control state is retained. Pinned
+Chromium source skips global-scope clock updates when its graph try-lock fails.
+This accepts the diagnosis, not a workaround: existing strict active policies
+remain. A new bounded authoritative context-clock adapter must pass its own
+rate/wrap/churn checks before adoption. The invalid64-second marker fixture is
+retained separately; its cold preparation missed the booked epoch and provides
+no clock-validity evidence.
+
+Latest assembled checkout regression:597files /5,026passing /4skipped in202.62s. The local public build and complete provenance checks pass; its built Rust curve page is bit exact over4,161,519values, and its48k Tape audio facade passes all6cases. New clock/policy successors retain separate pending acceptance.
+
+Next: finish the new clock adapter and actual live rack gate; integrate Tape's
+source-derived tail policy and Rust READY preparation; harden and adopt the
+live spatial owner. Then close remaining Filter activity/shared-room/Freeze
+host and transport boundaries. General cable editing remains later. Evidence
+and temporary scripts stay in ignored reports/ and reports/scripts/.
+
+Prior checkpoint — 11 November 2026:
 The active task is to close the active instrument/effect ports in the explicit
 prepared Rust environment. Native defaults and legacy playback remain operational;
 hidden standalone measured cello stays deferred. This is not yet an all-Rust

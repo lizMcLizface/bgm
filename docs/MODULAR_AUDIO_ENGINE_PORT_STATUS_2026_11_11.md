@@ -27,6 +27,18 @@ accepted results refer to the exact artifacts and cases in the linked records.
 
 ## Current live-host continuation
 
+Update12 November: Tape now has separately accepted36-case live kernel and
+36-case actual audio facade, bounded resources and a Rust curve preparer with
+4,161,519 exact Float32 comparisons. Automatic Native-tail policy and normal
+adoption remain separate gates. Live Ambience spatial now passes14 cold/reused
+cases at seven rates plus the full six-layer lifecycle with exact wet output;
+normal adoption and startup-failure hardening remain. Actual active Width/Ring
+clock lag is causally reproduced using two independent Native markers under
+graph churn; a new authoritative clock adapter is in progress. No all-Rust
+application completion or default-backend change is implied. The current
+PLAN/HANDOFF and component documents bind these newer checkpoints.
+
+
 The explicit [prepared environment](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now
 composes original owned Core/FM kernels and Rust transition/fade arithmetic,
 normal piano/Iowa sources, live VoiceCompressor, role motion, live weather and
