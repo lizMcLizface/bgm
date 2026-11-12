@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "profile": "complete-ambience-live-session-candidate-v1",
+  "runtime": "955bf081b75e8e959cc9c8fcdbc94bf9cd6bd70a563ac15396cdb1cd357bc1d9",
+  "reference": "07031bf8e6d7aa4e1da95d88cd2fe95a425b0fad826a0777edea0bc9db6f1dd1",
+  "hostVersion": "040b6d4a286b0d54",
+  "coreWasm": "c7b6313b0434755588c95fea48561ba3b89cca7c33f0cca4fc93b3dc6484716e",
+  "preparationWasm": "f1226732843f2d347d7330e4094dc46149b89b759850b2a1fe44e0bd5401df97",
+  "version": "32a2e8adf636e00c"
+}
