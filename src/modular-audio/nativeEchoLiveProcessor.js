@@ -18,7 +18,7 @@ export class NativeEchoLiveProcessor {
  }
  receive(data) {
   try {
-   if(data?.type==='dispose') { this.stop(); this.port.postMessage({type:'disposed'}); return; }
+   if(data?.type==='dispose') { let cleanupError=null;try{this.stop();}catch(error){cleanupError=String(error);}this.port.postMessage({type:'disposed',version:1,released:!this.unit?.handle,clean:cleanupError===null,request:data.request,...(cleanupError?{error:cleanupError}:{})});return; }
    if(this.stopped)throw Error('Echo processor stopped');
    if(data?.type==='stats') {
     this.port.postMessage({type:'stats',request:data.request,...this.unit.stats(),clock:this.clock.snapshot(),clears:this.clears,emptyQuanta:this.emptyQuanta}); return;

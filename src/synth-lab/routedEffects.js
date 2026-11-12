@@ -1,3 +1,4 @@
+import{retireAudioActions}from'../audio/retireAudio.js';
 import {createEffectsBus,effectsMemoryBytes} from './effects';
 import {sanitizeEffects,EFFECTS} from './effectsConfig';
 import {createNativeEcho} from './nativeEcho';
@@ -8,11 +9,12 @@ export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{
  if(typeof busFactory!=='function'||typeof echoFactory!=='function')throw Error('Invalid prepared effects bus factory');
  if(!['wasm','hybrid','local','dry'].includes(kind))throw Error('Unknown routed effects path.');
  const p=sanitizeEffects(raw),nodes=[],own=n=>(nodes.push(n),n),level=value=>{const n=own(context.createGain());n.gain.value=value;return n;};
- const inputs=[level(1),level(1),level(1)];let room,echo,echoRoomInput;
+ let inputs,room,echo,echoRoomInput,disposal;
  try{
+  inputs=[level(1),level(1),level(1)];
   if(kind==='dry'||p.bypass){
    const out=level(p.dry);inputs[0].connect(out);
-   return {inputs,connect:d=>out.connect(d),memoryBytes:0,dispose:()=>nodes.forEach(n=>n.disconnect())};
+   return {inputs,connect:d=>out.connect(d),memoryBytes:0,dispose:()=>disposal??=retireAudioActions(nodes.map(n=>()=>n.disconnect()),'Dry routed-effects cleanup failed')};
   }
   if(kind==='wasm'){
    room=await busFactory(context,p,{onStats,onError});inputs.forEach((n,i)=>n.connect(room.node,0,i));
@@ -30,8 +32,8 @@ export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{
     const intoRoom=level(p.delayToReverb/unitySend);echo.output.connect(intoRoom);intoRoom.connect(room.node,0,1);
    }
   }
-  return {inputs,echoRoomInput,backend:room.backend??'legacy-rust',get stats(){return room.stats;},get error(){return room.error;},connect:d=>room.connect(d),clear(){room.clear();return echo?.clear?.();},arm:()=>echo?.arm?.(),memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo&&echo.backend!=='owned-rust'?1:0,ownedDelayCount:echo?.backend==='owned-rust'?1:0,delayBackend:echo?.backend??(echo?'native':'none'),nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){nodes.forEach(n=>n.disconnect());echo?.dispose();room.dispose();}};
- }catch(e){nodes.forEach(n=>n.disconnect());echo?.dispose();room?.dispose();throw e;}
+  return {inputs,echoRoomInput,backend:room.backend??'legacy-rust',get stats(){return room.stats;},get error(){return room.error;},connect:d=>room.connect(d),clear(){room.clear();return echo?.clear?.();},arm:()=>echo?.arm?.(),memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo&&echo.backend!=='owned-rust'?1:0,ownedDelayCount:echo?.backend==='owned-rust'?1:0,delayBackend:echo?.backend??(echo?'native':'none'),nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){return disposal??=retireAudioActions([...nodes.map(n=>()=>n.disconnect()),()=>echo?.dispose(),()=>room.dispose()],'Routed-effects terminal cleanup failed');}};
+ }catch(e){const primary=e instanceof Error?e:Error(String(e)),prior=primary.cleanupReady;primary.cleanupReady=retireAudioActions([...nodes.map(n=>()=>n.disconnect()),()=>echo?.dispose(),()=>room?.dispose(),()=>prior],'Failed routed-effects construction cleanup');try{await primary.cleanupReady;}catch(cleanupError){primary.cleanupError=cleanupError;}throw primary;}
 }
 
 /** One instrument's delay feeds a selected room without allocating another FDN. */
@@ -39,15 +41,15 @@ export async function createInstrumentEffects(context,room,settings,{echoFactory
  if(typeof echoFactory!=='function')throw Error('Invalid prepared echo factory');
  if(!room.echoRoomInput)throw Error('Instrument delays require a local-effects room.');
  settings={send:0,roomSend:0,...sanitizeInstrumentEffects(settings)};
- const input=context.createGain(),send=context.createGain();send.gain.value=settings.roomSend;
- let echo;
+ const nodes=[];let input,send,echo,disposal;
  try{
+  input=context.createGain();nodes.push(input);send=context.createGain();nodes.push(send);send.gain.value=settings.roomSend;
   if(settings.send>0){
    echo=await echoFactory(context,{delay:settings.send,delayMs:settings.delayMs,feedback:settings.feedback,tone:settings.tone,pingPong:settings.pingPong},{onError});
    input.connect(echo.input);echo.output.connect(room.inputs[2]);echo.output.connect(send);send.connect(room.echoRoomInput);
   }
-  return {inputs:[room.inputs[0],room.inputs[1],input],sendLevels:{delay:1},clear:()=>echo?.clear?.(),arm:()=>echo?.arm?.(),backend:echo?.backend??(echo?'native':'none'),nativeDelayCount:echo&&echo.backend!=='owned-rust'?1:0,ownedDelayCount:echo?.backend==='owned-rust'?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){input.disconnect();send.disconnect();echo?.dispose();}};
- }catch(e){input.disconnect();send.disconnect();echo?.dispose();throw e;}
+  return {inputs:[room.inputs[0],room.inputs[1],input],sendLevels:{delay:1},clear:()=>echo?.clear?.(),arm:()=>echo?.arm?.(),backend:echo?.backend??(echo?'native':'none'),nativeDelayCount:echo&&echo.backend!=='owned-rust'?1:0,ownedDelayCount:echo?.backend==='owned-rust'?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){return disposal??=retireAudioActions([...nodes.map(n=>()=>n.disconnect()),()=>echo?.dispose()],'Instrument-effects terminal cleanup failed');}};
+ }catch(e){const primary=e instanceof Error?e:Error(String(e)),prior=primary.cleanupReady;primary.cleanupReady=retireAudioActions([...nodes.map(n=>()=>n.disconnect()),()=>echo?.dispose(),()=>prior],'Failed instrument-effects construction cleanup');try{await primary.cleanupReady;}catch(cleanupError){primary.cleanupError=cleanupError;}throw primary;}
 }
 
 export function connectEnsembleChannel(context,source,bus,part){
