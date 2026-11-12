@@ -1,3 +1,4 @@
+import{mainMasterAmbienceDestination}from'./generatorMasterScalarRoot.js';
 import{mainRoleSourceDestination,mainRolePostControlsOutput}from'./generatorMainControlRoot.js';
 import{assertAutomaticPreparedFadePolicy}from'./preparedStartPolicy.js';
 import{STOPPED_RUNTIME_ROLES,assertStoppedRuntime,inspectStoppedRuntime}from'./stoppedRuntimeSnapshot.js';
@@ -34,7 +35,7 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
   if(!bundle?.environment||bundle.environment.context!==context||typeof bundle.dispose!=='function'||typeof bundle.check!=='function')throw Error('Complete same-context detached Main owners required');bundle.check();
   if(bundle.preparedAmbienceOwner)assertAutomaticPreparedFadePolicy(g);
   const resources=new Set();for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles?.[id],destination=mainRoleSourceDestination(g,id);if(!next||next.instrument===r.instrument||next.wander===r.wander||typeof next.instrument.connect!=='function')throw Error('Independent candidate source and Wander required: '+id);native(context,output(next.instrument));native(context,next.wander.input);native(context,next.wander.output);native(context,destination);native(context,mainRolePostControlsOutput(g,id));if(next.instrument.destinations?.length)throw Error('Candidate already has a logical source destination: '+id);for(const owner of[next.instrument,next.wander]){if(resources.has(owner))throw Error('Duplicate Main candidate owner');resources.add(owner);}for(const[key,source]of[['send','sendSource'],['spaceSend','spaceSendSource']])if(r[key]&&(r[source]??r.wander.output)!==r.wander.output)throw Error('Main shared send has foreign source authority: '+id);}
-  native(context,bundle.sharedReturn);native(context,bundle.ambienceReturn);native(context,g.output);native(context,g.ambienceOut);
+  native(context,bundle.sharedReturn);native(context,bundle.ambienceReturn);native(context,g.output);native(context,mainMasterAmbienceDestination(g));
  }
  preflight();
  for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles[id],destination=mainRoleSourceDestination(g,id),gate=mainRolePostControlsOutput(g,id);
@@ -43,9 +44,9 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
   if(!sleeping)remove(output(r.instrument),destination,id+' previous source to stable role input');
   remove(gate,r.wander.input,id+' stable duck/gain to previous Wander');remove(r.wander.output,g.output,id+' previous Wander to Main output');add(gate,next.wander.input,id+' stable duck/gain to candidate Wander');add(next.wander.output,g.output,id+' candidate Wander to Main output');
  }
- if(previousRuntime){remove(previousRuntime.bundle.sharedReturn,g.output,'previous private shared return to Main');remove(previousRuntime.bundle.ambienceReturn,g.ambienceOut,'previous private ambience return to Main');}
- else{if(identities.ambience)remove(identities.ambience.wanderOut??output(identities.ambience),g.ambienceOut,'old ambience final wander output');if(identities.busRack)remove(routeOut(identities.busRack),g.output,'original bus output to Main');if(identities.spaceRack)remove(routeOut(identities.spaceRack),g.output,'original section-space output to Main');}
- add(bundle.sharedReturn,g.output,'candidate private shared return to Main');add(bundle.ambienceReturn,g.ambienceOut,'candidate private ambience return to Main');
+ if(previousRuntime){remove(previousRuntime.bundle.sharedReturn,g.output,'previous private shared return to Main');remove(previousRuntime.bundle.ambienceReturn,mainMasterAmbienceDestination(g),'previous private ambience return to Main');}
+ else{if(identities.ambience)remove(identities.ambience.wanderOut??output(identities.ambience),mainMasterAmbienceDestination(g),'old ambience final wander output');if(identities.busRack)remove(routeOut(identities.busRack),g.output,'original bus output to Main');if(identities.spaceRack)remove(routeOut(identities.spaceRack),g.output,'original section-space output to Main');}
+ add(bundle.sharedReturn,g.output,'candidate private shared return to Main');add(bundle.ambienceReturn,mainMasterAmbienceDestination(g),'candidate private ambience return to Main');
  function undoLogical(){const errors=[];for(const action of logical.slice().reverse())if(!action.closed)try{const{destination}=action,owner=action.role?currentRoles(bundle)[action.role].instrument:action.owner;if(typeof owner.disconnect==='function')owner.disconnect();else output(owner).disconnect(destination);action.closed=true;}catch(error){if(error.name==='InvalidAccessError'){action.closed=true;}else errors.push(error);}if(errors.length)throw new AggregateError(errors,'Main candidate logical connection rollback failed');}
  function publish({environment,roleWanderFactory}){
   if(installed||closed||environment!==bundle.environment)throw Error('Main candidate publication authority differs');

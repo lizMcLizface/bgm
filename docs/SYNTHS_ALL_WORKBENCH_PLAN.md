@@ -1,5 +1,7 @@
 # Synths/all workbench pass
 
+12 November master-control continuation: the [Generator master adapter](MODULAR_AUDIO_ENGINE_GENERATOR_MASTER_SCALARS.md) passes the grouped desktop application run with six role controllers plus Rust trim/ambience gains, stable source/runtime successors and clean actual release. Stored mix/ambience edits reserve both owners before publication. FDN teardown and Offline readiness now pass, and the independent master-output component is committed. The normal desk remains hybrid; sweep/send/summing, master-fade application wiring and delayed Room/Freeze adoption remain explicit. No new phone checks or deployment are required for this checkpoint.
+
 12 November integration checkpoint: actual cold Main Generator controls, source
 swaps, terminal timing-failure cleanup and save/reload pass. Complete FDN
 frontend and continuous Worker Freeze leaves are committed; their explicit

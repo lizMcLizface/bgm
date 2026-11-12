@@ -1,6 +1,6 @@
 # Modular audio engine handoff
 
-Current continuation — 12 November 2026, after bbbdcb7a and reviewed build registration:
+Current continuation — 12 November 2026, joined master scalar application checkpoint:
 The requested push through 111d282 completed as lizMcLizface. Later steps are
 local commits with that same author and committer; no deployment occurred.
 The application remains hybrid and its existing defaults remain operational.
@@ -66,13 +66,15 @@ All 70 Wasm files present at 8029c76 remain byte-identical; the raw Main and FDN
 binaries are separate added leaves. Logs and numerical receipts are under
 reports/modular_audio/port-main-fdn-freeze-*.
 
-The NEW trim/ambience scalar leaf is still uncommitted review work. Its first
-48 kHz nine-owner group passes exact Native PCM and clean release: six role
-controllers, two program scalars and one inactive output owner. The full rate
-matrix is running. These owners have not been adopted by the Generator yet.
+The [trim/ambience scalar leaf](MODULAR_AUDIO_ENGINE_MAIN_SCALAR_COLD.md) is committed as4fa9a6b7; its failure-only c1e0 successor retains the accepted numerical bodies. Exact component comparisons pass8..96k with nine owners and192k with three scalars. Nine-owner192k remains unaccepted after retained unchanged-window negatives and matched controls; complete-profile admission refuses above96k before local allocation.
 
-Next: finish the scalar matrix and realtime FDN arm proof, then integrate
-master output/trim/ambience ownership and port the remaining sweep/send boundaries. Global
+The [Generator master scalar adapter](MODULAR_AUDIO_ENGINE_GENERATOR_MASTER_SCALARS.md) now passes an actual eight-controller desktop run: first0 isolation, combined mix/ambience reservation, per-bar trim, nonzero six-role/master audio, source replacement, a whole-runtime successor and actual clean release. The group survives successors and borrows reach0. The master peak is0.4513126313686371. Ambience sources are deliberately off in this fixture; its nonzero PCM remains the separate component proof. Both scalar diagnostics retain latePublications1, rejected0/mainThreadClamps0; this is not a zero-lateness claim. Existing defaults remain unchanged.
+
+FDN normal live, deliberately interleaved teardown and Offline prepared-arm desktop gates now pass on f803ba7a02f2d50e. Its terminal Boolean quiesces callbacks before any Native disconnect; real SourceACK still owns release. Active render and kernel bytes remain unchanged. The separate document records the historical negative and exact accepted scope.
+
+The assembled regression run passes798files /6,732tests with four skips (232.85seconds). The two subsequent review fixes have89focused passing checks across seven files, including16new actual-Generator dispatch/runtime-lifetime checks. Cached activation now rechecks current health and cannot return prior success after retirement; failed-construction release awaits the actual joined cleanup promise rather than accepting a clean status snapshot alone. No original Wasm is rebuilt. Final public packaging also checks the newly registered scalar and FDN-arm diagnostic pages; full logs remain ignored.
+
+Next: integrate the separately verified master-output lifetime/stop plans, then port sweep/send and remaining summing boundaries. Getter-dependent active fade cancellation must explicitly refuse until it has real intrinsic-read authority. Global
 adoption of delayed Room/Freeze also needs explicit downstream control epochs
 and PDC; physical source-family admission and outer Instrument seams remain.
 Cable editing and changing the default backend are later work. No hidden

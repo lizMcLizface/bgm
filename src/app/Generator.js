@@ -1,3 +1,6 @@
+import{rememberGeneratorMasterScalarBirth,invalidateGeneratorMasterScalarBirth}from'../modular-audio/generatorMasterScalarBirth.js';
+import{generatorMasterScalarRoot,generatorMasterScalarAuthor,mainMasterTrimDestination,disposeGeneratorMasterScalars}from'../modular-audio/generatorMasterScalarRoot.js';
+import{applyPreparedSoundSettings}from'../modular-audio/generatorPreparedSoundSettings.js';
 import{generatorLiveInputTime}from'../modular-audio/generatorLiveInputTime.js';
 import{rememberGeneratorMainBirth,invalidateGeneratorMainBirth}from'../modular-audio/generatorMainBirth.js';
 import{generatorMainControlRoot,generatorMainControlAuthor,mainRoleSourceDestination,disposeGeneratorMainControls}from'../modular-audio/generatorMainControlRoot.js';
@@ -254,6 +257,7 @@ class Generator {
 
         this.warmRoles();
         this.reset();
+        rememberGeneratorMasterScalarBirth(this,{destination:masterBus});
     }
 
     /** Whether the music plays. */
@@ -271,7 +275,7 @@ class Generator {
     }
 
     // The master meter requests sleep only after one second of exact silence.
-    canSleepAudio(){const main=generatorMainControlRoot(this);return!this.mainControlPreparation&&(!main||main.status().state==='disposed')&&preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
+    canSleepAudio(){const main=generatorMainControlRoot(this),master=generatorMasterScalarRoot(this);return!this.mainControlPreparation&&!this.masterScalarPreparation&&(!main||main.status().state==='disposed')&&(!master||master.status().state==='disposed')&&preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
 
     // The piece's meter - or, while a bar is being planned, that bar's (meterFor): a breakdown
     // may have one of its own (settings.breakdowns.meter). A planned bar keeps its meter.
@@ -451,7 +455,7 @@ class Generator {
     assertAutomaticFadePolicy(seconds){if(this.hasPreparedAmbienceStart())assertPreparedFade(seconds);}
     assertFadeCancelPolicy(){const owner=getPublishedMainPreparedAmbience(this);if(owner&&this.fadeTimer&&(this.preparedFadeStop||owner.stoppedStatus().pendingStop))throw Object.assign(Error('Wait for the authored prepared fade to finish before restarting it'),{code:'PREPARED_AMBIENCE_FADE_CANCEL_UNSUPPORTED'});}
     preparedRoutingStatus(){return generatorSweepCellStatus(this);}
-    disposePreparedRouting(){return retireAudioActions([()=>disposeGeneratorSweepCell(this),()=>disposeGeneratorMainControls(this)],'Prepared Main routing retirement failed');}
+    disposePreparedRouting(){if(generatorMasterScalarRoot(this)&&(this.runtimeEnvironmentReady||this.audioEngineReady||this.percussionReady||this.sourceLoads?.size))throw Error('Finish source/runtime preparation before master routing retirement');return retireAudioActions([()=>disposeGeneratorSweepCell(this),()=>disposeGeneratorMasterScalars(this),()=>disposeGeneratorMainControls(this)],'Prepared Main routing retirement failed');}
     prepareRuntimeReturn(kind,values){const returns=getPublishedMainRuntimeReturns(this);if(!returns)throw Error('Explicit editable return publication required');return returns.prepare(kind,values);}
     prepareStoppedRuntime(options){return prepareGeneratorStoppedRuntime(this,options);}
     commitStoppedRuntime(candidate){return commitGeneratorStoppedRuntime(this,candidate);}
@@ -717,6 +721,7 @@ class Generator {
     set(key, value) {
         this.assertRuntimeSettingEdit({[key]:value});
         const main=generatorMainControlAuthor(this);if(main&&(key==='volumes'||key==='muted'))return main.applySettingsMix({[key]:value},ROLE_VOLUMES);
+        const master=generatorMasterScalarAuthor(this);if(master&&key==='ambienceVolume')return master.applySettingsAmbienceVolume(value);
         const soundOnlyDrums = key === 'drums' && Object.keys(value).every(k => k === 'kit' || value[k] === this.settings.drums[k]);
         this.settings[key] = value;
         if (key === 'generation') this.refreshStringPatches();
@@ -785,14 +790,14 @@ class Generator {
         this.assertRuntimeSettingEdit(patch);
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         const soundOnlyDrums = patch.drums && Object.keys(patch.drums).every(k => k === 'kit' || patch.drums[k] === this.settings.drums[k]);
-        const mainMix=generatorMainControlAuthor(this),ownsMix=!!mainMix&&('volumes'in patch||'muted'in patch);if(ownsMix)mainMix.applySettingsMix({...('volumes'in patch?{volumes:patch.volumes}:{}),...('muted'in patch?{muted:patch.muted}:{})},ROLE_VOLUMES);
+        const {ownsMix,ownsAmbience}=applyPreparedSoundSettings(this,patch,{roleAuthor:generatorMainControlAuthor(this),scalarAuthor:generatorMasterScalarAuthor(this),defaults:ROLE_VOLUMES,onError:error=>generatorMasterScalarRoot(this)?.quarantine(error)});
         Object.assign(this.settings, patch);
         if ('generation' in patch) this.refreshStringPatches();
         this.warmRoles();
         if ('ambienceShape' in patch) this.ambience.setShape(this.settings.ambienceShape);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceWander' in patch) this.ambience.setWander(this.settings.ambienceWander);
-        if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
+        if ('ambienceVolume' in patch&&!ownsAmbience) this.setAmbienceVolume(this.settings.ambienceVolume);
         if ('volumes' in patch&&!ownsMix) this.applyVolumes();
         if ('drumKit' in patch) this.roles.perc.instrument.setKit(this.settings.drumKit);
         if ('drums' in patch) void this.syncPercussionVoice();
@@ -856,6 +861,8 @@ class Generator {
     }
 
     setAmbienceVolume(volume) {
+        const master=generatorMasterScalarAuthor(this);if(master)return master.setAmbienceVolume(volume);
+        invalidateGeneratorMasterScalarBirth(this,'legacy ambience gain write');
         this.ambienceOut.gain.setTargetAtTime(ambienceGain(volume), this.AC.currentTime, 0.05);
     }
 
@@ -894,9 +901,10 @@ class Generator {
             assertMainRuntimeSourceEdit(this,'a new master sweep');
             // between the master fade and the loudness trim, wide open at first so joining the chain is silent
             this.sweep = new SweepFilter(this.AC);
-            this.output.disconnect(this.levelTrim);
+            const trim=mainMasterTrimDestination(this);
+            this.output.disconnect(trim);
             this.output.connect(this.sweep.input);
-            this.sweep.output.connect(this.levelTrim);
+            this.sweep.output.connect(trim);
         }
         this.sweep.set({ lowpass: active?.['filter.lowpass'] ?? SWEEP_OPEN.lowpass, highpass: active?.['filter.highpass'] ?? SWEEP_OPEN.highpass, resonance: active?.['filter.resonance'] ?? SWEEP_OPEN.resonance }, wants ? secondsPerBeat / 2 : 0.05);
     }
@@ -2439,7 +2447,7 @@ class Generator {
         this.applyMoves(bar, beatInBar);
         if (beatInBar === 0) this.applyDrift(bar, secondsPerBeat * this.transport.beatsPerBar);
         if (beatInBar === 0) this.applySpace(this.plan.get(bar).space ?? 0, time, secondsPerBeat * this.transport.beatsPerBar);
-        if (beatInBar === 0) this.levelTrim.gain.setTargetAtTime(this.plan.get(bar).loudness?.trim ?? 1, time, secondsPerBeat * this.transport.beatsPerBar * 0.3);
+        if (beatInBar === 0){const master=generatorMasterScalarAuthor(this),value=this.plan.get(bar).loudness?.trim??1,barSeconds=secondsPerBeat*this.transport.beatsPerBar;if(master)master.setLoudnessTrim(value,time,barSeconds);else{invalidateGeneratorMasterScalarBirth(this,'legacy loudness trim write');this.levelTrim.gain.setTargetAtTime(value,time,barSeconds*.3);}}
         let held=this.heldGlideBookings(bar);
         const rubato = this.plan.get(bar)?.rubato, unit = rubato && 60 / unitsPerMinute(this.plan.get(bar).meter ?? this.meter, this.plan.get(bar).bpm);
         const seconds = (e) => (rubato ? rubatoTime(rubato, unit, e.beat + e.length) - rubatoTime(rubato, unit, e.beat) : e.length * secondsPerBeat);
