@@ -1,3 +1,4 @@
+import {retireAudioActions,finishAudioRetirement}from'../../audio/retireAudio';
 // The Wasm engine's rooms for the native (JS) voices: the effects kernel's FDN room (synth-lab/effects.js)
 // instead of a convolver on a recorded impulse, so nothing is fetched and no multi-megabyte impulse is held.
 // The drum kits use it, and so do the native voices the Wasm engine still runs (library sounds that need the
@@ -54,7 +55,7 @@ export default class FdnRoom {
         this.failed = false;
         this.bus = null;
         this.starting = null;
-        this.fallback = null;
+        this.fallback = null;this.retirements=new Set();this.retirementFailure=null;
         this.dryGain = AC.createGain();
         this.sendGain = AC.createGain();
         this.colour = new RoomColour(AC);
@@ -177,13 +178,14 @@ export default class FdnRoom {
         if (!this.wanted || this.bus || this.starting || this.failed || this.disposed) return;
         this.starting = createEffectsBus(this.AC, this.settings(), { onError: (error) => this.fail(error) })
             .then((bus) => {
-                if (this.disposed || this.failed) return bus.dispose();
+                if (this.disposed || this.failed) return this.retireBus(bus);
                 this.bus = bus;
                 this.lowpass.connect(bus.node, 0, 1);
                 bus.node.connect(this.out);
                 return undefined;
             })
-            .catch((error) => this.fail(error));
+            .catch((error) => {if(this.disposed)throw error;return this.fail(error);});
+        this.starting.catch(()=>{});
     }
 
     // The kernel failed: the recorded room, from now on.
@@ -191,7 +193,7 @@ export default class FdnRoom {
         if (this.failed || this.disposed) return;
         this.failed = true;
         console.warn('Wasm room unavailable; using the recorded room.', error);
-        this.bus?.dispose();
+        this.retireBus(this.bus);
         this.bus = null;
         this.lowpass.disconnect();
         const room = new Nodes.Reverb(this.AC);
@@ -204,14 +206,13 @@ export default class FdnRoom {
         this.fallback = room;
     }
 
+    get disposalCapability(){return !this.bus&&!this.starting&&!this.failed||this.bus?.disposalCapability===true;}
+    async awaitDisposalCapability(){await this.starting;if(this.failed)throw Error('Legacy FDN fallback has no prepared ownership authority');await this.bus?.lifecycleReady;if(this.bus&&this.bus.disposalCapability!==true)throw Error('FDN effects processor lacks disposal ACK capability');return true;}
+    retireBus(bus){if(!bus)return Promise.resolve();let result;try{result=bus.dispose();}catch(error){result=Promise.reject(error);}const pending=Promise.resolve(result);this.retirements.add(pending);pending.catch(error=>{this.retirementFailure??=error;}).finally(()=>this.retirements.delete(pending));return pending;}
     dispose() {
-        if (this.disposed) return;
-        this.disposed = true;
-        this.bus?.dispose();
-        this.bus = null;
-        this.lowpass.disconnect();
-        this.sendGain.disconnect();
-        this.disconnect();
-        this.fallback?.disconnect?.();
+        if(this.disposal)return this.disposal;
+        this.disposed=true;const bus=this.bus;this.bus=null;
+        const initial=retireAudioActions([()=>this.retireBus(bus),()=>this.starting,()=>this.lowpass.disconnect(),()=>this.sendGain.disconnect(),()=>this.dryGain.disconnect(),()=>this.out.disconnect(),()=>this.fallback?.disconnect?.()],'FDN room disposal failed');
+        this.disposal=finishAudioRetirement(initial,()=>this.retirements,()=>this.retirementFailure,'FDN room retirement failed');this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;
     }
 }

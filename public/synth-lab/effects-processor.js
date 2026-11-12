@@ -2,6 +2,7 @@
 class EffectsProcessor extends AudioWorkletProcessor {
  constructor({processorOptions:o}) {
   super();this.failed=false;
+  this.port.onmessage=({data})=>{if(data?.type==='dispose'){if(data.request!==undefined&&(!Number.isInteger(data.request)||data.request<1||data.request>4294967295))return;this.stop(data.request??0);return;}if(this.failed)return;try{if(data.type==='parameters')for(const pair of data.values)this.fx.fx_param(...pair);if(data.type==='clear')this.fx.fx_clear();}catch(e){this.fail(e);}};
   try{this.fx=new WebAssembly.Instance(o.module,{}).exports;
   if(this.fx.fx_api?.()!==1)throw Error('Effects kernel API mismatch. Rebuild and reload.');
   this.fx.fx_init(sampleRate);for(const pair of o.parameters)this.fx.fx_param(...pair);
@@ -9,15 +10,12 @@ class EffectsProcessor extends AudioWorkletProcessor {
   this.inputs=Array.from({length:6},(_,i)=>new Float32Array(mem,this.fx.fx_input(i),2048));
   this.outputs=Array.from({length:2},(_,i)=>new Float32Array(mem,this.fx.fx_output(i),2048));
   this.views=this.outputs.map(x=>x.subarray(0,128));this.frames=0;this.endFrame=Number.isFinite(o.endFrame)?o.endFrame:null;
-  this.port.onmessage=({data})=>{try{
-   if(data.type==='parameters')for(const pair of data.values)this.fx.fx_param(...pair);
-   if(data.type==='clear')this.fx.fx_clear();
-   if(data.type==='dispose')this.stop();
-  }catch(e){this.fail(e);}};
+  this.port.postMessage({type:'lifecycle-ready',version:1,disposalAck:true});
   }catch(e){this.fail(e);}
  }
- stop(){this.failed=true;this.port.onmessage=null;this.port.close();this.fx=null;this.inputs=this.outputs=this.views=null;}
- fail(error){this.port.postMessage({type:'error',message:String(error)});this.stop();}
+ release(){this.failed=true;try{if(typeof this.fx?.fx_stat==='function')this.releasedFrame=this.fx.fx_stat(2);}catch(e){this.releaseError=String(e);}finally{this.fx=null;this.inputs=this.outputs=this.views=null;}}
+ stop(request=0,reason='dispose'){this.release();this.port.postMessage({type:'disposed',version:1,request,reason,frame:this.releasedFrame??0,released:true,clean:!this.releaseError,error:this.releaseError??null});}
+ fail(error){this.release();this.port.postMessage({type:'error',message:String(error)});}
  process(inputs,outputs){
   if(this.failed)return false;
   try{
@@ -30,7 +28,7 @@ class EffectsProcessor extends AudioWorkletProcessor {
     this.fx.fx_render(count);for(let ch=0;ch<out.length;ch++)out[ch].set(count===128?this.views[ch]:this.outputs[ch].subarray(0,count),offset);
    }
    this.frames+=n;if(this.endFrame===null&&this.frames>=sampleRate){this.frames=0;this.port.postMessage({type:'stats',peak:this.fx.fx_stat(0),sleeping:!!this.fx.fx_stat(1),reverbActive:!!this.fx.fx_stat(4),reverbFrames:this.fx.fx_stat(5),memory:this.fx.memory.buffer.byteLength});}
-   if(this.endFrame!==null&&this.fx.fx_stat(2)>=this.endFrame){this.stop();return false;}
+   if(this.endFrame!==null&&this.fx.fx_stat(2)>=this.endFrame){this.stop(0,'end-frame');return false;}
    return true;
   }catch(e){this.fail(e);return false;}
  }

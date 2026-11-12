@@ -1,3 +1,4 @@
+import {PercussionLifecycle} from './percussionLifecycle';
 import DrumKit from './drumKit';
 import {audioContext} from '../../audio/context';
 import {makeDrumRoom} from './fdnRoom';
@@ -29,6 +30,8 @@ export default class WasmDrumKit extends DrumKit {
         this.stats = null;
         this.error = null;
         this.disposed = false;
+        this.lifecycle = new PercussionLifecycle({onRelease:node=>{if(node){node.port.onmessage=null;node.onprocessorerror=null;}if(this.node===node)this.node=null;this.module=null;}});
+        this.lifecycleReady = this.lifecycle.ready;
         this.polyphony = 64;
         if (!externalEffects) {
             this.bus.disconnect();
@@ -45,7 +48,7 @@ export default class WasmDrumKit extends DrumKit {
     }
     async init() {
         const module = await percussionModule();
-        if (!registrations.has(this.AC)) registrations.set(this.AC, this.AC.audioWorklet.addModule(kernelAsset('percussion', 'percussion-processor.js')).catch(error => {registrations.delete(this.AC); throw error;}));
+        if (!registrations.has(this.AC)) registrations.set(this.AC, this.AC.audioWorklet.addModule(kernelAsset('percussion', 'percussion-processor.js')+'&lifecycle=1').catch(error => {registrations.delete(this.AC); throw error;}));
         await registrations.get(this.AC);
         if (this.disposed) return;
         this.module = module;
@@ -56,11 +59,14 @@ export default class WasmDrumKit extends DrumKit {
     createNode(messages) {
         const node = new AudioWorkletNode(this.AC, 'calmbgm-percussion', {numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module,messages,endFrame:Number.isFinite(this.AC.length) ? this.AC.length : null}});
         this.node = node;
+        this.lifecycle.bind(node);
         node.port.onmessage = ({data}) => {
+            if (this.lifecycle.receive(data)) return;
+            if (this.disposed) return;
             if (data.type === 'stats') this.stats = {...data,reportedAt:this.AC.currentTime};
             if (data.type === 'error') this.error = Error(data.message);
         };
-        node.onprocessorerror = () => {this.error = Error('Percussion worklet failed. Reload the page.');};
+        node.onprocessorerror = () => {this.error = Error('Percussion worklet failed. Reload the page.');this.lifecycle.fail(this.error);};
         node.connect(this.bus);
         for (const message of this.pending) node.port.postMessage(message);
         this.pending = [];
@@ -102,25 +108,17 @@ export default class WasmDrumKit extends DrumKit {
         this.soundUntil = time + 0.02;
         this.scheduleSleep();
     }
+    get disposalCapability(){return this.lifecycle.capability;}
+    disposalStatus(){return this.lifecycle.status();}
     dispose() {
-        if (this.disposed) return;
+        if (this.disposed) return this.disposal;
         this.disposed = true;
-        clearTimeout(this.sleepTimer);
-        this.sleepTimer = null;
-        this.pending = [];
-        if (this.node) {
-            this.node.port.postMessage({type:'dispose'});
-            this.node.disconnect();
-            this.node.port.onmessage = null;
-            const port = this.node.port;
-            setTimeout(() => port.close(), 250);
-        }
-        this.output.disconnect();
-        this.bus.disconnect();
-        this.reverb?.setAwake?.(false);
-        this.reverb?.dispose?.();
-        this.reverb?.disconnect?.();
-        this.destinations = [];
-        this.awake = false;
+        clearTimeout(this.sleepTimer);this.sleepTimer=null;this.pending=[];
+        const errors=[],pending=[],clean=action=>{try{const result=action();if(result?.then)pending.push(result);}catch(error){errors.push(error);}};
+        clean(()=>this.node?.disconnect());clean(()=>this.output.disconnect());clean(()=>this.bus.disconnect());
+        clean(()=>this.reverb?.setAwake?.(false));clean(()=>this.reverb?.dispose?.());clean(()=>this.reverb?.disconnect?.());
+        this.destinations=[];this.awake=false;
+        const sourceClosing=this.lifecycle.close();this.disposal=Promise.allSettled([sourceClosing,...pending]).then(results=>{for(const r of results)if(r.status==='rejected')errors.push(r.reason);if(errors.length)throw new AggregateError(errors,'Percussion source/routing cleanup failed');return results[0].value;});
+        this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;
     }
 }

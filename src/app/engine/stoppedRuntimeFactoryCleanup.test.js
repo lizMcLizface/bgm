@@ -1,0 +1,11 @@
+// @vitest-environment node
+import{it,expect,vi,afterEach}from'vitest';
+const f=vi.hoisted(()=>({start:vi.fn(),ready:Promise.resolve(),load:vi.fn(),dispose:vi.fn()}));
+vi.mock('../../synths/engine/liveSynth',()=>({startLiveSynth:f.start}));
+vi.mock('./iowaModel/player',()=>({default:class{constructor(){this.ready=f.ready;}connect(){return this;}setRoom(){}setVibrato(){}load(...args){return f.load(...args);}dispose(){return f.dispose();}}}));
+import Classics from'./classicsInstrument';import Iowa from'./iowaInstrument';import{SYNTHS}from'../../synths/models';
+const context={currentTime:1,createGain:()=>({gain:{value:1},connect(){},disconnect(){}})},deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
+afterEach(()=>vi.restoreAllMocks());
+it('CLASSIC creation keeps primary failure pending until async failed-owner cleanup completes',async()=>{const primary=Error('source load'),ack=deferred(),dispose=vi.spyOn(Classics.prototype,'dispose').mockReturnValue(ack.promise);f.start.mockRejectedValue(primary);let settled=false;const pending=Classics.create({context,preset:{classics:{synth:'prophet5',values:SYNTHS.prophet5.presets[0].values}}}).catch(e=>{settled=true;throw e;});pending.catch(()=>{});await vi.waitFor(()=>expect(dispose).toHaveBeenCalledOnce());expect(settled).toBe(false);ack.resolve();await expect(pending).rejects.toBe(primary);});
+it('Iowa creation preserves both primary and cleanup failure',async()=>{const primary=Error('Iowa load'),cleanup=Error('source ACK');f.load.mockRejectedValue(primary);f.dispose.mockRejectedValue(cleanup);await expect(Iowa.create({context,preset:{iowa:'missing'}})).rejects.toBe(primary);expect(primary.cleanupError).toBe(cleanup);});
+it('CLASSIC stack failure attempts every returned live close and preserves loading failure',async()=>{const primary=Error('stack load'),cleanup=Error('stack close'),closed=vi.fn(()=>Promise.reject(cleanup));f.start.mockReset();f.start.mockResolvedValueOnce({close:closed}).mockRejectedValueOnce(primary);const p=Classics.create({context,preset:{classics:{synth:'minimoog',light:true,values:SYNTHS.minimoog.presets[0].values}},polyphony:4,sourceNodeFactory:()=>{}});await expect(p).rejects.toBe(primary);expect(primary.cleanupError).toBeInstanceOf(AggregateError);expect(closed).toHaveBeenCalledOnce();});

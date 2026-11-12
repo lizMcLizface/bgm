@@ -18,7 +18,13 @@ class PercussionProcessor extends AudioWorkletProcessor {
         this.skippedFrames = 0;
         this.failed = false;
         this.port.onmessage = ({data}) => {
-            if (data.type === 'dispose') { this.dsp.clear(); this.disposed = true; }
+            if (data.type === 'dispose') {
+                if(data.request!==undefined&&(!Number.isInteger(data.request)||data.request<1||data.request>4294967295))return;
+                let error=null;this.disposed=true;try{this.dsp?.clear();}catch(e){error=String(e);}
+                this.dsp=null;this.output=null;this.left=null;this.right=null;
+                this.port.postMessage({type:'disposed',version:1,request:data.request??0,released:true,clean:error===null,error});return;
+            }
+            if(this.disposed)return;
             if (data.type === 'hit') this.dsp.hit(...data.values);
             if (data.type === 'levels') data.values.forEach((level, drum) => this.dsp.level(drum, level));
             if (data.type === 'kit') data.values.forEach(([level,tone,decay], drum) => {this.dsp.level(drum,level);this.dsp.tone_param(drum,tone);this.dsp.decay_param(drum,decay);});
@@ -27,6 +33,7 @@ class PercussionProcessor extends AudioWorkletProcessor {
             if (data.type === 'clear') this.dsp.clear();
         };
         for (const data of options.messages ?? []) this.port.onmessage({data});
+        this.port.postMessage({type:'lifecycle-ready',version:1,disposalAck:true});
     }
     process(inputs, outputs) {
         if (this.disposed || this.failed) return false;

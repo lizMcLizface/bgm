@@ -31,10 +31,10 @@ export default class ClassicsInstrument {
    }
    const start=()=>startLiveSynth({context,sourceNodeFactory,rackPluginFactory,rackDynamicsFactory,rackNativeFactory,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
    const preparations=Array.from({length:MONO.has(synth.id)&&polyphony>2?Math.min(polyphony,preset.classics.light?2:4):1},start);
-   if(sourceNodeFactory){const results=await Promise.allSettled(preparations);inst.lives=results.filter(r=>r.status==='fulfilled').map(r=>r.value);const failure=results.find(r=>r.status==='rejected');if(failure){await Promise.all(inst.lives.map(l=>l.close()));inst.lives=[];throw failure.reason;}}else inst.lives=await Promise.all(preparations);inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
+   if(sourceNodeFactory){const results=await Promise.allSettled(preparations);inst.lives=results.filter(r=>r.status==='fulfilled').map(r=>r.value);const failure=results.find(r=>r.status==='rejected');if(failure){const retired=await Promise.allSettled(inst.lives.map(l=>Promise.resolve().then(()=>l.close())));const errors=retired.filter(r=>r.status==='rejected').map(r=>r.reason);if(errors.length)failure.reason.cleanupError=new AggregateError(errors,'Incomplete Classic stack cleanup failed');inst.lives=[];throw failure.reason;}}else inst.lives=await Promise.all(preparations);inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
    inst.output.gain.value=preset.masterVolume??1;
    return inst;
-  }catch(error){inst.dispose();throw error;}
+  }catch(error){try{await inst.dispose();}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.preset={gainRelease:.5,...preset};this.polyphony=polyphony;this.output=context.createGain();this.nextId=1;this.reverb={settled:true,hear(){}};this.drums=drumNotes(preset.classics.synth);this.kit=null;this.held=new Map();this.disposed=false;this.sourceInputs=0;}
  pairs(values){const synth=SYNTHS[this.preset.classics.synth],effective={...values};if('voices'in effective)effective.voices=Math.min(effective.voices,this.polyphony);if(this.preset.classics.light&&'oversample'in effective)effective.oversample=0;return (this.preset.classics.moved?synth.params.toEnginePairs??synth.params.toPairs:synth.params.toPairs)(effective);}

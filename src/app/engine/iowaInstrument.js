@@ -10,7 +10,7 @@ export default class IowaInstrument {
             await instrument.player.ready;
             await instrument.player.load(preset.iowa);
             return instrument;
-        } catch (error) { instrument.dispose(); throw error; }
+        } catch (error) { try { await instrument.dispose(); } catch (cleanupError) { error.cleanupError = cleanupError; } throw error; }
     }
     constructor(context, preset, polyphony, sourceBackend = 'native', ordinaryCompressorFactory = null) {
         this.AC = context; this.preset = preset; this.polyphony = polyphony;

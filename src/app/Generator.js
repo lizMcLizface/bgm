@@ -197,7 +197,7 @@ class Generator {
             gain.connect(duck);
             duck.connect(wander.input);
             wander.output.connect(this.output);
-            this.roles[role] = { instrument, gain, tone, wander, ducker: new Ducker(duck.gain), presetName: preset, stringPatchBase:isBreathPatch(preset)?{name:preset,preset:findPreset(preset)}:null, edited: false, volume, mute: false, solo: false };
+            this.roles[role] = { instrument, gain, tone, wander, duck, ducker: new Ducker(duck.gain), presetName: preset, stringPatchBase:isBreathPatch(preset)?{name:preset,preset:findPreset(preset)}:null, edited: false, volume, mute: false, solo: false };
         });
         {
             const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
