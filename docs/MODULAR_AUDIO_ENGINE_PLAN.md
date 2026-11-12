@@ -78,7 +78,7 @@ explicit stopped reconstruction/reload. Native/default idle behavior remains.
 See MODULAR_AUDIO_ENGINE_CONTINUOUS_CONTEXT_POLICY.md. Wake-note ticket helpers
 retain cancellation and failed-release ownership for separately opted-in callers.
 
-Latest assembled checkout regression:619files /5,257passing /4skipped in
+Earlier assembled checkout regression:619files /5,257passing /4skipped in
 201.80s. The local public bundle builds in37.96s and its corrected file-inventory
 check passes. Nine accepted numeric Wasm files remain byte-identical through
 shared-reference refresh. This produces dynamics provenance successor
@@ -91,13 +91,20 @@ No physical deadline/quality guarantee or workload attribution is inferred.
 Evidence and temporary scripts stay in ignored reports/ and reports/scripts/.
 
 
+Latest full regression checkpoint:661files /5,548passing /4skipped in210.52s.
+The source-terminal public build and complete inventory check also pass in36.62s.
+This includes the terminal source contracts and corrected diagnostic expectations;
+later new leaf work retains its separate focused checks and actual-browser gates.
+
 Current verified component closure:
-Clocked Filter8938004098795a8e preserves the original Rust Filter and explicitly
+Clocked Filter76b3601b22cedffe preserves the original Rust Filter and explicitly
 requires a certified continuously active program. All32 Native cases at four
 supported rates pass (maximum absolute4.023313522338867e-7), independent PCM0;
-a true192k HTML reload preserves identities, settings and PCM.67 focused clock,
-activity and ownership checks pass. Running hot-install Native proof and normal
-source/prefix-bound adoption remain pending. See the clocked Filter document.
+a true192k HTML reload preserves identities, settings and PCM.68 focused clock,
+activity and ownership checks pass. Its real hot-install clock/control gate also
+passes281856 independent Native frame samples exactly despite384-frame stale
+globals, complete authored controls, suspension retirement and generation2
+repreparation. Normal source/prefix-bound adoption remains pending. See the clocked Filter document.
 
 Complete Ambience315d passes both original Brownian/Sine graphs with exact wet
 PCM and maximum aggregate1.1175870895385742e-8. Health-only successoreacd215ec7d49700

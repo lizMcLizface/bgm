@@ -1,13 +1,13 @@
 {
   "api": 1,
   "profile": "native-context-clocked-filter-v1",
-  "version": "8938004098795a8e",
+  "version": "76b3601b22cedffe",
   "kernelVersion": "600efc7bac76d264",
   "wasm": "66a18420423f168ffacba227b46249cd48bdfd45926bc11a94d559da69a8ebf7",
   "nativeClockVersion": "7a0838a735108706",
-  "source": "31227c31de084096394721dadc694b7f5770697b32f089ccfcd3b30e40b47cfa",
-  "processor": "cf2e466fc079a513182b7205ef28b80591cf1d27b5ab22ecd1a8cc2bb05287a1",
-  "processorName": "native-filter-clocked-8938004098795a8e",
+  "source": "81ef36ac32414f399d84bc492784057b110ca90bb6d29f13e9f27e92504b6131",
+  "processor": "11f564b2548e2ed7cb3345f14f21b52148a23475e27371df00ff42b7e402f693",
+  "processorName": "native-filter-clocked-76b3601b22cedffe",
   "files": [
     "tools/buildClockedFilter.mjs",
     "src/modular-audio/clockedFilterProfile.js",

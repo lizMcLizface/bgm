@@ -13,6 +13,7 @@ export function clockedFilterProcessor(base,codec){
 }
 export function clockedFilterExtraSource(base){
  const end=base.indexOf('export async function prepareNormalFilterExtra(');if(end<0)throw Error('Original Filter factory boundary changed');base=base.slice(0,end);
+ const disconnect='this.input.disconnect(this.inner.input);inputDetached=true;';if(base.split(disconnect).length!==2)throw Error('Original Filter warmup edge boundary changed');base=base.replace(disconnect,'if(this.clockedProgramConnected){this.input.disconnect(this.inner.input);this.clockedProgramConnected=false;inputDetached=true;}');
  const edge='this.input.connect(this.inner.input);';if(base.split(edge).length!==3)throw Error('Original Filter program edge boundaries changed');
  // Both construction and warmup-finally remain isolated until the new factory admits program.
  return '// Generated from preserved Filter outer facade; input is isolated until preparation ACK.\n'+base.replace('export class NormalFilterExtraStage','export class ClockedFilterExtraStage').replaceAll(edge,'');
