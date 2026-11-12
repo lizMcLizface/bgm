@@ -1,0 +1,3 @@
+# Generated JavaScript is byte-hashed by runtime and build checks.
+/public/**/*.js text eol=lf
+*.wasm binary
