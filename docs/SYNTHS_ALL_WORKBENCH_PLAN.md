@@ -1,5 +1,7 @@
 # Synths/all workbench pass
 
+12 November output continuation: the [complete master entry](MODULAR_AUDIO_ENGINE_GENERATOR_MASTER_OUTPUT.md) now passes actual stop/quick-resume/tail-resume, source/runtime successors and clean ordered retirement across nine Rust controls. Active getter-dependent fade cancellation is explicitly refused before timer changes. Sweep has a committed six-rate leaf with reload proof; prepared first use and explicit send/summing adoption are next. The normal desk remains hybrid and no deployment occurred.
+
 12 November master-control continuation: the [Generator master adapter](MODULAR_AUDIO_ENGINE_GENERATOR_MASTER_SCALARS.md) passes the grouped desktop application run with six role controllers plus Rust trim/ambience gains, stable source/runtime successors and clean actual release. Stored mix/ambience edits reserve both owners before publication. FDN teardown and Offline readiness now pass, and the independent master-output component is committed. The normal desk remains hybrid; sweep/send/summing, master-fade application wiring and delayed Room/Freeze adoption remain explicit. No new phone checks or deployment are required for this checkpoint.
 
 12 November integration checkpoint: actual cold Main Generator controls, source

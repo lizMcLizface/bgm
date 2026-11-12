@@ -1,10 +1,17 @@
 {
   "api": 1,
-  "source": "a0741454655f240e86af6e25d2502099b5faca72a74dcfc0a5cce5d17b75914e",
+  "source": "fe8b300b002f763e3db76c89bc61e75a071b8303f864d2ced984a70e97c29dcd",
   "wasm": "3c2700933e385c2a30c32c4a4a688651b0624a8f06993cb39afffc454dd3c6dd",
   "bytes": 87806,
-  "version": "b9eba74bfb16c3bc",
+  "version": "d52e6974dbf46342",
   "files": [
+    "src/modular-audio/generatorMasterOutputBirth.js",
+    "src/modular-audio/generatorMasterOutputRoot.js",
+    "src/modular-audio/generatorMasterOutputSession.js",
+    "src/modular-audio/generatorMasterOutputStop.js",
+    "src/modular-audio/generatorRustMasterSession.js",
+    "src/modular-audio/mainOutputColdOwner.js",
+    "src/modular-audio/mainOutputColdRoot.js",
     "src/modular-audio/generatorMasterProfile.js",
     "src/modular-audio/generatorMasterScalarBirth.js",
     "src/modular-audio/generatorMasterScalarPlan.js",
@@ -83,25 +90,23 @@
     "scope": "Declared constructor/failure-join references only; original mixer numerical bytes unchanged"
   },
   "preparedReferenceDelta": {
-    "predecessor": "aa9092fcfba7e337",
+    "predecessor": "b9eba74bfb16c3bc",
     "changed": [
-      "src/modular-audio/generatorMainControlAuthor.js",
+      "src/modular-audio/generatorSweepCell.js",
       "src/modular-audio/generatorStoppedRuntime.js",
       "src/modular-audio/stoppedRuntimeSnapshot.js",
       "src/modular-audio/stoppedRuntimeOwners.js",
-      "src/modular-audio/mainStoppedRuntimeBinding.js",
       "src/app/Generator.js"
     ],
     "added": [
-      "src/modular-audio/generatorMasterProfile.js",
-      "src/modular-audio/generatorMasterScalarBirth.js",
-      "src/modular-audio/generatorMasterScalarPlan.js",
-      "src/modular-audio/generatorMasterScalarAuthor.js",
-      "src/modular-audio/generatorMasterScalarRoot.js",
-      "src/modular-audio/generatorMasterScalarSession.js",
-      "src/modular-audio/generatorPreparedSoundSettings.js",
-      "src/modular-audio/generatorSweepCell.js"
+      "src/modular-audio/generatorMasterOutputBirth.js",
+      "src/modular-audio/generatorMasterOutputRoot.js",
+      "src/modular-audio/generatorMasterOutputSession.js",
+      "src/modular-audio/generatorMasterOutputStop.js",
+      "src/modular-audio/generatorRustMasterSession.js",
+      "src/modular-audio/mainOutputColdOwner.js",
+      "src/modular-audio/mainOutputColdRoot.js"
     ],
-    "scope": "Explicit cold Main roles plus master trim/ambience ownership, atomic sound-setting reservations, stable sweep/runtime routing borrows and prior reviewed lifecycle references; original mixer numerical bytes unchanged"
+    "scope": "Explicit cold nine-control Main bootstrap and output/trim/ambience ownership, raw stop/resume plans, timer lifetime guards, ordered dependent retirement and stable source/runtime borrows; original mixer numerical bytes unchanged"
   }
 }

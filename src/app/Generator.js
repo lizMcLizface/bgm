@@ -1,3 +1,6 @@
+import{rememberGeneratorMasterOutputBirth,invalidateGeneratorMasterOutputBirth}from'../modular-audio/generatorMasterOutputBirth.js';
+import{generatorMasterOutputRoot,disposeGeneratorMasterOutput}from'../modular-audio/generatorMasterOutputRoot.js';
+import{stopWithGeneratorMasterOutput,finishGeneratorMasterOutputStop}from'../modular-audio/generatorMasterOutputStop.js';
 import{rememberGeneratorMasterScalarBirth,invalidateGeneratorMasterScalarBirth}from'../modular-audio/generatorMasterScalarBirth.js';
 import{generatorMasterScalarRoot,generatorMasterScalarAuthor,mainMasterTrimDestination,disposeGeneratorMasterScalars}from'../modular-audio/generatorMasterScalarRoot.js';
 import{applyPreparedSoundSettings}from'../modular-audio/generatorPreparedSoundSettings.js';
@@ -258,6 +261,7 @@ class Generator {
         this.warmRoles();
         this.reset();
         rememberGeneratorMasterScalarBirth(this,{destination:masterBus});
+        rememberGeneratorMasterOutputBirth(this);
     }
 
     /** Whether the music plays. */
@@ -275,7 +279,7 @@ class Generator {
     }
 
     // The master meter requests sleep only after one second of exact silence.
-    canSleepAudio(){const main=generatorMainControlRoot(this),master=generatorMasterScalarRoot(this);return!this.mainControlPreparation&&!this.masterScalarPreparation&&(!main||main.status().state==='disposed')&&(!master||master.status().state==='disposed')&&preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
+    canSleepAudio(){const main=generatorMainControlRoot(this),master=generatorMasterScalarRoot(this),output=generatorMasterOutputRoot(this);return!this.mainControlPreparation&&!this.masterScalarPreparation&&!this.masterOutputPreparation&&(!output||output.status().state==='disposed')&&(!main||main.status().state==='disposed')&&(!master||master.status().state==='disposed')&&preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
 
     // The piece's meter - or, while a bar is being planned, that bar's (meterFor): a breakdown
     // may have one of its own (settings.breakdowns.meter). A planned bar keeps its meter.
@@ -357,7 +361,7 @@ class Generator {
         if (this.stopFade) {
             // still fading out from Stop: finish quickly so the old tails
             // can't ring into the new start
-            this.output.gain.setTargetAtTime(0, this.AC.currentTime, 0.005);
+            const output=generatorMasterOutputRoot(this);if(output)output.applyOperation('quickResume');else{invalidateGeneratorMasterOutputBirth(this,'legacy quick resume');this.output.gain.setTargetAtTime(0, this.AC.currentTime, 0.005);}
             await new Promise((resolve) => setTimeout(resolve, 30));
             this.endStopFade();
         }
@@ -455,7 +459,7 @@ class Generator {
     assertAutomaticFadePolicy(seconds){if(this.hasPreparedAmbienceStart())assertPreparedFade(seconds);}
     assertFadeCancelPolicy(){const owner=getPublishedMainPreparedAmbience(this);if(owner&&this.fadeTimer&&(this.preparedFadeStop||owner.stoppedStatus().pendingStop))throw Object.assign(Error('Wait for the authored prepared fade to finish before restarting it'),{code:'PREPARED_AMBIENCE_FADE_CANCEL_UNSUPPORTED'});}
     preparedRoutingStatus(){return generatorSweepCellStatus(this);}
-    disposePreparedRouting(){if(generatorMasterScalarRoot(this)&&(this.runtimeEnvironmentReady||this.audioEngineReady||this.percussionReady||this.sourceLoads?.size))throw Error('Finish source/runtime preparation before master routing retirement');return retireAudioActions([()=>disposeGeneratorSweepCell(this),()=>disposeGeneratorMasterScalars(this),()=>disposeGeneratorMainControls(this)],'Prepared Main routing retirement failed');}
+    disposePreparedRouting(){if(generatorMasterOutputRoot(this)&&(this.stopFade||this.fadeTimer||this.endTimer))throw Object.assign(Error('Finish authored master timers before routing retirement'),{code:'GENERATOR_MASTER_TIMER_PENDING'});if(generatorMasterScalarRoot(this)&&(this.runtimeEnvironmentReady||this.audioEngineReady||this.percussionReady||this.sourceLoads?.size))throw Error('Finish source/runtime preparation before master routing retirement');const work=(async()=>{const errors=[];for(const close of[()=>disposeGeneratorSweepCell(this),()=>disposeGeneratorMasterOutput(this),()=>disposeGeneratorMasterScalars(this),()=>disposeGeneratorMainControls(this)])try{await close();}catch(error){errors.push(error);}if(errors.length)throw new AggregateError(errors,'Prepared Main routing retirement failed');})();work.catch(()=>{});return work;}
     prepareRuntimeReturn(kind,values){const returns=getPublishedMainRuntimeReturns(this);if(!returns)throw Error('Explicit editable return publication required');return returns.prepare(kind,values);}
     prepareStoppedRuntime(options){return prepareGeneratorStoppedRuntime(this,options);}
     commitStoppedRuntime(candidate){return commitGeneratorStoppedRuntime(this,candidate);}
@@ -581,6 +585,7 @@ class Generator {
     /** Back to full level from a fadeOut that is under way. */
     cancelFadeOut({restartAmbience=true}={}) {
         this.assertFadeCancelPolicy();
+        const selectedOutput=generatorMasterOutputRoot(this);if(selectedOutput){selectedOutput.applyOperation('cancelFadeOut',{activeFade:Boolean(this.fadeTimer)});return;}
         if (!this.fadeTimer) return;
         clearTimeout(this.fadeTimer);
         this.fadeTimer = null;
@@ -591,6 +596,7 @@ class Generator {
             this.endBar = null;
             this.replan([]);
         }
+        invalidateGeneratorMasterOutputBirth(this,'legacy active fade cancellation');
         const gain = this.output.gain;
         gain.cancelScheduledValues(this.AC.currentTime);
         gain.setValueAtTime(gain.value, this.AC.currentTime);
@@ -607,6 +613,7 @@ class Generator {
     // the output is restored (for auditions and live play). Without it the
     // voices fade and the tails ring out.
     stop(options) {
+        if(generatorMasterOutputRoot(this))return stopWithGeneratorMasterOutput(this,options,{cancelIntent:()=>cancelPreparedIntent(this),cancelCoordinator:()=>selectedPartsCoordinators.get(this)?.cancel({music:true,ambience:false}),stopFadeMs:STOP_FADE_MS});
         if(this.runtimeEnvironmentReady||this.hasPreparedAmbienceStart())cancelPreparedIntent(this);
         const pendingStart=selectedPartsCoordinators.get(this)?.cancel({music:true,ambience:false});
         if(this.hasPreparedAmbienceStart()&&!this.isRunning&&!options?.preparedPartial)return pendingStart??Promise.resolve();
@@ -628,12 +635,13 @@ class Generator {
         this.liveNotes?.clear();
         if (!this.quickStop) {
             // a sleep fade cut short: back to full level for the tails
-            if (wasFading) this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);
+            if (wasFading){invalidateGeneratorMasterOutputBirth(this,'legacy tail resume');this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);}
             this.pause(heard);
             if (ending) this.replan([]);
             this.notifyRunning();
             return;
         }
+        invalidateGeneratorMasterOutputBirth(this,'legacy stop');
         const gain = this.output.gain;
         gain.cancelScheduledValues(this.AC.currentTime);
         gain.setTargetAtTime(0, this.AC.currentTime, STOP_FADE);
@@ -687,6 +695,8 @@ class Generator {
 
     endStopFade() {
         if (!this.stopFade) return;
+        if(generatorMasterOutputRoot(this))return finishGeneratorMasterOutputStop(this);
+        invalidateGeneratorMasterOutputBirth(this,'legacy stop completion');
         clearTimeout(this.stopFade);
         this.stopFade = null;
         Object.values(this.roles).forEach(({ instrument }) => instrument.flushTails());
@@ -896,6 +906,7 @@ class Generator {
     applySweep(active, secondsPerBeat) {
         const wants = active && ['filter.lowpass', 'filter.highpass', 'filter.resonance'].some((key) => key in active);
         if (!wants && !this.sweep) return;
+        if(generatorMasterOutputRoot(this))throw Object.assign(Error('Prepare the Rust sweep path before activating a sweep on the selected Rust master'),{code:'GENERATOR_MASTER_SWEEP_UNPREPARED'});
         if (!this.sweep) {
             const returns=getPublishedMainRuntimeReturns(this);if(returns){this.sweep=returns.activateSweep();this.sweep.set({lowpass:active?.['filter.lowpass']??SWEEP_OPEN.lowpass,highpass:active?.['filter.highpass']??SWEEP_OPEN.highpass,resonance:active?.['filter.resonance']??SWEEP_OPEN.resonance},wants?secondsPerBeat/2:.05);return;}
             assertMainRuntimeSourceEdit(this,'a new master sweep');
