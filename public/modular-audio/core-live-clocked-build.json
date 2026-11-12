@@ -1,11 +1,13 @@
 {
   "api": 1,
   "profile": "native-clock-owned-core-fm-live-v1",
-  "version": "a20fefe1bf89996a",
-  "source": "c50f8fbffe7c52d31f6a5736e64b22688f6b28497114036bf7429f57bcf2d420",
+  "version": "fbfb59f1401a1016",
+  "source": "7389f1bcbfcc8a86eacb938571e76ba7972cc600203e98a625022b559d6ff76e",
   "graphWasm": "a88ac8e012a902fb66b9475e2d5fa134075b671b7155ae5f62da84c4d9a3349b",
   "clockVersion": "7a0838a735108706",
   "files": [
+    "src/audio/instrumentConstruction.js",
+    "src/audio/constructorJournal.js",
     "tools/buildClockedCoreLive.mjs",
     "src/modular-audio/clockedCoreLiveProfile.js",
     "src/modular-audio/clockedCoreLive.js",

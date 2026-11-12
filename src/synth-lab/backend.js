@@ -1,3 +1,5 @@
+import {retireAudioActions} from '../audio/retireAudio.js';
+import {createInstrumentTransaction} from '../audio/instrumentConstruction.js';
 import{attachSourceDisposalFence}from'../modular-audio/sourceDisposalFence.js';
 import {kernelAsset} from './kernelAssets';
 import {sanitizeNoteBehavior} from './noteBehavior';
@@ -34,7 +36,7 @@ export class WasmBackend {
 const settled=async inst=>{await Promise.all([noiseReady(inst.AC),bitCrusherReady(inst.AC),spaceReady(inst.AC)]);};
 export class CurrentBackend {
  constructor(context,inst){this.context=context;this.inst=inst;this.kind='current';this.held=new Map();this.pedal=false;this.pending=[];}
- static async create(context,patch){const inst=new Instrument({context,polyphony:patch.global.polyphony,preset:legacyPreset(patch)});await settled(inst);return new CurrentBackend(context,inst);}
+ static async create(context,patch){const inst=await createInstrumentTransaction(()=>new Instrument({context,polyphony:patch.global.polyphony,preset:legacyPreset(patch)}),settled);return new CurrentBackend(context,inst);}
  connect(destination){this.inst.connect(destination);}
  patch(p){this.inst.applyPreset(legacyPreset(p));}
  on(midi,velocity){const id=this.inst.startNote(midi,velocity);this.held.set(id,midi);return id;}
@@ -42,5 +44,5 @@ export class CurrentBackend {
  sustain(on){this.pedal=on;if(!on){for(const id of this.pending)this.off(id);this.pending=[];}}
  pressure(){} // Current Instrument has no continuous per-note pressure contract.
  panic(){this.pending=[];this.held.clear();this.pedal=false;this.inst.silence();this.inst.flushTails();}
- dispose(){this.panic();this.inst.dispose();}
+ dispose(){if(this.disposal)return this.disposal;let resolve,reject;this.disposal=new Promise((yes,no)=>{resolve=yes;reject=no;});this.disposal.catch(()=>{});retireAudioActions([()=>{this.panic();},()=>{const pending=this.inst.dispose();if(pending===this.disposal)throw Error('CurrentBackend Instrument returned its outer disposal fence');return pending;}],'CurrentBackend disposal failed').then(resolve,reject);return this.disposal;}
 }

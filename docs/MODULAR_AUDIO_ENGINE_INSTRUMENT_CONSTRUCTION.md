@@ -1,0 +1,49 @@
+# Outer Instrument construction ownership
+
+This checkpoint is a failure/terminal ownership successor. It does not make the whole Instrument, a physical family or Main eligible for an all-Rust runtime. Existing Native Room/Space/VoiceCompressor/lazy-source constructor prerequisites remain separately unproven where stated below. The grouped actual48k Instrument gate passed on the frozen6105 physical host; the later CurrentBackend failure-only guard is identified separately below.
+
+## Captured ownership
+
+`InstrumentConstruction` records at most64 direct private actions, in original acquisition order. The Instrument adds its returned wrappers immediately, owns every raw stage input before the next allocation, and records a single returned-MonoSynth-prefix action before voice construction. A child enters that prefix before connect/init. The prefix follows the existing configured Native polyphony without imposing a new32voice limit; tests cover300returned children and40voices through the real Instrument constructor. All closes are attempted; retained error details are capped at16, with the full error count recorded.
+
+A nested constructor throwing without its own cleanupReady cannot be certified from the outer catch. Known returned prefixes still retire, while INSTRUMENT_NESTED_CONSTRUCTION_UNCERTAIN preserves the unreturned inner ownership gap. Completed returned Native objects have explicit private-node cleanup actions; a SendReverb action closes its private send/colour nodes and never retires the context hub. These actions do not retroactively prove a Room/Space/VoiceCompressor constructor's unreturned internal prefix. Active untyped Native Space processors remain terminal-unproven. No arbitrary graph traversal or global Native API replacement is used.
+
+The existing successful constructor statements/expressions are mechanically identical after removing only private ownership wrappers, source-request registration and the added KS option. Fifty-four unrelated methods are byte-identical. Original physical/Core render, process, frame/clock, transition and WasmBackend source bodies remain unchanged. CurrentBackend now joins actual Instrument retirement behind a stable outer disposal fence; LabVoice joins constructor cleanupReady and its returned owner's disposal while preserving original healthy constructor/connect order.
+
+## Physical source requests
+
+Instrument accepts an optional pluckedSourceFactory alongside the existing pianoSourceFactory. Both injected factories receive a request-owned AbortSignal. Material and other-pending-source checks run before a second factory can be called. The pending-source action is recorded before factory kickoff. Disposal aborts that request, joins any actual returned or late owner, and waits its positive cleanup receipt.
+
+The whole-request retirement observation has an explicit60,000ms limit. This is an uncertainty budget, not a usable latency promise or a sum-of-phase guarantee. An abort-ignoring or stalled factory cannot hold disposal forever: the observer rejects permanently, retains the pending late-owner close observer, and never reports release because time elapsed. A real late owner is still disposed when it arrives; late cleanup cannot revive the rejected observation. Fake-timer tests exercise this boundary without waiting60seconds. Disposal does not separately await the raw promise in a way that defeats this observer.
+
+The exact builtin createPianoLiveSource keeps its older callback-only contract, whether omitted or passed explicitly by function identity. That observation records callbackObserved/hostCallbackQuiescent and typedTerminalProof:false; it records no released or acknowledged assertion for a void return. An unknown forwarding wrapper or injected void-disposal factory receives no such exception and remains uncertain. No default factory is substituted.
+
+The explicit Native7a physical factory successor exposes completed actual source/private-pull/preparation cleanupReady receipts on known-clean failed admission. It does not infer cleanup from AUDIO_OWNER_DISPOSED alone. The accepted1801 predecessor is archived separately, and its Processor/Rust bodies remain unchanged. The new metadata names its new baseVersion and source-reference predecessor explicitly; it does not alias or relabel the accepted10cf identity.
+
+## Admission and remaining limits
+
+`awaitPhysicalInstrumentAdmission` returns only the actual source's initialized identity, independent Native clock/Source FIFO receipt, healthy per-Node terminal capability, and stopped/no-pending-bookings evidence. The method refuses Offline7a, foreign or closed Nodes, pending/held notes, wrong generations, identity mismatches and label-only actors. It sets no whole-Instrument capability. Existing Offline initialization remains deferred, and no Native/default or song backend field changes.
+
+Unresolved inner constructor partials, active untyped Space termination, Native feedback numerical alternatives, unused/lazy Native sources and broader family admission remain explicit separate work. Returning an outer cleanup journal is not evidence that every hidden constructor or processor is ported, freed, quiescent or all-Rust. Main's physical-family refusal remains in place.
+
+## Private evidence and publication
+
+The private receipt is reports/modular_audio/instrument-construction-private/receipt.json. Proposed identities after final builtin-identity regression: piano9f9a377aaf424196; physical6184d9588e03ab5e; finiteKS70cfd5a34669576a; Core494c960981834b9c; clockedCore96cf53d71aa84ef7; mixer2262cb28f151f010; Physical7a6105a049d64fc2e3. These seven JSON source/reference successors were copied after explicit parent review; no Wasm, processor or original-source copies occurred. All69 captured public Wasm baselines remain unchanged; both physical numerical files remain253,652bytes/SHA809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308.
+
+Final155 focused/adjacent checks in19files pass, including exact omitted/explicit builtin identity versus unknown-wrapper regression, six tests of actual returned Native class cleanup with controlled nodes, and the separate panic-failure guard. The mechanical healthy-constructor AST/54method/Processor proof passes. Private metadata generation enforces unchanged original source/runtime/Wasm before changing reference identities. Mixer additionally recovers the accepted Git baseline and allows only the declared lifecycle helper additions and existing reviewed host-reference changes.
+
+The grouped private page is /reports/scripts/instrument-journal.html?review=instrument-journal-v1. It is a real SDK constructor/lifetime gate for piano/KS output, actual initialized/FIFO receipts, held terminal acknowledgement, sibling independence, late-source cancellation, and scoped constructor faults. Its accepted receipt remains attached to the exact6105 host rather than relabelled as a later Core metadata run. No phone checks or deployment are part of this checkpoint.
+
+## Actual6105 SDK acceptance
+
+reports/modular_audio/instrument-journal-6105-first.json records checksPassed true/error null at48k, with real2voice piano/KS initialized identities and independent Native/FIFO admission while their Rust frames were0. Actual SDK output peaks were.14055505394935608(piano) and.1128329485654831(KS), both with0preparation-late frames and no source error. These are functional/lifetime checks; no new whole-chain Native feedback PCM-parity claim is made.
+
+During primary disposal, its actual program edge was closed while the real terminal packet was deliberately held: source/pull/clock release observations remained false and its constructor journal stayed retiring. Delivering that real clean packet completed release. The sibling advanced43,264→43,776 and remained audible at peak.10898984223604202. A separately cancelled SDK request stayed unsettled until its real late source was delivered; it was never published, and subsequently completed a clean typed terminal packet plus private clock/pull and outer-journal retirement. All three regular/late SDK journals ended retired, their expected actual source ACKs completed, and shared clock cleanup passed.
+
+A scoped second Native gain acquisition preserved the exact original Error and completed the captured constructor prefix (including its nested positive proof). A separate deliberately opaque injected nested constructor retained INSTRUMENT_NESTED_CONSTRUCTION_UNCERTAIN while captured actors still closed. That negative capability observation is part of the passing gate, not proof that the opaque constructor was fully owned.
+
+## CurrentBackend panic-guard successor
+
+After saving the exact6105 actual receipt, review found that panic() could throw before inst.dispose(). The successor installs its stable outer promise before invoking either action, attempts both immediately through all-settled cleanup, and preserves panic plus asynchronous disposal failures. Reentrant disposal returns that same promise; an accidentally self-returned disposal fence is refused rather than awaited. Four focused regressions cover combined panic/async failures, reentrancy, self-fence refusal and unchanged healthy immediate panic→Instrument-dispose call order.
+
+Only Core host references change for this guard:494c960981834b9c→ffb0dae7b8131bc4 and clocked96cf53d71aa84ef7→fbfb59f1401a1016. Physical6105 stays unchanged. The original makeWasmNode/WasmBackend region, all process/frame/clock/transition bodies and all69 captured public Wasm baselines remain unchanged. The exact source/manifest predecessor receipt is reports/modular_audio/instrument-construction-panic-guard/receipt.json; the actual6105 report is retained under its original identity and SHA. No matrix rerun or numerical tolerance change is claimed for this failure-only guard.

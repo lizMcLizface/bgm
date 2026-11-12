@@ -1,3 +1,4 @@
+import {joinInstrumentCreationFailure} from '../audio/instrumentConstruction.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
 import{validateAudioEnvironment,nativeInstrumentEnvironment}from'../app/engine/audioEnvironment';
 import Instrument from '../app/engine/Instrument';
@@ -17,7 +18,7 @@ import {VoiceFx} from '../app/engine/voiceFx';
 import {sourcePerformance,WASM_PERFORMANCE_EVENT} from '../audio/wasmPerformance';
 export {noteEvents} from './noteEvents';
 export class LabVoice {
- static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){try{await v.dispose();}catch(cleanupError){e.cleanupError=cleanupError;}throw e;}}
+ static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){return joinInstrumentCreationFailure(e,()=>v.dispose());}}
  constructor(context,spec){this.context=context;this.spec=structuredClone(spec);this.patch=structuredClone(spec.patch);this.output=context.createGain();this.output.gain.value=.7;this.nextId=100000;this.keys=new Map();this.released=new Set();this.pedal=false;this.level=1;this.disposed=false;}
  async init(notes,onError){
   this.onRuntimeError=onError;

@@ -1,4 +1,7 @@
 import{retireAudioActions,awaitRetiredPreparation}from'../../audio/retireAudio.js';
+import {InstrumentConstruction,createInstrumentTransaction} from '../../audio/instrumentConstruction.js';
+import {retireInstrumentPart} from './instrumentOwnedParts.js';
+import {awaitPhysicalInstrumentAdmission} from '../../modular-audio/physicalInstrumentAdmission.js';
 // One playable synth voice-set with its own effects chain: what PolySynth
 // is, minus React and minus being a module-level singleton
 // (docs/DESIGN.md §2.2). Configured with the same flat preset
@@ -192,62 +195,66 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null, motionFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, pluckedSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null, motionFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
         if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
+        if (pluckedSourceFactory !== null && typeof pluckedSourceFactory !== 'function') throw Error('Invalid plucked source factory');
         if (motionFactory !== null && typeof motionFactory !== 'function') throw Error('Invalid Motion factory');
         motionFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateMotionPreset=motionFactory?.validatePreset;
         if (shimmerFactory !== null && typeof shimmerFactory !== 'function') throw Error('Invalid Shimmer factory');
         shimmerFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateShimmerPreset=shimmerFactory?.validatePreset;
-        this.pianoSourceFactory = pianoSourceFactory;
+        this.pianoSourceFactory = pianoSourceFactory;this.pluckedSourceFactory=pluckedSourceFactory;
         this.pendingSourceBookings = new Set(); this.sourceBackend = sourceBackend; this.pianoSource = null; this.pianoSourcePromise = null; this.pluckedSource = null; this.pluckedSourcePromise = null; this.sourceFailure = null;
         this.sourceBookingTrace = []; this.sourcePreparationLateFrames = 0; this.sourcePreparationLateBookings = 0;
         this.AC = context;
         const compressorPolicy=instrumentCompressorPolicy(context,preset,ordinaryCompressorFactory);
         this.ordinaryDynamicsOwned=compressorPolicy.owned;
         this.polyphony = polyphony;
+        this.construction=new InstrumentConstruction(context);
+        try {
 
-        this.synthMix = new Nodes.Compressor(this.AC,compressorPolicy.synthMix);
-        this.distortion = new Nodes.Distortion(this.AC);
-        this.flanger = new Nodes.Flanger(this.AC);
-        this.chorus = new Nodes.Chorus(this.AC);
-        this.phaser = new Nodes.Phaser(this.AC);
-        this.bitCrush = new Nodes.BitCrusher(this.AC);
-        this.tape = FX_STAGES.tape.create(this.AC);
-        this.compressor = (voiceCompressorFactory ?? FX_STAGES.compressor.create)(this.AC, {hostLifetime:'instrument'});
-        this.shimmer = (shimmerFactory ?? FX_STAGES.shimmer.create)(this.AC);
-        this.freeze = FX_STAGES.freeze.create(this.AC);
-        this.delay = new Nodes.Delay(this.AC);
-        this.pingPong = new Nodes.PingPongDelay(this.AC);
+        this.synthMix = this.construction.nested('synthMix',()=>new Nodes.Compressor(this.AC,compressorPolicy.synthMix),retireInstrumentPart);
+        this.distortion = this.construction.nested('distortion',()=>new Nodes.Distortion(this.AC),retireInstrumentPart);
+        this.flanger = this.construction.nested('flanger',()=>new Nodes.Flanger(this.AC),retireInstrumentPart);
+        this.chorus = this.construction.nested('chorus',()=>new Nodes.Chorus(this.AC),retireInstrumentPart);
+        this.phaser = this.construction.nested('phaser',()=>new Nodes.Phaser(this.AC),retireInstrumentPart);
+        this.bitCrush = this.construction.nested('bitCrush',()=>new Nodes.BitCrusher(this.AC),retireInstrumentPart);
+        this.tape = this.construction.nested('tape',()=>FX_STAGES.tape.create(this.AC),retireInstrumentPart);
+        this.compressor = this.construction.nested('compressor',()=>(voiceCompressorFactory ?? FX_STAGES.compressor.create)(this.AC, {hostLifetime:'instrument'}),retireInstrumentPart);
+        this.shimmer = this.construction.nested('shimmer',()=>(shimmerFactory ?? FX_STAGES.shimmer.create)(this.AC),retireInstrumentPart);
+        this.freeze = this.construction.nested('freeze',()=>FX_STAGES.freeze.create(this.AC),retireInstrumentPart);
+        this.delay = this.construction.nested('delay',()=>new Nodes.Delay(this.AC),retireInstrumentPart);
+        this.pingPong = this.construction.nested('pingPong',()=>new Nodes.PingPongDelay(this.AC),retireInstrumentPart);
         // one shared with the other voices, or its own (nodes/sharedReverb.js)
         // or, for a voice the Wasm engine runs natively, the kernel's room (engine/fdnRoom.js)
-        this.reverb = fdnRoom && fdnRoomSupported(this.AC) ? new FdnRoom(this.AC, 'reverb1')
-            : reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+        this.reverb = this.construction.nested('reverb',()=>fdnRoom && fdnRoomSupported(this.AC) ? new FdnRoom(this.AC, 'reverb1')
+            : reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC),retireInstrumentPart);
         if (deferReverb) this.reverb.defer();
-        this.eq = new Nodes.EQ2(this.AC);
-        this.filter = new Nodes.Filter(this.AC);
-        this.limiter = new Nodes.Compressor(this.AC,compressorPolicy.limiter);
-        this.output = new Nodes.Gain(this.AC);
-        this.vibrato = new Nodes.LFO(this.AC);
-        this.motion = (motionFactory ?? FX_STAGES.motion.create)(this.AC,{hostAwake:false,onError:error=>{this.effectFailure??=error instanceof Error?error:Error(String(error));}});
+        this.eq = this.construction.nested('eq',()=>new Nodes.EQ2(this.AC),retireInstrumentPart);
+        this.filter = this.construction.nested('filter',()=>new Nodes.Filter(this.AC),retireInstrumentPart);
+        this.limiter = this.construction.nested('limiter',()=>new Nodes.Compressor(this.AC,compressorPolicy.limiter),retireInstrumentPart);
+        this.output = this.construction.nested('output',()=>new Nodes.Gain(this.AC),retireInstrumentPart);
+        this.vibrato = this.construction.nested('vibrato',()=>new Nodes.LFO(this.AC),retireInstrumentPart);
+        this.motion = this.construction.nested('motion',()=>(motionFactory ?? FX_STAGES.motion.create)(this.AC,{hostAwake:false,onError:error=>{this.effectFailure??=error instanceof Error?error:Error(String(error));}}),retireInstrumentPart);
         // Filter LFO, in cents on every voice's cutoff (wired only while it
         // has depth - see setFilterLfoConnected).
-        this.filterLfo = this.AC.createOscillator();
+        let filterLfoStarted=false;
+        this.filterLfo = this.construction.acquire('filter LFO',()=>this.AC.createOscillator(),node=>retireAudioActions([()=>{if(filterLfoStarted)node.stop();},()=>node.disconnect()],'Instrument filter LFO retirement failed'));
         this.filterLfoCapture = new ControlClock(this.AC.currentTime,440);
-        this.filterLfoDepth = this.AC.createGain();
+        this.filterLfoDepth = this.construction.acquire('filter LFO depth',()=>this.AC.createGain(),node=>node.disconnect());
         this.filterLfoDepth.gain.value = 0;
         this.filterLfo.connect(this.filterLfoDepth);
-        this.filterLfo.start();
+        this.filterLfo.start();filterLfoStarted=true;
         this.filterLfoConnected = false;
         // Slow wander (wander.js) in cents on the voices' cutoff and pitch;
         // each wave is made, and wired, only once it has depth.
-        this.wanderLfos = {};
+        this.wanderLfos = {};this.construction.acquire('lazy wander set',()=>this.wanderLfos,owners=>retireAudioActions(Object.values(owners).map(owner=>()=>owner.dispose()),'Instrument wander retirement failed'));
         this.filterWanderConnected = false;
         this.filterWanderOn = false;
         this.pitchWanderOn = false;
-        this.pitchWanderOut = this.AC.createGain();
+        this.pitchWanderOut = this.construction.acquire('pitch wander output',()=>this.AC.createGain(),node=>node.disconnect());
         // What the voices wire to their oscillators' detune: the vibrato and the pitch wander.
         this.pitchTap = { connect: (destination) => { this.vibrato.connect(destination); this.pitchWanderOut.connect(destination); },
             disconnect: destination => { try { this.vibrato.getDepthNode().disconnect(destination); } catch {} try { this.pitchWanderOut.disconnect(destination); } catch {} } };
@@ -255,7 +262,7 @@ class Instrument {
         // Same order as PolySynth's initSynth. Each effect sits between its
         // own input/output gain nodes, so the chain can route around it.
         this.stages = EFFECT_STAGES.map(({ key, active }) => {
-            const stage = { key, active, input: this.AC.createGain(), output: this.AC.createGain(), on: null };
+            const stage = { key, active, input: this.construction.acquire('stage input '+key,()=>this.AC.createGain(),node=>node.disconnect()), output: this.construction.acquire('stage output '+key,()=>this.AC.createGain(),node=>node.disconnect()), on: null };
             [].concat(this[key].getNode()).forEach((node) => stage.input.connect(node));
             this[key].connect(stage.output);
             return stage;
@@ -271,8 +278,9 @@ class Instrument {
 
         const startTime = this.AC.currentTime + 0.01;
         this.voiceOscillatorStartTime=startTime;
+        const returnedVoices=this.construction.voicePrefix();
         this.voices = Array.from({ length: polyphony }, () => {
-            const synth = new MonoSynth(this.AC);
+            const synth = returnedVoices.create(()=>new MonoSynth(this.AC));
             // Voices start asleep (disconnected); see wake()/sleepIdle().
             synth.connectVibratoToAll(this.pitchTap);
             synth.stringPitchTap = this.pitchTap;
@@ -320,15 +328,21 @@ class Instrument {
         this.offlineOrdinaryInitial=compressorPolicy.offline;
         try{this.applyPreset(preset);}finally{this.offlineOrdinaryInitial=false;}
         this.effectsReady = Promise.all([this.synthMix.ready,this.limiter.ready,...this.stages.map(({ key }) => this[key]?.ready)].filter(Boolean));
+        this.sourceConstructionRequest=this.construction.sourceRequest('physical source request',{requireTerminal:!(sourceBackend==='owned-rust'&&this.preset.stringModel==='piano'&&(this.pianoSourceFactory??createPianoLiveSource)===createPianoLiveSource)});
         const source = sourceBackend === 'owned-rust' ? this.preset.stringModel === 'piano' ? this.ensurePianoSource() : this.preset.stringModel === 'plucked' ? this.ensurePluckedSource() : Promise.resolve(null) : Promise.resolve(null);
         this.sourceReady = Promise.all([source, this.effectsReady]).then(() => ownedSourceOf(this));
         this.sourceReady.catch(error => { this.sourceFailure = error; });
+        }catch(error){this.disposed=true;throw this.construction.failure(error);}
     }
+
+    static create(options){return createInstrumentTransaction(()=>new Instrument(options));}
+    physicalSource(){return ownedSourceOf(this)??null;}
+    async awaitPhysicalAdmission(){await this.sourceReady;return awaitPhysicalInstrumentAdmission(this,ownedSourceOf(this));}
 
     ensurePianoSource() {
         if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
-        if (this.pluckedSource) return Promise.reject(Error('Changing owned physical source material requires a fresh instrument'));
-        this.pianoSourcePromise ??= (this.pianoSourceFactory ?? createPianoLiveSource)(this).then(async source => {
+        if(this.preset?.stringModel!=='piano'||this.pluckedSource||this.pluckedSourcePromise)return Promise.reject(Error('Piano source requires its unchanged physical material'));
+        this.pianoSourcePromise ??= this.sourceConstructionRequest.start(({signal})=>(this.pianoSourceFactory ?? createPianoLiveSource)(this,{signal})).then(async source => {
             if (this.disposed) { await source.dispose(); throw Object.assign(Error('Disposed instrument'),{code:'AUDIO_OWNER_DISPOSED'}); }
             this.pianoSource = source; return source;
         }).catch(error => { this.sourceFailure = error; throw error; });
@@ -340,8 +354,8 @@ class Instrument {
     }
     ensurePluckedSource() {
         if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
-        if (this.pianoSource) return Promise.reject(Error('Changing owned physical source material requires a fresh instrument'));
-        this.pluckedSourcePromise ??= createPluckedLiveSource(this).then(async source => {
+        if(this.preset?.stringModel!=='plucked'||this.pianoSource||this.pianoSourcePromise)return Promise.reject(Error('Plucked source requires its unchanged physical material'));
+        this.pluckedSourcePromise ??= this.sourceConstructionRequest.start(({signal})=>(this.pluckedSourceFactory ?? createPluckedLiveSource)(this,{signal})).then(async source => {
             if (this.disposed) { await source.dispose(); throw Object.assign(Error('Disposed instrument'),{code:'AUDIO_OWNER_DISPOSED'}); }
             this.pluckedSource = source; return source;
         }).catch(error => { this.sourceFailure = error; throw error; });
@@ -1113,13 +1127,15 @@ class Instrument {
         if (this.disposed) return this.disposal;
         this.disposed = true;
         const actions=[
+            ()=>this.sourceConstructionRequest?.retire(),
             ()=>{if(this.morph)clearInterval(this.morph.timer);this.morph=null;clearTimeout(this.sleepTimer);clearTimeout(this.wanderTimer);},
             ...Object.values(this.wanderLfos).map(lfo=>()=>lfo.dispose()),
             ()=>this.silence(),()=>clearTimeout(this.sleepTimer),
             ()=>ownedSourceOf(this)?.dispose(),
-            ...[this.pianoSourcePromise,this.pluckedSourcePromise].filter(Boolean).map(p=>()=>awaitRetiredPreparation(p)),
+            ...(!this.sourceConstructionRequest?[this.pianoSourcePromise,this.pluckedSourcePromise].filter(Boolean).map(p=>()=>awaitRetiredPreparation(p)):[]),
             ()=>{const effects=retireAudioActions([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze,this.motion].filter(Boolean).map(owner=>()=>owner.dispose?.()),'Instrument effects disposal failed');this.effectsDisposal=effects.catch(error=>{this.effectsDisposalError=error.errors?.[0]??error;});return effects;},
             ...this.voices.map(synth=>()=>synth.destroy()),()=>this.reverb.dispose?.(),()=>this.output.disconnect(),
+            ()=>this.construction.retire(),
         ];
         this.disposal=retireAudioActions(actions,'Instrument disposal failed');
         this.disposal.catch(error=>{this.disposalError=error;});
