@@ -31,18 +31,15 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
  const drives={};let instanceGraph=instances;
  let effects,metering=false,wired='',latest=values,busy=false,disposed=false,failed=false,rewirePromise=null;
  const nodes=[],gain=()=>{const n=context.createGain();nodes.push(n);return n;};
- const input=gain(),trim=gain(),processed=gain(),bypass=gain(),output=gain();
- const ownedCompressor=dynamicsFactory?dynamicsFactory(context,{kind:'compressor',onError}):null;
- if(ownedCompressor&&(!ownedCompressor.input||!ownedCompressor.output||typeof ownedCompressor.patch!=='function')){ownedCompressor.dispose?.();throw Error('Invalid prepared compressor stage');}
- const compIn=gain(),clean=ownedCompressor?null:gain(),compressed=ownedCompressor?null:gain(),compOut=ownedCompressor?ownedCompressor.output:gain();
- const compressor=ownedCompressor?null:new Compressor(context);if(compressor)nodes.push(compressor.getNode());
- const detector=context.createAnalyser();detector.fftSize=256;nodes.push(detector);const detectorSamples=new Float32Array(256);
+ // Acquisitions occur in the protected initial transaction below. Each Native
+ // node is recorded immediately; returned owned actors remain in this scope.
+ let input,trim,processed,bypass,output,ownedCompressor=null,ownedCompressorRelease,ownedCompressorReleaseError,ownedCompressorAccessError,compIn,clean,compressed,compOut,compressor,detector,detectorSamples;
  let links=[];
  const link=(from,to)=>{from.connect(to);links.push([from,to]);};
  const unlink=()=>{for(const [from,to] of links){try{from.disconnect(to);}catch{/* already gone */}}links=[];};
  let disposal;
  const notifyCleanup=(error,errors)=>{errors.push(error);try{onError(error);}catch(notification){errors.push(notification);}};
- const dispose=()=>{if(disposed)return disposal;disposed=true;const pending=[],errors=[],close=s=>{try{const result=s?.dispose?.();if(result?.then)pending.push(result);}catch(error){notifyCleanup(error,errors);}};pool.forEach(close);Object.values(extra).forEach(close);Object.values(drives).forEach(close);Object.values(split).forEach(close);close(effects);close(ownedCompressor);for(const node of nodes)try{node.disconnect();}catch(error){notifyCleanup(error,errors);}if(rewirePromise)pending.push(rewirePromise);disposal=Promise.allSettled(pending).then(results=>{for(const result of results)if(result.status==='rejected')notifyCleanup(result.reason,errors);if(errors.length)throw new AggregateError(errors,'Rack terminal cleanup failed');});disposal.catch(()=>{});return disposal;};
+ const dispose=()=>{if(disposed)return disposal;disposed=true;const pending=[],errors=[],close=s=>{try{const result=s?.dispose?.();if(result?.then)pending.push(result);}catch(error){notifyCleanup(error,errors);}};pool.forEach(close);Object.values(extra).forEach(close);Object.values(drives).forEach(close);Object.values(split).forEach(close);close(effects);if(ownedCompressor)try{if(ownedCompressorReleaseError)throw ownedCompressorReleaseError;const result=ownedCompressorRelease();if(result?.then)pending.push(result);}catch(error){notifyCleanup(error,errors);}for(const node of nodes)try{node.disconnect();}catch(error){notifyCleanup(error,errors);}if(rewirePromise)pending.push(rewirePromise);disposal=Promise.allSettled(pending).then(results=>{for(const result of results)if(result.status==='rejected')notifyCleanup(result.reason,errors);if(errors.length)throw new AggregateError(errors,'Rack terminal cleanup failed');});disposal.catch(()=>{});return disposal;};
  // the inserts packet for one run of effects: the effects outside the run are zeroed, the output trim belongs to the last run
  const runPacket=(inserts,units,last)=>{
   const p={...inserts};
@@ -121,6 +118,19 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
   finally{busy=false;if(!disposed&&!failed)patch(latest);}
  }
  try{
+  input=gain();trim=gain();processed=gain();bypass=gain();output=gain();
+  ownedCompressor=dynamicsFactory?dynamicsFactory(context,{kind:'compressor',onError}):null;
+  if(ownedCompressor){
+   let invalid;
+   try{invalid=!ownedCompressor.input||!ownedCompressor.output||typeof ownedCompressor.patch!=='function';}
+   finally{try{const release=ownedCompressor.dispose;if(typeof release!=='function')ownedCompressorReleaseError=Error('Returned compressor has no terminal cleanup authority');else ownedCompressorRelease=()=>Reflect.apply(release,ownedCompressor,[]);}catch(error){ownedCompressorAccessError=error;ownedCompressorReleaseError=Object.assign(Error('Returned compressor terminal method could not be captured'),{cause:error});}}
+   if(invalid)throw Error('Invalid prepared compressor stage');
+   if(ownedCompressorAccessError)throw ownedCompressorAccessError;
+   if(ownedCompressorReleaseError)throw Error('Invalid prepared compressor stage');
+  }
+  compIn=gain();clean=ownedCompressor?null:gain();compressed=ownedCompressor?null:gain();compOut=ownedCompressor?ownedCompressor.output:gain();
+  compressor=ownedCompressor?null:new Compressor(context);if(compressor)nodes.push(compressor.getNode());
+  detector=context.createAnalyser();nodes.push(detector);detector.fftSize=256;detectorSamples=new Float32Array(256);
   const stages=stagesOf(values);
   if(!await ensure(stages))return null;
   const preparedExtras=[ownedCompressor,...Object.values(extra)].filter(s=>s?.prepareInitial);
