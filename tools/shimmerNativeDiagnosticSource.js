@@ -1,4 +1,6 @@
+import originalSpaceReference from'./fixtures/spaceProcessorOriginal.json';
 export const ORIGINAL_SPACE_SHA256='815d8158cf9c49ccf118fb1838d341513d5b6983a102823b4ecc16b18808a6c0';
+export function originalShimmerDiagnosticSource(){if(originalSpaceReference.version!==1||originalSpaceReference.sha256!==ORIGINAL_SPACE_SHA256)throw Error('Original Space fixture identity differs');return originalSpaceReference.source;}
 export const DIAGNOSTIC_SHIMMER_NAME='review-original-shimmer-815d8158-v1';
 export function buildShimmerDiagnosticSource(original){let body=original;for(const registration of["registerProcessor('calmbgm-shimmer', Shimmer);","registerProcessor('calmbgm-freeze', Freeze);"]){if(body.split(registration).length!==2)throw Error('Original Space registration layout differs');body=body.replace(registration,'');}return body+`
 // Review-only instrumentation. Original DSP class text above is unchanged.
