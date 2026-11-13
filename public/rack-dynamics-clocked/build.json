@@ -1,17 +1,18 @@
 {
   "api": 1,
   "profile": "native-context-clocked-rack-dynamics-v1",
-  "version": "1531336cb2360258",
-  "kernelVersion": "9cee05bda3513ce7",
+  "version": "072cf3030500ce09",
+  "kernelVersion": "c50a9ed634e2c2dc",
   "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
   "bytes": 81473,
   "nativeClockVersion": "7a0838a735108706",
-  "source": "624c1c4b024c8d339ef4a002c3737c4c43ef195586a84fa3f025d37da7d5b30d",
-  "processor": "0a3db6bfe1cae2adcd85dfa46ae54e93b0c2c06067d1d96df04ff5b95b021185",
-  "processorName": "rack-native-clocked-dynamics-1531336cb2360258",
+  "source": "fc828bb1e3c6e91fb29f984e83b238262e4d081d799b5456817a410e467a97bd",
+  "processor": "3a1a962464a62597b1ed35b04f95e60194755544ea08253c238b2fb801318454",
+  "processorName": "rack-native-clocked-dynamics-072cf3030500ce09",
   "files": [
     "tools/buildClockedRackDynamics.mjs",
     "src/modular-audio/clockedRackDynamicsProfile.js",
+    "src/modular-audio/rackDynamicsCommandTransport.js",
     "src/modular-audio/clockedRackDynamicsStage.js",
     "src/modular-audio/clockedRackDynamicsFactory.js",
     "src/modular-audio/clockedRackDynamicsBinding.js",
@@ -24,5 +25,5 @@
     "src/modular-audio/stampedRackTargetTransport.js",
     "public/rack-dynamics-calls/build.json"
   ],
-  "scope": "New explicit authoritative Native clock adapter around unchanged rack-dynamics-calls Wasm and per-lane control arithmetic. Physical input isolation until initial ACK; source metadata held until disposal ACK. No default selection."
+  "scope": "Native clock adapter around unchanged rack-dynamics-calls Wasm and per-lane control arithmetic. Bounded 32-command MessagePort transport retains authored frames and FIFO ACKs; edits apply at the next observed Native clock block and lateness is reported. Only demand and clock use AudioParams. Physical input isolation until initial ACK; clock lease held until disposal ACK. No default selection."
 }

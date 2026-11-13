@@ -41,6 +41,7 @@ import {DRUM_LANES,matchesDrumLane} from './drumLanes';
 import {movePlayhead} from '../seq/playhead';
 import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset,drumChoices,drumPatches,sceneDrumPatch} from './host';
 import {allAudioChoice,allAudioUrl,currentAllRuntime,prepareAllRustRuntime,allRuntimeStatus} from './runtimeBackend';
+import {measurePlayback} from './playbackDiagnostics';
 import {SYNTHS} from '../models';
 import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
@@ -110,6 +111,7 @@ function AllWorkbench({initialArrange=false}){
  const objects=useDeskObjects();
  const [audioBackend]=useState(()=>allAudioChoice(window.location.search));
  const [audioRuntime,setAudioRuntime]=useState(()=>audioBackend==='current'?currentAllRuntime(createHost):null);
+ const [playbackMeasurement,setPlaybackMeasurement]=useState(null),[measuringPlayback,setMeasuringPlayback]=useState(false);
  const sceneList=BROWSABLE_SCENES;
  const [initialLink]=useState(()=>{try{return {link:new URLSearchParams(window.location.search).get('allResume')==='1'?null:frontPageLink(window.location)};}catch(error){return {error};}});
  const [stored]=useState(()=>initialLink.link||initialLink.error?{}:readStored());
@@ -1019,6 +1021,14 @@ function AllWorkbench({initialArrange=false}){
   try{panic();stop();await host.current?.dispose();window.location.assign(allAudioUrl(window.location.href,value,{resume:started}));}
   catch(error){console.error(error);setStatus(`Audio release failed: ${error.message}. Reload to reconstruct playback.`);setBusy(false);}
  }
+ async function measureOutput(){
+  if(!host.current||measuringPlayback)return;
+  const measuredHost=host.current;
+  setMeasuringPlayback(true);
+  try{const result=await measurePlayback(measuredHost);setPlaybackMeasurement(host.current===measuredHost?result:{result:'inconclusive',reason:'Audio host changed during measurement'});}
+  catch(error){setPlaybackMeasurement({result:'failed',error:error.message});}
+  finally{setMeasuringPlayback(false);}
+ }
  return <div className="synth instrument all-instrument">
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
@@ -1095,7 +1105,7 @@ function AllWorkbench({initialArrange=false}){
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
    {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={previewOnly?previewAnchor:setupAnchor} title={previewOnly?'Source tests':'Setup'} preferences={!previewOnly} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
-    {!previewOnly&&<details className="group wide"><summary>Audio backend diagnostics</summary><pre aria-label="Audio backend diagnostics">{JSON.stringify(allRuntimeStatus(audioRuntime,host.current),null,2)}</pre></details>}
+    {!previewOnly&&<details className="group wide"><summary>Audio backend diagnostics</summary><button type="button" disabled={!started||measuringPlayback} onClick={measureOutput}>{measuringPlayback?'Measuring output…':'Measure output glitches (5 s)'}</button><p className="hint">Measure while playing a note or sequence. Device underruns are separate from DSP distortion; zero underruns does not certify clean sound.</p><pre aria-label="Audio output measurement">{JSON.stringify(playbackMeasurement,null,2)}</pre><pre aria-label="Audio backend diagnostics">{JSON.stringify(allRuntimeStatus(audioRuntime,host.current),null,2)}</pre></details>}
     {!previewOnly&&<section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>

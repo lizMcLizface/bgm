@@ -188,6 +188,43 @@ navigation. Scene/link/file replacement likewise awaits old-host retirement.
 The initial loader disposes a failed or superseded candidate. There is no
 automatic fallback to Current after a Rust preparation failure.
 
+### Output deadline correction, 13 November
+
+The first integrated route was functionally connected but missed device output
+deadlines badly: a visible 48 kHz / 10 ms base-latency idle sample recorded 343
+underruns and 46.99% fallback duration. Current at the same latency recorded
+0.20%. Substituting only the rack dynamics stages removed the idle failure.
+Changing their metadata to k-rate did not solve it.
+
+The clocked compressor/limiter now uses a bounded MessagePort FIFO for authored
+lane commands, removing 288 metadata AudioParams per stage. Only demand and the
+two authoritative Native clock signals remain AudioParams. The 32-command
+unobserved limit, whole-patch preflight, original lane order, Float32 values,
+per-lane authored frames, initial-control ACK isolation and terminal disposal
+ACK remain. Commands apply at the next observed Native clock block; late edits
+are counted rather than described as sample-exact delivery. Rust DSP, lookahead,
+coefficient arithmetic, defaults and the frozen WIP remain unchanged. The base
+facade accepts an explicit writer factory; existing nonclocked routes retain
+their stamped transport. Their generated identities change with that facade,
+while their Wasm bytes are identical.
+
+After correction the full Rust idle sample recorded 0.20% fallback, and separate
+five-second sustained-note and sequence samples each recorded zero underruns at
+the same latency. This measures device deadlines, not subjective sound quality.
+Setup's existing backend diagnostics now exposes the measurement on the actual
+selected host, with feature detection for browsers without output statistics.
+Reports are ignored under `reports/all-audio-*`. The existing 48 kHz browser
+Native dynamics batch passed all ten mono/stereo, routing, reload and separate
+lane-time cases with zero waveform error. Eight additional real-Wasm tests at
+8/44.1/48/96 kHz compare the new transport bit-for-bit with the stamped reference,
+including late controls; queue and lifecycle guards are tested separately.
+
+Final verification: 895 accepted test files / 7,366 passing tests and four skips;
+public provenance checks, Vite public build and artifact checks passed. A fresh
+sequence measurement after those jobs stopped recorded zero output underruns
+over 5.0068 reported seconds at the original 48 kHz / 10 ms base latency. Audio
+was stopped after verification. All 39 WIP hashes and the backup ZIP hash match.
+
 Unexpected external suspension invalidates the prepared clocked runtime. Reload
 to reconstruct it; the page reports live input failure instead of reviving
 stale ownership. Per-owner quotas and DSP defaults are unchanged. The owned

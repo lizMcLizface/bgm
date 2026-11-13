@@ -6,11 +6,11 @@
   "primarySources": "32011192c8a269087ceb23c81777422ffc9c239411dd4461217a9f7961cb7a08",
   "audited": false,
   "source": "acc96f13ac1cd28f6b758b2ac35d9f0197aacfde94e2f5a1839862eddba2f402",
-  "runtime": "9eb96df72b09d8687aca03cd518efce31ee1f80648aa299ad19d9c1f0f3b1312",
+  "runtime": "75d6bc254d696bf9e3372dde19bb0df149090fe94398bd65236857a624bbe790",
   "reference": "1611a63f30031280251c351d8dfcc72c30090573767fdf5b1edf4d87bf55f977",
   "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
   "bytes": 81473,
-  "version": "9c903a2d98864cfe",
-  "processorName": "rack-live-dynamics-9c903a2d98864cfe",
-  "processor": "e6a1892acd1bab7b09ee5557a0181ca941a2cfa678ae668590e4853e4e725be1"
+  "version": "b77428140b98616d",
+  "processorName": "rack-live-dynamics-b77428140b98616d",
+  "processor": "02a419002e0823d2b91d31e0669dc6ad7e0bc0c45689db6bc2b2f9c652009415"
 }

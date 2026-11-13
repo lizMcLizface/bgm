@@ -1,10 +1,11 @@
 import{RustRackDynamics}from'./rackDynamicsRust.js';
+import{RackDynamicsCommandWriter}from'./rackDynamicsCommandTransport.js';
 /** Own program bridge stays physically isolated through initial clock/target ACK.
  * Original RustRackDynamics owns all seven Native control lanes and their call order. */
 export class ClockedRackDynamicsStage{
  constructor(context,assets,{kind='compressor',onError=()=>{},hostAwake=true,initialPacket}={}){
   if(!['compressor','limiter'].includes(kind)||typeof onError!=='function'||typeof hostAwake!=='boolean')throw Error('Invalid clocked dynamics stage options');this.context=this.AC=context;this.kind=kind;this.assets=assets;this.onError=onError;this.hostAwake=hostAwake;this.disposed=false;this.error=null;this.prepared=false;this.programConnected=false;this.offline=typeof context.startRendering==='function';this.preparedSequence=-1;
-  try{this.inner=new RustRackDynamics(context,assets,{kind,transport:'calls',hostAwake:false,onError:error=>this.fail(error)});this.input=context.createGain();this.output=this.inner.output;this.ready=this.inner.ready.then(()=>this);this.health=this.inner.health;if(initialPacket!==undefined)this.patch(initialPacket,true);}catch(error){this.fail(error);throw error;}
+  try{this.inner=new RustRackDynamics(context,assets,{kind,transport:'calls',writerFactory:(port,ac)=>new RackDynamicsCommandWriter(port,ac),hostAwake:false,onError:error=>this.fail(error)});this.input=context.createGain();this.output=this.inner.output;this.ready=this.inner.ready.then(()=>this);this.health=this.inner.health;if(initialPacket!==undefined)this.patch(initialPacket,true);}catch(error){this.fail(error);throw error;}
  }
  alive(){if(this.disposed||this.error)throw Error(this.error??'Disposed clocked dynamics');this.inner.alive();}
  patch(...args){this.alive();return this.inner.patch(...args);}patchSpec(...args){this.alive();return this.inner.patchSpec(...args);}writeLane(...args){this.alive();return this.inner.writeLane(...args);}
