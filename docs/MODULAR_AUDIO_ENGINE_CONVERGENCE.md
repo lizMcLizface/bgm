@@ -6,8 +6,8 @@ The handoff remains the authority for frozen WIP and prior numerical receipts.
 
 The application has optional Rust factories and several accepted components. It
 does not yet have a complete Rust execution path for every Instrument effect,
-return and final global volume. Normal application selection and defaults are
-unchanged by this cleanup.
+return and final global volume. All now exposes an opt-in prepared Rust runtime;
+its current playback backend remains the default. See the All integration below.
 
 ## Selection and dependency spine
 
@@ -149,3 +149,62 @@ HTML. The Vite public bundle and `checkPublicBuild.mjs` passed with the existing
 large-chunk warning. The new entry is registered and required by the artifact
 checker. Initial build failures (guarded navigation HTML and unsupported
 top-level await in the page loader) were corrected without regenerating DSP.
+
+## All: selectable prepared runtime
+
+The All toolbar now offers **Current · default** and **Rust integrated ·
+experimental**. Choose Rust, then press **Prepare Rust audio**. This explicit
+gesture resumes the context before owners are constructed, so startup and
+retirement can be serviced. Normal Play, keyboard/phrase input, source edits,
+scene loading and setup-file restoration then use the selected factories.
+The Source tests snapshot executor remains a separate, explicitly invoked tool.
+
+`src/synths/all/runtimeBackend.js` is the selection boundary. One prepared
+environment is reused for every host built by that page session. It combines:
+
+- `prepareClockedOwnedHostEnvironment` and clocked Core/FM with the existing
+  explicit 128 ms default lead for live input;
+- owned CLASSIC, piano/KS and Iowa factories, Wasm basic percussion, prepared
+  compressors, Motion/Shimmer, inserts/effects buses and ambience preparation;
+- the clocked rack dynamics and Width/Ring factories, rack plugins and owned
+  role Wander;
+- `deskBackend: owned` for the actual All desk, including its channels and
+  master primitives. Existing routing and its summation order are retained.
+
+This is a complete selectable All playback route with declared Native stages,
+not every leaf port. Native Instrument outer effects, role tone/initial mix,
+shared routing/fan-in, Sweep, return junctions and final global volume remain.
+The cold nine-controller Main roots, four-cohort ordered join, standalone
+original-effect actors, delayed Room/Freeze joins and 39 frozen WIP files are
+not silently enabled. All's editable mixed-source graph is broader than the
+fixed ordered Generator recipe, which still has its own review entry.
+
+The selection uses the page URL (`allAudio=rust`), outside compositions and
+setup files. `allResume=1` tells a reload to restore the saved workbench rather
+than reapply a preset URL and lose later edits. Rust scene selection preserves
+both parameters. Switching backends flushes the existing song/Continuous save,
+refuses navigation if that save fails, then awaits host retirement before
+navigation. Scene/link/file replacement likewise awaits old-host retirement.
+The initial loader disposes a failed or superseded candidate. There is no
+automatic fallback to Current after a Rust preparation failure.
+
+Unexpected external suspension invalidates the prepared clocked runtime. Reload
+to reconstruct it; the page reports live input failure instead of reviving
+stale ownership. Per-owner quotas and DSP defaults are unchanged. The owned
+desk keeps the existing 3 ms limiter lookahead and does not promise automatic PDC.
+
+**Setup → Audio backend diagnostics** reports the selected environment, actual
+source backend labels and actual desk readiness/version. It declares the
+remaining Native boundaries. The mixer manifest was derived privately from its
+committed predecessor, checked, then published in the existing namespace. Only
+the host-reference receipt changes; mixer Wasm bytes are unchanged.
+
+Verification for this slice: the accepted suite passed 892 files / 7,346 tests
+with four skips. After the final resume/save safeguards, the complete focused
+All page, host and runtime suite passed 119 tests, including both new persistence
+regressions. Public provenance checks, the final Vite bundle and public artifact
+inventory passed. Browser checks use `localhost:4193` as a separate storage
+origin so the user's existing `127.0.0.1` workbench is preserved. They exercise
+normal playback and meters, DIM/master level, pause/resume/Stop, live CLASSIC
+phrase output, owned Iowa replacement, scene reconstruction, reload persistence
+and switching back to Current. Reports remain ignored under `reports/all-runtime-*`.

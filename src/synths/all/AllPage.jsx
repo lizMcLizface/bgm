@@ -40,6 +40,7 @@ import {drumStepEvents} from './drumSteps';
 import {DRUM_LANES,matchesDrumLane} from './drumLanes';
 import {movePlayhead} from '../seq/playhead';
 import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset,drumChoices,drumPatches,sceneDrumPatch} from './host';
+import {allAudioChoice,allAudioUrl,currentAllRuntime,prepareAllRustRuntime,allRuntimeStatus} from './runtimeBackend';
 import {SYNTHS} from '../models';
 import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
@@ -107,8 +108,10 @@ export default function AllPage(){
 }
 function AllWorkbench({initialArrange=false}){
  const objects=useDeskObjects();
+ const [audioBackend]=useState(()=>allAudioChoice(window.location.search));
+ const [audioRuntime,setAudioRuntime]=useState(()=>audioBackend==='current'?currentAllRuntime(createHost):null);
  const sceneList=BROWSABLE_SCENES;
- const [initialLink]=useState(()=>{try{return {link:frontPageLink(window.location)};}catch(error){return {error};}});
+ const [initialLink]=useState(()=>{try{return {link:new URLSearchParams(window.location.search).get('allResume')==='1'?null:frontPageLink(window.location)};}catch(error){return {error};}});
  const [stored]=useState(()=>initialLink.link||initialLink.error?{}:readStored());
  const [continuousSounds]=useState(()=>load(CONTINUOUS_SOUNDS_STORE,null));
  const [customScene,setCustomScene]=useState(()=>initialLink.link&&!initialLink.link.scene?normalizeScene({name:'Front-page settings',settings:initialLink.link.share.settings,voices:{}}):stored.sceneData?.name===stored.scene?stored.sceneData:null);
@@ -165,12 +168,15 @@ function AllWorkbench({initialArrange=false}){
  },[]);
 
  useEffect(()=>{
-  let alive=true;
+  if(!audioRuntime){setStatus('Rust playback selected · prepare audio to load your song');return;}
+  let alive=true,created=null;
   (async()=>{try{
    setBusy(true);
    const link=initialLink.link;
    const base=link&&!link.scene?{...scene,voices:{},layerVoices:{},percussion:null}:scene;
-   const h=createHost(base,{seed:link?.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link&&!link.scene?link.share?.settings:stored.project&&stored.scene===scene.name?stored.settings:undefined});
+   const h=await audioRuntime.createHost(base,{seed:link?.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link&&!link.scene?link.share?.settings:stored.project&&stored.scene===scene.name?stored.settings:undefined});
+   created=h;
+   if(!alive){await h.dispose();return;}
    host.current=h;
    await h.applySceneVoices(base);
    if(link){h.g.set('generation',generationFromSearch(link.search));await h.applyFrontPageLink(link);}
@@ -200,9 +206,9 @@ function AllWorkbench({initialArrange=false}){
     return [s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:scene.name}:{synth:'calmbgm',name:''})];
    })));
    setStatus(initialLink.error?`Could not read link: ${initialLink.error.message}`:back?`${scene.name} · back where you left off`:`${scene.name} · ${progressionsOf(song).length} progressions`);setStarted(true);setHostVersion(v=>v+1);
-  }catch(error){console.error(error);if(alive)setStatus(error.message);}finally{if(alive)setBusy(false);}})();
+  }catch(error){if(created)try{await created.dispose();}catch(cleanupError){error.cleanupError=cleanupError;}if(host.current===created)host.current=null;console.error(error);if(alive)setStatus(error.message);}finally{if(alive)setBusy(false);}})();
   return ()=>{alive=false;host.current?.dispose();host.current=null;};
- },[]);// eslint-disable-line react-hooks/exhaustive-deps
+ },[audioRuntime]);// eslint-disable-line react-hooks/exhaustive-deps
  // a new song: the generator plans another one for the same settings (new seed) and the sequencers take it
  function newSong(extra={}){
   pendingGenerator.current=null;
@@ -242,16 +248,16 @@ function AllWorkbench({initialArrange=false}){
   let h;
   try{
    setBusy(true);setStarted(false);
-   h=createHost(next,{seed});await h.applySceneVoices(next);await h.applyFrontPageLink({scene:next,search:''});await h.setupMixer();
+   h=await audioRuntime.createHost(next,{seed});await h.applySceneVoices(next);await h.applyFrontPageLink({scene:next,search:''});await h.setupMixer();
    if(host.current!==old){h.dispose();return;}
    const sceneMutes=takeHostMutes(h);
    const song=continuous?startStream(h,h.settings.seed):h.capture({progressions:progressionCount});
-   pendingGenerator.current=null;old.dispose();host.current=h;
+   pendingGenerator.current=null;await old.dispose();host.current=h;
    selectDefaultSequencer(song);
    setCustomScene(null);setSceneName(next.name);setMutes(sceneMutes);setSolos({});setPlacedId(null);setDeleteStack(null);setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
    setProject(song);setBpm(Math.round(song.bpm));setProgression(0);setArrOffset(0);setCol(0);setSounds(Object.fromEntries(SEQUENCERS.map(s=>[s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:next.name}:{synth:'calmbgm',name:''})])));setStatus(`${next.name}`);setStarted(true);setHostVersion(v=>v+1);
-   const url=new URL(window.location.href);url.search='';url.searchParams.set('preset',sceneSlug(next.name));window.history.replaceState(window.history.state,'',url);
-  }catch(error){h?.dispose();console.error(error);setStatus(`Could not load ${name}: ${error.message}`);if(host.current===old)setStarted(true);}finally{sceneLoading.current=false;setBusy(false);}
+   const url=new URL(window.location.href);url.search='';url.searchParams.set('preset',sceneSlug(next.name));window.history.replaceState(window.history.state,'',allAudioUrl(url,audioBackend,{resume:audioBackend==='rust'}));
+  }catch(error){await h?.dispose();console.error(error);setStatus(`Could not load ${name}: ${error.message}`);if(host.current===old)setStarted(true);}finally{sceneLoading.current=false;setBusy(false);}
  }
  async function openFrontPageLink(e){
   e.preventDefault();if(sceneLoading.current||!host.current)return;
@@ -260,18 +266,18 @@ function AllWorkbench({initialArrange=false}){
   try{
    const link=parseFrontPageInput(linkText),next=link.scene??normalizeScene({name:'Front-page settings',settings:link.share.settings,voices:{}});
    const base=link.scene?next:{...next,voices:{},layerVoices:{},percussion:null};
-   h=createHost(base,{seed:link.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link.scene?undefined:link.share?.settings});
+   h=await audioRuntime.createHost(base,{seed:link.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link.scene?undefined:link.share?.settings});
    await h.applySceneVoices(base);
    h.g.set('generation',generationFromSearch(link.search));
    await h.applyFrontPageLink(link);await h.setupMixer();
    if(host.current!==old)throw new Error('The current setup changed while the link was loading.');
    const sceneMutes=takeHostMutes(h);
    const song=continuous?startStream(h,h.g.settings.seed):h.capture({progressions:progressionCount,seed:h.g.settings.seed});
-   stop();pendingGenerator.current=null;old.dispose();host.current=h;h=null;
+   stop();pendingGenerator.current=null;await old.dispose();host.current=h;h=null;
    setCustomScene(link.custom||!link.scene?next:null);setSceneName(next.name);setProject(song);setBpm(Math.round(song.bpm));selectDefaultSequencer(song);setMutes(sceneMutes);setSolos({});
    setProgression(0);setArrOffset(0);setCol(0);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setArrangement(false);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
    setSounds({...host.current.loaded});setWins({});setStarted(true);setHostVersion(v=>v+1);setStatus(link.scene?`Opened ${next.name}`:'Opened front-page settings');
-  }catch(error){h?.dispose();console.error(error);setStatus(`Could not open link: ${error.message}`);}
+  }catch(error){await h?.dispose();console.error(error);setStatus(`Could not open link: ${error.message}`);}
   finally{sceneLoading.current=false;setBusy(false);}
  }
  function saveSetupFile(){
@@ -293,7 +299,7 @@ function AllWorkbench({initialArrange=false}){
   try{
    if(file.size>MAX_BYTES)throw new Error('This setup file is too large (maximum 16 MB).');
    const data=decodeSetup(await file.text()),next=data.sceneData??SCENES.find(s=>s.name===data.scene);
-   h=createHost(next,{seed:data.settings.seed,settings:data.settings});
+   h=await audioRuntime.createHost(next,{seed:data.settings.seed,settings:data.settings});
    await h.applySceneVoices(next);if(data.book)h.restoreBook?.(data.book);await h.restoreSounds(data.sounds);await h.setupMixer();
    takeHostMutes(h);
    let restoredStream=null;
@@ -309,7 +315,7 @@ function AllWorkbench({initialArrange=false}){
     restoredStream={generator,baseSteps:0};
    }
    if(host.current!==old)throw new Error('The current setup changed while the file was loading.');
-   stop();setStarted(false);old.dispose();host.current=h;h=null;
+   stop();setStarted(false);await old.dispose();host.current=h;h=null;
    stream.current=restoredStream;pendingGenerator.current=null;projectRef.current=data.project;progressionRef.current=data.ui.progression;
    playheadRef.current=(data.project.progressions?.[data.ui.progression]?.startBar??0)*data.project.stepsPerBar;repeatRef.current=null;
    if(data.workbench)objects.restore(data.workbench);
@@ -322,7 +328,7 @@ function AllWorkbench({initialArrange=false}){
    setSounds({...host.current.loaded});deskRef.current.restore(data.desk);ambienceRef.current.restore(data.ambience);tuning.set(data.tuning);
    if(data.pendingGenerator)queueGeneratorChange(host.current,data.project,data.ui.progression);
    setHostVersion(v=>v+1);setStarted(true);setStatus(`Opened ${file.name}`);
-  }catch(error){h?.dispose();console.error(error);setStatus(`Could not open setup: ${error.message}`);}
+  }catch(error){await h?.dispose();console.error(error);setStatus(`Could not open setup: ${error.message}`);}
   finally{sceneLoading.current=false;setBusy(false);}
  }
  async function chooseSound(r,synth,name,values,patch){
@@ -396,8 +402,8 @@ function AllWorkbench({initialArrange=false}){
  function dark(){if(lit.current.size){lit.current.clear();setLitNotes([]);}}
  // audio starts with the first key or phrase
  const wake=()=>{const h=host.current;return h?h.wake().then(()=>setAwake(true)):Promise.resolve();};
- const playPhrase=id=>{wake().then(()=>phrases.play(id));};
- const down=(k,n,v)=>{wake().then(()=>performer.down(k,n,v));};
+ const playPhrase=id=>{wake().then(()=>phrases.play(id)).catch(error=>setStatus(`Audio unavailable: ${error.message}`));};
+ const down=(k,n,v)=>{wake().then(()=>performer.down(k,n,v)).catch(error=>setStatus(`Audio unavailable: ${error.message}`));};
  const downRef=useRef(down);downRef.current=down;
  function panic(){void previewRef.current?.stop();phrases.stop();performer.panic();Object.values(host.current?.g.roles??{}).forEach(r=>r.instrument?.silence?.());dark();}
  const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
@@ -417,10 +423,10 @@ function AllWorkbench({initialArrange=false}){
   window.addEventListener('keydown',phraseKey);
   return ()=>{kb();m.dispose();window.removeEventListener('keydown',phraseKey);phrases.stop();performer.panic();};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
- useSaved(STORE,{pendingGenerator:!!pendingGenerator.current,scene:sceneName,...(customScene?{sceneData:customScene}:{}),progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined,soundState:started?host.current?.snapshotSounds?.():undefined,settings:host.current?.g.settings,book:host.current?.book,desk:deskRef.current?.snapshot(),ambience:ambienceRef.current?.snapshot()},{skip:()=>!project||!started||continuous});
+ const flushSong=useSaved(STORE,{pendingGenerator:!!pendingGenerator.current,scene:sceneName,...(customScene?{sceneData:customScene}:{}),progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined,soundState:started?host.current?.snapshotSounds?.():undefined,settings:host.current?.g.settings,book:host.current?.book,desk:deskRef.current?.snapshot(),ambience:ambienceRef.current?.snapshot()},{skip:()=>!project||!started||continuous});
  // Keep the actual test/listening sounds across Continuous reloads without
  // saving its ever-growing generated buffer or overwriting a finite song.
- useSaved(CONTINUOUS_SOUNDS_STORE,{version:1,scene:sceneName,bpm,mutes,solos,sounds:started?host.current?.snapshotSounds?.():undefined,mixer:started?host.current?.mixerSnapshot?.():undefined,desk:deskRef.current?.snapshot()},{skip:()=>!started||!continuous||busy});
+ const flushContinuous=useSaved(CONTINUOUS_SOUNDS_STORE,{version:1,scene:sceneName,bpm,mutes,solos,sounds:started?host.current?.snapshotSounds?.():undefined,mixer:started?host.current?.mixerSnapshot?.():undefined,desk:deskRef.current?.snapshot()},{skip:()=>!started||!continuous||busy});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
  useEffect(()=>{
@@ -999,10 +1005,26 @@ function AllWorkbench({initialArrange=false}){
   else {const generator=pendingGenerator.current?.generator??stream.current?.generator;if(generator)generator.update(h.g.settings,Object.fromEntries(flagKeys.map(key=>[key,typeof h.g[key]==='boolean'?h.g[key]:null])));refreshGenerator();setStatus(pendingGenerator.current?'Live controls applied · composition changes still queued':'Live controls applied');}
  }catch(error){console.error(error);setStatus(error.message);}};
  const changeRule=(id,choice)=>{try{host.current?.editRule(id,choice);queueGeneratorChange();}catch(error){console.error(error);setStatus(error.message);}};
+ async function prepareRustAudio(){
+  if(busy||audioRuntime)return;
+  setBusy(true);setStatus('Preparing Rust playback…');
+  try{setAudioRuntime(await prepareAllRustRuntime(createHost));}
+  catch(error){console.error(error);setStatus(`Rust preparation failed: ${error.message}`);}
+  finally{setBusy(false);}
+ }
+ async function changeAudioBackend(value){
+  if(!['current','rust'].includes(value)||value===audioBackend||busy||playing||paused||previewActive)return;
+  if(started&&(continuous?flushContinuous():flushSong())!==true){setStatus('Could not save this setup before changing audio. Save a setup file or enable local storage first.');return;}
+  setBusy(true);setStatus('Releasing audio before changing backend…');
+  try{panic();stop();await host.current?.dispose();window.location.assign(allAudioUrl(window.location.href,value,{resume:started}));}
+  catch(error){console.error(error);setStatus(`Audio release failed: ${error.message}. Reload to reconstruct playback.`);setBusy(false);}
+ }
  return <div className="synth instrument all-instrument">
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
+   <label className="bar-audio">Audio <select aria-label="Audio backend" value={audioBackend} disabled={busy||playing||paused||previewActive} onChange={e=>changeAudioBackend(e.target.value)}><option value="current">Current · default</option><option value="rust">Rust integrated · experimental</option></select></label>
+   {audioBackend==='rust'&&!audioRuntime&&<button type="button" disabled={busy} onClick={prepareRustAudio}>Prepare Rust audio</button>}
    <button ref={setupAnchor} type="button" aria-expanded={showSetup&&!previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(false);setShowSetup(v=>previewOnly||!v);}} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
    <button ref={previewAnchor} type="button" aria-label="Source tests" aria-expanded={showSetup&&previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(true);setShowSetup(v=>!previewOnly||!v);}}>Tests{previewActive?' · running':''}</button>
    <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{!sceneList.includes(scene)&&<option value={scene.name}>{scene.name}</option>}{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
@@ -1020,6 +1042,7 @@ function AllWorkbench({initialArrange=false}){
    <button type="button" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});}} aria-label="Full screen">⛶</button>
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
+  {audioBackend==='rust'&&<p role="status" aria-label="Audio backend status">Rust sources, prepared effects and desk. Some Instrument effects, role tone/mix controls, shared routing, Sweep and final volume remain Native. Live Core/FM input uses a 128 ms lead. Reload to recover after external suspension.</p>}
   <Desk includeHomeInFit={false} objects={objects} containedNavigation minZoom={.1} arrangeRequest={initialArrange&&started?1:0} arrangeWidth="auto">
    <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} settings={generatorSettings} onSettings={changeSettings} generator={host.current?.g} book={host.current?.book} onRule={changeRule} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
    <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1360,y:930}}>{voices}</FloatBox>
@@ -1072,6 +1095,7 @@ function AllWorkbench({initialArrange=false}){
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
    {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={previewOnly?previewAnchor:setupAnchor} title={previewOnly?'Source tests':'Setup'} preferences={!previewOnly} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
+    {!previewOnly&&<details className="group wide"><summary>Audio backend diagnostics</summary><pre aria-label="Audio backend diagnostics">{JSON.stringify(allRuntimeStatus(audioRuntime,host.current),null,2)}</pre></details>}
     {!previewOnly&&<section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>

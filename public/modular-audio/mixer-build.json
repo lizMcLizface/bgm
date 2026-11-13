@@ -1,10 +1,11 @@
 {
   "api": 1,
-  "source": "84e5e758853daff031cfe69157e60c48d243b4d4c234605758979b611d42ace7",
+  "source": "f538b15857324088a0bd42152a075e741ee3cc76887c3865a148e9f3c2f2f085",
   "wasm": "3c2700933e385c2a30c32c4a4a688651b0624a8f06993cb39afffc454dd3c6dd",
   "bytes": 87806,
-  "version": "e2168438994ed61d",
+  "version": "2e2cb0219509ee60",
   "files": [
+    "src/synths/all/runtimeBackend.js",
     "src/modular-audio/generatorOrderedMixPlan.js",
     "src/modular-audio/generatorOrderedMixAuthor.js",
     "src/modular-audio/generatorOrderedMixSources.js",
@@ -97,21 +98,13 @@
     "scope": "Declared constructor/failure-join references only; original mixer numerical bytes unchanged"
   },
   "preparedReferenceDelta": {
-    "predecessor": "f899dafde5634b94",
+    "predecessor": "e2168438994ed61d",
     "changed": [
-      "src/modular-audio/generatorStoppedRuntime.js",
-      "src/modular-audio/stoppedRuntimeOwners.js",
-      "src/modular-audio/mainStoppedRuntimeBinding.js",
-      "src/modular-audio/ownedRoleWanderNode.js",
-      "src/app/Generator.js"
+      "src/synths/all/host.js"
     ],
     "added": [
-      "src/modular-audio/generatorOrderedMixPlan.js",
-      "src/modular-audio/generatorOrderedMixAuthor.js",
-      "src/modular-audio/generatorOrderedMixSources.js",
-      "src/modular-audio/generatorOrderedMixRoot.js",
-      "public/ordered-send-live/host.json"
+      "src/synths/all/runtimeBackend.js"
     ],
-    "scope": "Explicit cold Main/output/scalar bootstrap, privately prepared Sweep and first four-cohort partial Generator send/sum join with actual RoleWander output borrows, fixed rack policy and whole-successor preflight refusal; ordered retirement and original mixer numerical bytes unchanged"
+    "scope": "Explicit cold Main/output/scalar, Sweep and four-cohort Generator references plus selectable All prepared runtime and explicit percussion option; original mixer numerical bytes unchanged"
   }
 }

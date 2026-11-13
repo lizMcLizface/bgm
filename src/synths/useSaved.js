@@ -9,14 +9,15 @@ import {save} from './storage';
 export function useSaved(key,value,{skip,delay=300}={}){
  const latest=useRef(value),skipRef=useRef(skip);
  latest.current=value;skipRef.current=skip;
+ const flush=()=>{if(!skipRef.current?.())return save(key,latest.current);};
  useEffect(()=>{
   const t=setTimeout(()=>{if(!skipRef.current?.())save(key,latest.current);},delay);
   return ()=>clearTimeout(t);
  },[key,value,delay]);
  useEffect(()=>{
-  const flush=()=>{if(!skipRef.current?.())save(key,latest.current);};
   const hidden=()=>{if(document.visibilityState==='hidden')flush();};
   window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',hidden);
   return ()=>{window.removeEventListener('pagehide',flush);document.removeEventListener('visibilitychange',hidden);};
  },[key]);
+ return flush;
 }

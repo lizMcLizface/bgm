@@ -43,6 +43,12 @@ vi.mock('./host', () => {
  };
 });
 const previewMock=vi.hoisted(()=>({calls:[]}));
+const runtimeMock=vi.hoisted(()=>({fail:false,calls:0}));
+vi.mock('./runtimeBackend',async importOriginal=>({...await importOriginal(),prepareAllRustRuntime:async create=>{
+ runtimeMock.calls++;if(runtimeMock.fail)throw Error('Rust assets unavailable');
+ const environment={profile:'owned-active-host-v1'};
+ return {backend:'rust',environment,createHost:(scene,options)=>create(scene,{...options,deskBackend:'owned',audioEnvironment:environment,percussion:'wasm'})};
+}}));
 vi.mock('../../modular-audio/workbenchPreview',()=>{const create=options=>{const controller={stop:vi.fn(async()=>{options.onState('stopped');options.onDone({reason:'stopped',pass:false});}),ready:Promise.resolve({actual:'worker',bufferingLatencyFrames:3072})};previewMock.calls.push({options,controller});return controller;};return {createWorkbenchPreview:create,createWorkbenchTestSuite:options=>create({...options,testSuite:true}),createWorkbenchCapacityComparison:options=>create({...options,comparison:true})};});
 import AllPage,{defaultSequencer} from './AllPage';
 
@@ -52,7 +58,7 @@ beforeEach(async () => {
  globalThis.IS_REACT_ACT_ENVIRONMENT = true;
  localStorage.clear();
  window.history.replaceState(null,'','/');
- previewMock.calls=[];mocks.capture.mockClear();
+ previewMock.calls=[];mocks.capture.mockClear();runtimeMock.fail=false;runtimeMock.calls=0;
  mocks.hosts=[];mocks.failScene=false;mocks.continuousRole='lead';
  container = document.createElement('div'); document.body.append(container);
  root = createRoot(container);
@@ -1137,4 +1143,48 @@ test('continuous reload retains actual sounds and mixer choices without saving i
  // cannot replace its sounds on a later reload.
  await act(async()=>container.querySelector('[aria-label="Generator mode"]').dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true})));await act(async()=>{const k=document.querySelector('[aria-label="Drums patch"]');k.value='felt';k.dispatchEvent(new Event('change',{bubbles:true}));});act(()=>window.dispatchEvent(new Event('pagehide')));
  act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));expect(mocks.hosts.at(-1).loaded.perc).toMatchObject({synth:'kit',name:'felt'});expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Song');
+});
+
+test('Rust All playback requires preparation and retains the selected runtime across scene reconstruction',async()=>{
+ act(()=>root.unmount());mocks.hosts=[];window.history.replaceState(null,'','/synths/all/?allAudio=rust');
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(mocks.hosts).toHaveLength(0);expect(runtimeMock.calls).toBe(0);
+ expect(container.querySelector('[aria-label="Audio backend"]').value).toBe('rust');
+ await act(async()=>button('Prepare Rust audio').click());
+ expect(runtimeMock.calls).toBe(1);expect(mocks.hosts).toHaveLength(1);
+ const old=mocks.hosts[0];expect(old.options).toMatchObject({deskBackend:'owned',percussion:'wasm',audioEnvironment:{profile:'owned-active-host-v1'}});
+ const select=container.querySelector('.bar-scene select'),next=[...select.options].find(option=>option.value!==select.value).value;
+ await act(async()=>{select.value=next;select.dispatchEvent(new Event('change',{bubbles:true}));});
+ expect(mocks.hosts).toHaveLength(2);expect(mocks.hosts[1].options.audioEnvironment).toBe(old.options.audioEnvironment);
+ expect(old.dispose).toHaveBeenCalledOnce();expect(runtimeMock.calls).toBe(1);
+ expect(new URLSearchParams(window.location.search).get('allAudio')).toBe('rust');
+});
+test('failed Rust preparation creates no native fallback and preserves the saved song',async()=>{
+ act(()=>root.unmount());mocks.hosts=[];window.history.replaceState(null,'','/synths/all/?allAudio=rust');
+ const song=localStorage.getItem('synths:all:state');runtimeMock.fail=true;
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ await act(async()=>button('Prepare Rust audio').click());
+ expect(mocks.hosts).toHaveLength(0);expect(container.textContent).toContain('Rust assets unavailable');
+ expect(localStorage.getItem('synths:all:state')).toBe(song);expect(button('Prepare Rust audio').disabled).toBe(false);
+ runtimeMock.fail=false;await act(async()=>button('Prepare Rust audio').click());expect(mocks.hosts).toHaveLength(1);
+});
+
+test('Rust scene reload resumes saved source edits instead of reapplying the preset URL',async()=>{
+ act(()=>root.unmount());localStorage.clear();mocks.hosts=[];window.history.replaceState(null,'','/synths/all/?allAudio=rust');
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));await act(async()=>button('Prepare Rust audio').click());
+ const scene=container.querySelector('.bar-scene select'),next=[...scene.options].find(option=>option.value!==scene.value).value;
+ await act(async()=>{scene.value=next;scene.dispatchEvent(new Event('change',{bubbles:true}));});
+ act(()=>button('Source tests').click());const kit=document.querySelector('[aria-label="Source test drum kit"]');
+ await act(async()=>{kit.value='hand';kit.dispatchEvent(new Event('change',{bubbles:true}));});
+ act(()=>window.dispatchEvent(new Event('pagehide')));
+ expect(new URLSearchParams(window.location.search).get('allResume')).toBe('1');
+ act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));await act(async()=>button('Prepare Rust audio').click());
+ expect(mocks.hosts.at(-1).loaded.perc).toMatchObject({synth:'kit',name:'hand'});
+ expect(mocks.hosts.at(-1).options.deskBackend).toBe('owned');
+});
+test('backend switching refuses to discard an unsaved setup when storage fails',async()=>{
+ const old=mocks.hosts.at(-1),write=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw Error('storage full');});
+ try{const backend=container.querySelector('[aria-label="Audio backend"]');await act(async()=>{backend.value='rust';backend.dispatchEvent(new Event('change',{bubbles:true}));});
+  expect(old.dispose).not.toHaveBeenCalled();expect(container.textContent).toContain('Could not save this setup before changing audio');
+ }finally{write.mockRestore();}
 });
