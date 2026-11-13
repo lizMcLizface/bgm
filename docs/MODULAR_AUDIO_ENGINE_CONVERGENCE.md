@@ -9,6 +9,83 @@ does not yet have a complete Rust execution path for every Instrument effect,
 return and final global volume. All now exposes an opt-in prepared Rust runtime;
 its current playback backend remains the default. See the All integration below.
 
+## Matched All comparison
+
+All now includes **Compare backends → Freeze workbench and compare**. It captures
+the current finite song (or the currently captured Continuous buffer), sound
+presets and edits, source/mixer effects, desk, tuning, tempo, mutes and solos.
+Ambience must be stopped and queued generation changes resolved. A separate
+session-storage capsule drives Current → Rust → Rust → Current, with an actual
+document reload and retirement before every trial, including the repeated Rust
+trial. The normal All host, scheduler, visible desk and meters run throughout;
+this does not substitute the raw-source preview or a synthetic DSP microbenchmark.
+The captured material loops unchanged; new Continuous generation is excluded.
+Probability and random-direction expression use one recorded seed through the
+normal note/drum event factories, reset in every fresh trial. Ordinary playback
+keeps its existing random source. A first unseeded repeat was correctly rejected
+after its event ledger differed; its negative report is retained under reports/.
+
+Each trial records three seconds idle, five seconds playing warm-up, then
+10/30/60 audio-clock seconds of the song. The 30-second choice is the default.
+It records output deadline counters, actual wall/context spans, output latency,
+sampled nonzero meters, JS heap snapshots, main-thread timer-delay distribution,
+the actual selected runtime and a hash of scheduled note/hit payloads and their
+relative sample positions. Restored settings are checked against the frozen
+recipe and the other runs. Normal rulebook persistence normalization is applied
+before capture (an absent inherited-flags object and an empty one are equivalent).
+Hidden documents, context interruption, edits, changed quality/buffer/viewport,
+different event workloads, late scheduler submissions and unavailable deadline
+counters prevent a clean matched-input verdict. Underruns themselves remain a
+measured result, not a reason to discard a fair but poorly performing backend.
+
+Trial controls are isolated from the inert musical interface, keyboard/MIDI
+input is disabled, and nested workbench storage writes go into a session shadow.
+The original local saved song, Continuous preferences and layout remain intact.
+**Return to saved workbench** retires the trial host before returning. A missing
+capsule gives a recovery link without constructing a fallback audio host.
+
+Browser timer delays are not DSP CPU timings, and browser JS heap is not total
+audio memory. `tools/measureAllComparison.ps1` optionally samples explicit OS
+process IDs into JSON for the comparison's import control. Example:
+
+```powershell
+./tools/measureAllComparison.ps1 -ProcessIds 12345 -Scope 'Confirmed All renderer' -ScopeConfirmed -DurationSeconds 240 -OutputPath reports/all-process.json
+```
+
+Identify the actual renderer before using `-ScopeConfirmed`; that flag is an
+operator attestation, not automatic tab attribution. A candidate process can be
+recorded without it, but the UI marks its CPU scope unconfirmed. Do not substitute
+every Chrome process on a computer with other tabs. If the PID changes across
+reloads, take separate scoped files and import them together. CPU100% means one
+occupied logical core; private bytes are process commit and include Native/Wasm
+allocations in that process. Samples must cover at least80% of a measured phase,
+with no PID loss/reuse or overlapping intervals, to qualify. Neither aggregate
+process CPU nor zero underruns establishes per-quantum audio headroom or a
+multicore speedup. No native/plugin or all-Rust claim follows from this comparison.
+
+Downloadable JSON includes the frozen recipe, measurements and comparison
+checks. The session shadow of unrelated UI conveniences is excluded. Rust's
+configured128ms Core/FM live-input lead remains disclosed separately; this is a
+sequence comparison with matched output-buffer policy, not an end-to-end live
+keyboard latency comparison. Existing defaults and preserved WIP remain intact.
+
+First final desktop result (13 November): the captured Uplifting Trance Departures
+workbench at48kHz /10ms base latency passed all four matched-input/condition
+checks. Every trial scheduled532 events with relative-frame/payload hash
+`0dc7abda2c2485fd541e0ed4ae21afcfd1375ca4aa2a20983ec156307e5dae3f`.
+The two30-second Current windows recorded0/0 underruns; Rust recorded5/0, with
+49.4ms total fallback in the first Rust window. JS heap snapshots after the four
+windows were115196808,145171578,147891082 and236017919 bytes. Their drift does
+not establish total audio-memory savings or a backend memory ranking.
+Candidate renderer CPU/private-byte samples are retained separately, with scope
+unconfirmed: privileged browser process attribution was unavailable. The import
+UI must preserve that qualification, not promote those numbers into a CPU win.
+Evidence is under ignored `reports/all-comparison-*`. This fixture establishes
+a working comparison and no demonstrated performance advantage warranting a
+default change. It is not a six-branch capacity, stress, multi-rate, live-MIDI
+latency or subjective sound-quality certification. All7377accepted tests and
+the public provenance/build/artifact checks pass; all39WIP hashes remain intact.
+
 ## Selection and dependency spine
 
 `Generator` / `synths/all/host.js` → `audioEnvironment.js` validation →

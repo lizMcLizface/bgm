@@ -1188,3 +1188,25 @@ test('backend switching refuses to discard an unsaved setup when storage fails',
   expect(old.dispose).not.toHaveBeenCalled();expect(container.textContent).toContain('Could not save this setup before changing audio');
  }finally{write.mockRestore();}
 });
+
+test('comparison reload restores a frozen finite song, locks edits and isolates nested saves',async()=>{
+ act(()=>window.dispatchEvent(new Event('pagehide')));
+ const original=localStorage.getItem('synths:all:state'),recipe=JSON.parse(original),id='12345678-1234-1234-1234-123456789abc';
+ act(()=>root.unmount());
+ const {initializeComparisonStorage,writeComparison}=await import('./comparisonSession');
+ const data={version:1,id,recipe,conditions:{sampleRate:48000,baseLatencySeconds:.01},conveniences:{},runs:[],plan:{order:['current','rust','rust','current'],warmupSeconds:5,measureSeconds:30,idleSeconds:3},returnUrl:'http://localhost/synths/all/',processReports:[]};
+ writeComparison(data);initializeComparisonStorage(data);window.history.replaceState(null,'','/synths/all/?allCompare='+id+'&allResume=1');
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(container.querySelector('.synth-bar').hasAttribute('inert')).toBe(true);
+ expect(container.querySelector('[aria-label="Backend comparison"]')).toBeTruthy();expect(button('Run comparison trial').disabled).toBe(false);
+ expect(mocks.scheduler.options.bank().patterns).toHaveLength(recipe.project.progressions?.length??1);
+ act(()=>window.dispatchEvent(new Event('pagehide')));expect(localStorage.getItem('synths:all:state')).toBe(original);
+});
+
+test('a missing comparison capsule shows recovery without constructing an audio host',async()=>{
+ act(()=>root.unmount());sessionStorage.clear();const count=mocks.hosts.length;
+ window.history.replaceState(null,'','/synths/all/?allCompare=12345678-1234-1234-1234-123456789abc');
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(container.textContent).toContain('Comparison snapshot unavailable');expect(mocks.hosts).toHaveLength(count);
+ expect(container.querySelector('a').getAttribute('href')).toContain('allResume=1');
+});

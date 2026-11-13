@@ -113,6 +113,13 @@ html:has(.all-instrument),body:has(.all-instrument),#root:has(.all-instrument){h
 #all-midi-setup{overscroll-behavior:contain;touch-action:pan-y;user-select:text;-webkit-user-select:text;}
 #all-midi-setup textarea,#all-midi-setup pre{user-select:text;-webkit-user-select:text;}
 #all-midi-setup .source-preview-field{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:8px 0;}
+.backend-comparison{flex:0 0 auto;padding:8px 16px;border-bottom:1px solid #474738;background:#1a1f20;color:#e6e5da;font-size:13px;}
+.backend-comparison:has(h2){height:310px;box-sizing:border-box;overflow:auto;}
+.backend-comparison h2{font-size:17px;margin:4px 0;}.backend-comparison p{margin:7px 0;}
+.backend-comparison button,.backend-comparison select{margin:4px;padding:7px 12px;}
+.backend-comparison table{width:100%;max-width:1100px;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+.backend-comparison th,.backend-comparison td{text-align:left;padding:5px 12px 5px 0;border-bottom:1px solid #363e3e;}
+.backend-comparison pre{white-space:pre-wrap;max-height:320px;overflow:auto;font-size:11px;}
 #all-midi-setup .source-test-actions{display:flex;flex-wrap:wrap;gap:8px;}
 #all-midi-setup .source-test-actions button{min-height:42px;flex:1 1 160px;white-space:normal;}
 #all-midi-setup .source-test-settings{margin:12px 0;}

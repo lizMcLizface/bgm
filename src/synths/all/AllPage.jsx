@@ -42,6 +42,8 @@ import {movePlayhead} from '../seq/playhead';
 import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset,drumChoices,drumPatches,sceneDrumPatch} from './host';
 import {allAudioChoice,allAudioUrl,currentAllRuntime,prepareAllRustRuntime,allRuntimeStatus} from './runtimeBackend';
 import {measurePlayback} from './playbackDiagnostics';
+import BackendComparison from './BackendComparison';
+import {comparisonScope,readComparison} from './comparisonSession';
 import {SYNTHS} from '../models';
 import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
@@ -51,7 +53,8 @@ import {degreeToMidi,midiToDegree,makeKey} from '../../seq/harmony';
 import {keyAt,transposeProjectScale} from './scaleTransform';
 import {choiceKnob} from './GeneratorControls';
 import {heldSteps} from '../../seq/notes';
-import {flagKeys} from '../../app/rulebook/session';
+import {flagKeys,cleanBook} from '../../app/rulebook/session';
+import {seeded} from '../../app/random';
 import {tuning} from '../tuning';
 import {createContinuous,appendProgression,trimProgressions} from './continuous';
 import {prepareGeneratorChange,publishGeneratorChange,liveGeneratorKeys} from './generatorChange';
@@ -103,12 +106,15 @@ export function defaultSequencer(project){
 export default function AllPage(){
  const [objects]=useState(createAllDeskObjects);
  const [initialArrange]=useState(()=>window.innerWidth<=700&&!objects.list().some(o=>o.pose));
+ const [comparisonError]=useState(()=>{try{if(comparisonScope())readComparison();return null;}catch(error){return error.message;}});
  // Keep this route's small style payload with its lazy JS module. Remote
  // previews can serve that module while rejecting a separate lazy CSS request.
+ if(comparisonError)return <main><h1>Comparison snapshot unavailable</h1><p>{comparisonError}</p><a href={import.meta.env.BASE_URL+'synths/all/?allResume=1'}>Return to saved workbench</a></main>;
  return <><style data-all-workbench-styles>{rackStyles+'\n'+allStyles}</style><DeskObjectsProvider store={objects}><AllWorkbench initialArrange={initialArrange}/></DeskObjectsProvider></>;
 }
 function AllWorkbench({initialArrange=false}){
  const objects=useDeskObjects();
+ const [comparison]=useState(()=>comparisonScope()?readComparison():null),comparisonObserver=useRef(null);
  const [audioBackend]=useState(()=>allAudioChoice(window.location.search));
  const [audioRuntime,setAudioRuntime]=useState(()=>audioBackend==='current'?currentAllRuntime(createHost):null);
  const [playbackMeasurement,setPlaybackMeasurement]=useState(null),[measuringPlayback,setMeasuringPlayback]=useState(false);
@@ -411,6 +417,7 @@ function AllWorkbench({initialArrange=false}){
  const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
  const updateSetup=(k,v)=>{setSetup(x=>({...x,[k]:v}));if(k==='midiDevice'){performer.releaseAll();midiRef.current.selected=v;}if(k==='midiChannel'){performer.releaseAll();midiRef.current.channel=v;}};
  useEffect(()=>{
+  if(comparison)return undefined;
   const m=new LabMidi({on:(k,n,v)=>downRef.current(k,n,mapVelocity(v,CURVES[setupRef.current.velocity]??CURVES.normal)),off:k=>performer.up(k),sustain:()=>{},control:()=>{},panic:()=>performer.panic(),
    onStatus:inputs=>setMidi({inputs,status:inputs.length?`${inputs.length} MIDI input${inputs.length>1?'s':''} connected.`:'MIDI ready · plug in your piano.'})});
   m.selected=setupRef.current.midiDevice;m.channel=setupRef.current.midiChannel;midiRef.current=m;
@@ -434,13 +441,15 @@ function AllWorkbench({initialArrange=false}){
  useEffect(()=>{
   if(!started)return undefined;
   const h=host.current;
+  const comparisonRandom=comparison?seeded(comparison.plan.expressionSeed):null;
   const bank=()=>{const p=projectRef.current,parts=repeatRef.current?[repeatRef.current]:progressionsOf(p);return {patterns:parts,lengths:parts.map(x=>x.bars*p.stepsPerBar),tempos:[],chain:parts.map((_,i)=>i),current:repeatRef.current?0:Math.min(progressionRef.current,parts.length-1)};};
   const sched=createScheduler({
    now:()=>h.context.currentTime,
    bank,
-   beforeStep:info=>{if(info.step===0)commitGenerator.current(info);},
+   beforeStep:info=>{comparisonObserver.current?.step(info);if(info.step===0)commitGenerator.current(info);},
    pattern:(part)=>({start:part.startBar*projectRef.current.stepsPerBar,key:projectRef.current.key,leader:-1,sequencers:SEQUENCERS.map(s=>({pattern:s.role==='perc'?null:projectRef.current.patterns[s.role],mute:mutesRef.current[s.role]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[s.role])})),drums:projectRef.current.patterns.perc}),
    events:(p,step,c)=>{
+    if(comparisonRandom)c={...c,random:comparisonRandom};
     const absolute=step+p.start,drumIndex=SEQUENCERS.findIndex(s=>s.role==='perc');
     const hits=p.sequencers[drumIndex]&&!p.sequencers[drumIndex].mute?drumStepEvents(p.drums,absolute,c):[];
     const notes=repeatRef.current?repeatNoteEvents(p,step,c,repeatRef.current.bars*projectRef.current.stepsPerBar):[
@@ -450,7 +459,7 @@ function AllWorkbench({initialArrange=false}){
     return [...notes,...hits.map(event=>({track:drumIndex,...event}))];
    },
    tempo:()=>bpmRef.current,swing:()=>0.5,flam:()=>0.5,
-   emit:events=>events.forEach(e=>{const r=SEQUENCERS[e.track].role;if(r==='perc')h.drum(e.hit,e.time,e.stepSec);else{h.note(r,e.note,e.time,e.duration,e.velocity);light(e.note,(e.time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000,Math.max(60,e.duration*1000));}booked.current[r]=(booked.current[r]||0)+1;}),
+   emit:events=>{comparisonObserver.current?.events(events,h.context.currentTime);events.forEach(e=>{const r=SEQUENCERS[e.track].role;if(r==='perc')h.drum(e.hit,e.time,e.stepSec);else{h.note(r,e.note,e.time,e.duration,e.velocity);light(e.note,(e.time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000,Math.max(60,e.duration*1000));}booked.current[r]=(booked.current[r]||0)+1;});},
    onStep:({pattern:part,step,time})=>{
     const wait=Math.max(0,(time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000);
     const absolute=bank().patterns[part].startBar*projectRef.current.stepsPerBar+step+(stream.current?.baseSteps??0),revision=generationRevision.current;
@@ -1029,12 +1038,18 @@ function AllWorkbench({initialArrange=false}){
   catch(error){setPlaybackMeasurement({result:'failed',error:error.message});}
   finally{setMeasuringPlayback(false);}
  }
+ function comparisonRecipe(){
+  const h=host.current;
+  return {scene:sceneName,sceneData:scene,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project:projectRef.current,
+   mixer:h.mixerSnapshot(),soundState:h.snapshotSounds(),settings:h.g.settings,book:cleanBook({version:1,...h.book}),desk:deskRef.current.snapshot(),ambience:ambienceRef.current.snapshot(),tuning:tuning.get(),pendingGenerator:!!pendingGenerator.current};
+ }
+ async function leaveComparison(url){panic();stop();setBusy(true);try{await host.current?.dispose();window.location.assign(String(url));}catch(error){setBusy(false);throw error;}}
  return <div className="synth instrument all-instrument">
-  <header className="synth-bar">
+  <header className="synth-bar" inert={comparison?'':undefined}>
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
    <label className="bar-audio">Audio <select aria-label="Audio backend" value={audioBackend} disabled={busy||playing||paused||previewActive} onChange={e=>changeAudioBackend(e.target.value)}><option value="current">Current · default</option><option value="rust">Rust integrated · experimental</option></select></label>
-   {audioBackend==='rust'&&!audioRuntime&&<button type="button" disabled={busy} onClick={prepareRustAudio}>Prepare Rust audio</button>}
+   {audioBackend==='rust'&&!audioRuntime&&!comparison&&<button type="button" disabled={busy} onClick={prepareRustAudio}>Prepare Rust audio</button>}
    <button ref={setupAnchor} type="button" aria-expanded={showSetup&&!previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(false);setShowSetup(v=>previewOnly||!v);}} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
    <button ref={previewAnchor} type="button" aria-label="Source tests" aria-expanded={showSetup&&previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(true);setShowSetup(v=>!previewOnly||!v);}}>Tests{previewActive?' · running':''}</button>
    <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{!sceneList.includes(scene)&&<option value={scene.name}>{scene.name}</option>}{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
@@ -1052,7 +1067,9 @@ function AllWorkbench({initialArrange=false}){
    <button type="button" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});}} aria-label="Full screen">⛶</button>
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
-  {audioBackend==='rust'&&<p role="status" aria-label="Audio backend status">Rust sources, prepared effects and desk. Some Instrument effects, role tone/mix controls, shared routing, Sweep and final volume remain Native. Live Core/FM input uses a 128 ms lead. Reload to recover after external suspension.</p>}
+  <BackendComparison session={comparison} host={host.current} runtime={audioRuntime} backend={audioBackend} ready={started} busy={busy||playing||paused||previewActive} capture={comparisonRecipe} onPrepare={prepareRustAudio} play={play} stop={stop} leave={leaveComparison} observer={comparisonObserver} readDesk={()=>deskRef.current.snapshot()}/>
+  {(audioBackend==='rust'||comparison)&&<p role="status" aria-label="Audio backend status">{comparison?'Comparison uses the actual All workbench and scheduler. Rust keeps its declared Native stages and 128 ms Core/FM live-input lead.':'Rust sources, prepared effects and desk. Some Instrument effects, role tone/mix controls, shared routing, Sweep and final volume remain Native. Live Core/FM input uses a 128 ms lead. Reload to recover after external suspension.'}</p>}
+  <div inert={comparison?'':undefined} style={{display:'contents'}}>
   <Desk includeHomeInFit={false} objects={objects} containedNavigation minZoom={.1} arrangeRequest={initialArrange&&started?1:0} arrangeWidth="auto">
    <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} settings={generatorSettings} onSettings={changeSettings} generator={host.current?.g} book={host.current?.book} onRule={changeRule} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
    <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1360,y:930}}>{voices}</FloatBox>
@@ -1150,6 +1167,7 @@ function AllWorkbench({initialArrange=false}){
      </>}/>}
    </footer>
   </Desk>
+  </div>
  </div>;
 }
 
