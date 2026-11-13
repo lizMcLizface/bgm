@@ -60,7 +60,7 @@ export default function BackendComparison({session,host,runtime,backend,ready,bu
             if(JSON.stringify(await conditions(host.context))!==JSON.stringify(startConditions))issues.push('Conditions changed during trial');
             issues.push(...idle.issues,...warmup.issues,...sequence.issues);
             record={index,backend,actualHash,expectedHash,restorationDifferences,conditions:startConditions,runtime:allRuntimeStatus(runtime,host),idle,warmup,sequence,events,issues,
-                liveInputLeadSeconds:backend==='rust'?.128:0,liveInputScope:'Configured Core/FM live-input lead; not a measured end-to-end latency. Sequence input uses the same All scheduler.'};
+                liveInputLeadSeconds:backend==='rust'?(runtime.liveInputLeadSeconds??.128):0,liveInputScope:'Configured Core/FM live-input lead; not a measured end-to-end latency. Sequence input uses the same All scheduler.'};
         }catch(error){record={index,backend,error:error.message,issues};}
         finally {stop();observer.current=null;meter?.dispose();abort.current=null;setRunning(false);}
         try {const next=saveComparisonRun(data,record);setData(next);setMessage(record.error?`Trial failed: ${record.error}`:next.runs.length===4?'Comparison complete. Download the results or return to your saved workbench.':'Trial saved. Reload for the next backend.');}catch(error){setMessage(error.message);}
@@ -104,6 +104,6 @@ export default function BackendComparison({session,host,runtime,backend,ready,bu
             <input ref={input} type="file" multiple accept="application/json,.json" aria-label="Import process measurements" onChange={importProcesses}/>
             <table><thead><tr><th>Trial</th><th>CPU median / p95 (one core)</th><th>Private bytes median</th><th>Scope</th></tr></thead><tbody>{data.runs.map(run=>{const m=run.sequence&&processMetrics(data.processReports,run.sequence);return <tr key={run.index}><td>{run.index+1}</td><td>{m?.valid?`${fixed(m.coreEquivalentPercent?.p50)}% / ${fixed(m.coreEquivalentPercent?.p95)}%`:'Not measured'}</td><td>{m?.valid?mb(m.privateBytes?.p50):'Not attributable'}</td><td>{m?!m.scopeConfirmed?'CPU scope unconfirmed':!m.valid?'Invalid process coverage':m.scope.join('; '):'Not measured'}</td></tr>;})}</tbody></table>
         </details>
-        <details inert={running?'':undefined}><summary>Comparison evidence and limitations</summary><p>{summary.scope}</p><p>Timer delays measure main-thread responsiveness, not DSP CPU. Short samples do not certify glitch-free playback. Random generator extension and ambience are excluded; the captured song loops unchanged. Configured Core/FM live lead remains 128 ms for Rust. Output device latency is reported separately.</p><pre aria-label="Backend comparison report">{reportText}</pre></details>
+        <details inert={running?'':undefined}><summary>Comparison evidence and limitations</summary><p>{summary.scope}</p><p>Timer delays measure main-thread responsiveness, not DSP CPU. Short samples do not certify glitch-free playback. Random generator extension and ambience are excluded; the captured song loops unchanged. Configured Core/FM live lead is reported per run and is separate from the device output buffer. Output device latency is reported separately.</p><pre aria-label="Backend comparison report">{reportText}</pre></details>
     </section>;
 }

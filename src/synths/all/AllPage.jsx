@@ -40,7 +40,8 @@ import {drumStepEvents} from './drumSteps';
 import {DRUM_LANES,matchesDrumLane} from './drumLanes';
 import {movePlayhead} from '../seq/playhead';
 import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset,drumChoices,drumPatches,sceneDrumPatch} from './host';
-import {allAudioChoice,allAudioUrl,currentAllRuntime,prepareAllRustRuntime,allRuntimeStatus} from './runtimeBackend';
+import {allAudioChoice,allAudioUrl,currentAllRuntime,prepareAllRustRuntime,allRuntimeStatus,ALL_LIVE_LEADS_MS,allLiveInputLead} from './runtimeBackend';
+import {measureLiveInput,readLiveTrials,saveLiveTrial} from './liveInputTrial';
 import {measurePlayback} from './playbackDiagnostics';
 import BackendComparison from './BackendComparison';
 import {comparisonScope,readComparison} from './comparisonSession';
@@ -116,6 +117,8 @@ function AllWorkbench({initialArrange=false}){
  const objects=useDeskObjects();
  const [comparison]=useState(()=>comparisonScope()?readComparison():null),comparisonObserver=useRef(null);
  const [audioBackend]=useState(()=>allAudioChoice(window.location.search));
+ const [liveInputLead]=useState(()=>allLiveInputLead(window.location.search));
+ const [liveTrials,setLiveTrials]=useState(readLiveTrials),[testingLive,setTestingLive]=useState(false),[liveProgress,setLiveProgress]=useState(''),liveAbort=useRef(null);
  const [audioRuntime,setAudioRuntime]=useState(()=>audioBackend==='current'?currentAllRuntime(createHost):null);
  const [playbackMeasurement,setPlaybackMeasurement]=useState(null),[measuringPlayback,setMeasuringPlayback]=useState(false);
  const sceneList=BROWSABLE_SCENES;
@@ -1019,7 +1022,7 @@ function AllWorkbench({initialArrange=false}){
  async function prepareRustAudio(){
   if(busy||audioRuntime)return;
   setBusy(true);setStatus('Preparing Rust playback…');
-  try{setAudioRuntime(await prepareAllRustRuntime(createHost));}
+  try{setAudioRuntime(await prepareAllRustRuntime(createHost,{liveInputLeadSeconds:liveInputLead}));}
   catch(error){console.error(error);setStatus(`Rust preparation failed: ${error.message}`);}
   finally{setBusy(false);}
  }
@@ -1038,6 +1041,27 @@ function AllWorkbench({initialArrange=false}){
   catch(error){setPlaybackMeasurement({result:'failed',error:error.message});}
   finally{setMeasuringPlayback(false);}
  }
+ async function changeLiveLead(value){
+  if(busy||playing||paused||previewActive)return;
+  if(started&&(continuous?flushContinuous():flushSong())!==true){setStatus('Could not save this setup before changing live-input lead.');return;}
+  setBusy(true);
+  try{
+   // A failed source may refuse note-off. Its independent terminal disposal
+   // still has to complete before reconstructing the next explicit policy.
+   try{panic();stop();}catch(error){console.warn('Failed-source release before retirement',error);}
+   await host.current?.dispose();const url=allAudioUrl(location.href,'rust',{resume:started});url.searchParams.set('allLeadMs',value);window.location.assign(url);
+  }catch(error){setStatus(`Audio release failed: ${error.message}`);setBusy(false);}
+ }
+ async function testLiveInput(){
+  if(busy||playing||paused||previewActive||!started)return;
+  const h=host.current,r=voiceRef.current,token={aborted:false};liveAbort.current=token;setBusy(true);setTestingLive(true);setLiveProgress('Preparing live keybed test…');
+  try{
+   const recipe={role:r,settings:h.g.settings,sounds:h.snapshotSounds(),mixer:h.mixerSnapshot(),desk:deskRef.current.snapshot(),tuning:tuning.get()};
+   const report=await measureLiveInput({host:h,performer,role:r,recipe,abort:token,onProgress:(elapsed,total)=>setLiveProgress(`Live keybed: ${Math.floor(elapsed)} / ${total} s · singles, chords, arpeggio`)});
+   setLiveTrials(saveLiveTrial(report));setLiveProgress(report.failure?`Live-input failure: ${report.failure}`:`Live input: ${report.late} late, ${report.dropped} dropped; ${report.underrunEvents} output underruns.`);
+  }catch(error){setLiveProgress(error.message);}finally{liveAbort.current=null;setTestingLive(false);setBusy(false);}
+ }
+ function downloadLiveTrials(){const url=URL.createObjectURL(new Blob([JSON.stringify(liveTrials,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='all-live-input-latency.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  function comparisonRecipe(){
   const h=host.current;
   return {scene:sceneName,sceneData:scene,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project:projectRef.current,
@@ -1049,6 +1073,7 @@ function AllWorkbench({initialArrange=false}){
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
    <label className="bar-audio">Audio <select aria-label="Audio backend" value={audioBackend} disabled={busy||playing||paused||previewActive} onChange={e=>changeAudioBackend(e.target.value)}><option value="current">Current · default</option><option value="rust">Rust integrated · experimental</option></select></label>
+   {audioBackend==='rust'&&<label>Live lead <select aria-label="Rust live-input lead" value={liveInputLead*1000} disabled={busy||playing||paused||previewActive} onChange={e=>changeLiveLead(e.target.value)}>{ALL_LIVE_LEADS_MS.map(ms=><option key={ms} value={ms}>{ms} ms{ms===128?' · default':''}</option>)}</select></label>}
    {audioBackend==='rust'&&!audioRuntime&&!comparison&&<button type="button" disabled={busy} onClick={prepareRustAudio}>Prepare Rust audio</button>}
    <button ref={setupAnchor} type="button" aria-expanded={showSetup&&!previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(false);setShowSetup(v=>previewOnly||!v);}} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
    <button ref={previewAnchor} type="button" aria-label="Source tests" aria-expanded={showSetup&&previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(true);setShowSetup(v=>!previewOnly||!v);}}>Tests{previewActive?' · running':''}</button>
@@ -1068,7 +1093,7 @@ function AllWorkbench({initialArrange=false}){
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
   <BackendComparison session={comparison} host={host.current} runtime={audioRuntime} backend={audioBackend} ready={started} busy={busy||playing||paused||previewActive} capture={comparisonRecipe} onPrepare={prepareRustAudio} play={play} stop={stop} leave={leaveComparison} observer={comparisonObserver} readDesk={()=>deskRef.current.snapshot()}/>
-  {(audioBackend==='rust'||comparison)&&<p role="status" aria-label="Audio backend status">{comparison?'Comparison uses the actual All workbench and scheduler. Rust keeps its declared Native stages and 128 ms Core/FM live-input lead.':'Rust sources, prepared effects and desk. Some Instrument effects, role tone/mix controls, shared routing, Sweep and final volume remain Native. Live Core/FM input uses a 128 ms lead. Reload to recover after external suspension.'}</p>}
+  {(audioBackend==='rust'||comparison)&&<p role="status" aria-label="Audio backend status">{comparison?'Comparison uses the actual All workbench and scheduler. Rust keeps its declared Native stages. Live lead is reported separately.':'Rust sources, prepared effects and desk. Some Instrument effects, role tone/mix controls, shared routing, Sweep and final volume remain Native. Live Core/FM input uses a '+(liveInputLead*1000)+' ms lead. Reload to recover after external suspension.'}</p>}
   <div inert={comparison?'':undefined} style={{display:'contents'}}>
   <Desk includeHomeInFit={false} objects={objects} containedNavigation minZoom={.1} arrangeRequest={initialArrange&&started?1:0} arrangeWidth="auto">
    <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} settings={generatorSettings} onSettings={changeSettings} generator={host.current?.g} book={host.current?.book} onRule={changeRule} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
@@ -1122,7 +1147,10 @@ function AllWorkbench({initialArrange=false}){
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
    {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={previewOnly?previewAnchor:setupAnchor} title={previewOnly?'Source tests':'Setup'} preferences={!previewOnly} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
-    {!previewOnly&&<details className="group wide"><summary>Audio backend diagnostics</summary><button type="button" disabled={!started||measuringPlayback} onClick={measureOutput}>{measuringPlayback?'Measuring output…':'Measure output glitches (5 s)'}</button><p className="hint">Measure while playing a note or sequence. Device underruns are separate from DSP distortion; zero underruns does not certify clean sound.</p><pre aria-label="Audio output measurement">{JSON.stringify(playbackMeasurement,null,2)}</pre><pre aria-label="Audio backend diagnostics">{JSON.stringify(allRuntimeStatus(audioRuntime,host.current),null,2)}</pre></details>}
+    {!previewOnly&&<details className="group wide"><summary>Audio backend diagnostics</summary><button type="button" disabled={!started||measuringPlayback||busy} onClick={measureOutput}>{measuringPlayback?'Measuring output…':'Measure output glitches (5 s)'}</button><p className="hint">Measure while playing a note or sequence. Device underruns are separate from DSP distortion; zero underruns does not certify clean sound.</p><pre aria-label="Audio output measurement">{JSON.stringify(playbackMeasurement,null,2)}</pre><pre aria-label="Audio backend diagnostics">{JSON.stringify(allRuntimeStatus(audioRuntime,host.current),null,2)}</pre>
+     {audioBackend==='rust'&&<><button type="button" disabled={!started||busy||playing||paused||previewActive} onClick={testLiveInput}>Test live keybed (30 s)</button><button type="button" disabled={testingLive||!liveTrials.length} onClick={downloadLiveTrials}>Download live-input results</button>{testingLive&&<button type="button" onClick={()=>{liveAbort.current.aborted=true;}}>Stop live test</button>}<p role="status" aria-label="Live input test status">{liveProgress}</p><p>Uses the voice selected on the keybed. Singles, chords and rapid notes pass through its normal Performer. Lead choices require a reload; the device buffer is unchanged.</p>
+       <table aria-label="Live input trial results"><thead><tr><th>Lead</th><th>Late / dropped</th><th>Output underruns</th><th>Input result</th></tr></thead><tbody>{liveTrials.map((r,i)=><tr key={i}><td>{r.leadMs} ms</td><td>{r.late??'unknown'} / {r.dropped??'unknown'}</td><td>{r.underrunEvents??'unknown'}</td><td>{r.failure??(r.pass?'Input timing clean':'Review')}</td></tr>)}</tbody></table><details><summary>Raw live-input report</summary><pre aria-label="Live input test report">{JSON.stringify(liveTrials,null,2)}</pre></details></>}
+    </details>}
     {!previewOnly&&<section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>

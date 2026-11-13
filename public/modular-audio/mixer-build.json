@@ -1,9 +1,9 @@
 {
   "api": 1,
-  "source": "f538b15857324088a0bd42152a075e741ee3cc76887c3865a148e9f3c2f2f085",
+  "source": "9f4baca5587c7452ae87a1efa5d4faf4a9e2c4be91b9c5ec1d2f4a3e52e8780f",
   "wasm": "3c2700933e385c2a30c32c4a4a688651b0624a8f06993cb39afffc454dd3c6dd",
   "bytes": 87806,
-  "version": "2e2cb0219509ee60",
+  "version": "e337d6a5890e94d4",
   "files": [
     "src/synths/all/runtimeBackend.js",
     "src/modular-audio/generatorOrderedMixPlan.js",
@@ -98,13 +98,11 @@
     "scope": "Declared constructor/failure-join references only; original mixer numerical bytes unchanged"
   },
   "preparedReferenceDelta": {
-    "predecessor": "e2168438994ed61d",
+    "predecessor": "2e2cb0219509ee60",
     "changed": [
-      "src/synths/all/host.js"
-    ],
-    "added": [
       "src/synths/all/runtimeBackend.js"
     ],
+    "added": [],
     "scope": "Explicit cold Main/output/scalar, Sweep and four-cohort Generator references plus selectable All prepared runtime and explicit percussion option; original mixer numerical bytes unchanged"
   }
 }

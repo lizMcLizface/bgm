@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ context: { state: 'suspended', resume: vi.fn()
 vi.mock('../../audio/context.js', () => ({ audioContext: mocks.context }));
 vi.mock('../../modular-audio/clockedOwnedHostEnvironment.js', () => ({ prepareClockedOwnedHostEnvironment: context => mocks.prepare(context) }));
 vi.mock('../../modular-audio/clockedCoreLive.js', () => ({ prepareClockedCoreLive: (...args) => mocks.core(...args) }));
-import { allAudioChoice, allAudioUrl, currentAllRuntime, prepareAllRustRuntime } from './runtimeBackend.js';
+import { allAudioChoice, allAudioUrl, currentAllRuntime, prepareAllRustRuntime,allLiveInputLead } from './runtimeBackend.js';
 
 beforeEach(() => {
     mocks.events = []; mocks.context.state = 'suspended';
@@ -37,6 +37,15 @@ it('prepares once after resume and reuses the selected factories for every host 
     await expect(first.wake()).rejects.toThrow('Clock retired');
     await expect(runtime.createHost('refused')).rejects.toThrow('Clock retired');
     expect(create).toHaveBeenCalledTimes(2);
+});
+it.each([128,64,32,16,8])('prepares the explicit %s ms live policy without changing the default',async ms=>{
+ expect(allLiveInputLead('')).toBe(.128);expect(allLiveInputLead('?allLeadMs='+ms)).toBe(ms/1000);
+ const runtime=await prepareAllRustRuntime(vi.fn(),{liveInputLeadSeconds:ms/1000});expect(runtime.liveInputLeadSeconds).toBe(ms/1000);
+ expect(mocks.core).toHaveBeenCalledWith(mocks.context,{liveInputLeadSeconds:ms/1000});
+});
+it('rejects unsupported leads before resuming or preparing an owner',async()=>{
+ expect(()=>allLiveInputLead('?allLeadMs=0')).toThrow('Unsupported');
+ await expect(prepareAllRustRuntime(vi.fn(),{liveInputLeadSeconds:0})).rejects.toThrow('Unsupported');expect(mocks.context.resume).not.toHaveBeenCalled();
 });
 it('retires a partial host on engine failure and preserves cleanup failure details', async () => {
     const failure = Error('Source unavailable'), cleanup = Error('ACK missing');

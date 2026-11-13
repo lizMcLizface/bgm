@@ -112,6 +112,8 @@ html:has(.all-instrument),body:has(.all-instrument),#root:has(.all-instrument){h
 .all-instrument .desk-touch-hint{display:none;}
 #all-midi-setup{overscroll-behavior:contain;touch-action:pan-y;user-select:text;-webkit-user-select:text;}
 #all-midi-setup textarea,#all-midi-setup pre{user-select:text;-webkit-user-select:text;}
+#all-midi-setup .group{min-width:0;}
+#all-midi-setup pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;font-size:11px;}
 #all-midi-setup .source-preview-field{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:8px 0;}
 .backend-comparison{flex:0 0 auto;padding:8px 16px;border-bottom:1px solid #474738;background:#1a1f20;color:#e6e5da;font-size:13px;}
 .backend-comparison:has(h2){height:310px;box-sizing:border-box;overflow:auto;}

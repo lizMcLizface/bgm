@@ -1,5 +1,12 @@
 // Runtime selection is page-session state, separate from compositions and setup files.
 export const ALL_AUDIO_QUERY = 'allAudio';
+export const ALL_LIVE_LEADS_MS = [128,64,32,16,8];
+export function allLiveInputLead(search) {
+    const value=new URLSearchParams(search).get('allLeadMs');
+    if(value===null)return .128;
+    const ms=Number(value);if(!ALL_LIVE_LEADS_MS.includes(ms))throw Error('Unsupported All live-input lead');
+    return ms/1000;
+}
 export const allAudioChoice = search => new URLSearchParams(search).get(ALL_AUDIO_QUERY) === 'rust' ? 'rust' : 'current';
 export function allAudioUrl(value, backend, { resume = false } = {}) {
     const url = new URL(value);
@@ -13,7 +20,8 @@ export function allAudioUrl(value, backend, { resume = false } = {}) {
 export const currentAllRuntime = createHost => Object.freeze({ backend: 'current', createHost });
 
 // Explicit gesture entry: prepared owners must be able to service startup and retirement.
-export async function prepareAllRustRuntime(createHost) {
+export async function prepareAllRustRuntime(createHost,{liveInputLeadSeconds=.128}={}) {
+    if(!ALL_LIVE_LEADS_MS.includes(liveInputLeadSeconds*1000))throw Error('Unsupported All live-input lead');
     const { audioContext } = await import('../../audio/context.js');
     await audioContext.resume();
     if (audioContext.state !== 'running') throw Error('Start the audio context before preparing Rust playback');
@@ -21,11 +29,11 @@ export async function prepareAllRustRuntime(createHost) {
     const { prepareClockedCoreLive } = await import('../../modular-audio/clockedCoreLive.js');
     const prepareEnvironment = async context => {
         const base = await prepareClockedOwnedHostEnvironment(context);
-        const core = await prepareClockedCoreLive(context, { liveInputLeadSeconds: .128 });
+        const core = await prepareClockedCoreLive(context, { liveInputLeadSeconds });
         return Object.freeze({ ...base, createCoreBackend: core, prepareContext: prepareEnvironment });
     };
     const environment = await prepareEnvironment(audioContext);
-    return Object.freeze({ backend: 'rust', environment,
+    return Object.freeze({ backend: 'rust', environment,liveInputLeadSeconds,
         async createHost(scene, options = {}) {
             environment.checkRuntime();
             const host = createHost(scene, { ...options, deskBackend: 'owned', audioEnvironment: environment, percussion: 'wasm' });
@@ -47,6 +55,7 @@ export function allRuntimeStatus(runtime, host) {
     if (!runtime) return { backend: 'rust', state: 'awaiting-gesture' };
     return {
         backend: runtime.backend, state: host ? 'ready' : 'preparing',
+        liveInputLeadSeconds:runtime.liveInputLeadSeconds??null,
         environment: host?.g.audioEnvironment?.profile ?? 'existing',
         desk: host?.deskStatus?.() ?? null,
         sources: host ? Object.fromEntries(Object.entries(host.g.roles).map(([role, { instrument }]) => [role,

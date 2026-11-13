@@ -86,6 +86,77 @@ default change. It is not a six-branch capacity, stress, multi-rate, live-MIDI
 latency or subjective sound-quality certification. All7377accepted tests and
 the public provenance/build/artifact checks pass; all39WIP hashes remain intact.
 
+### Lower live-input lead trials, 13 November
+
+The 128 ms setting is the Core/FM default-time policy for keyboard/MIDI input.
+It does not add 128 ms to explicitly timed sequencer events, nor specify the
+device buffer. All's Rust toolbar now offers session-only 128/64/32/16/8 ms
+choices (`allLeadMs`); changing one saves the workbench, retires the host and
+reloads. The existing 128 ms default and Current backend default are unchanged.
+The chosen value reaches the prepared source factory and its status/report.
+
+**Setup → Audio backend diagnostics → Test live keybed (30 s)** sends 118 notes
+(10 singles, 10 triads and 78 rapid overlapping notes), or 236 down/up calls,
+through the selected normal Performer and Instrument start/stop/retune path.
+It supplies no future audio timestamps. Actual processor late/drop counters,
+device underruns, selected-role output meters, dispatch delays and the bounded
+default-time ledger are recorded. Other keys, hidden documents, context changes,
+incomplete calls and source errors prevent a clean input result. Final releases
+are allowed to execute before the final source-counter sync. The sequencer stays
+stopped. Input timing and device output are separate results; a clean input
+result can still have an output underrun.
+
+Seven desktop trials used the Pad keybed's DI-Poly / Outrun Lead in the saved
+Uplifting Trance Departures workbench, at 48 kHz and 10 ms `baseLatency`:
+
+| Configured live lead | Trials | Late source commands | Dropped | Output underruns |
+| --- | --- | --- | --- | --- |
+| 128 ms | 1 exploratory | 0 | 0 | 0 |
+| 64 ms | 1 exploratory | 0 | 0 | 0 |
+| 32 ms | 2 | 0 / 0 | 0 / 0 | 0 / 0 |
+| 16 ms | 2 | 0 / 1 | 0 / 0 | 1 / 0 |
+| 8 ms | 1 | 58 | 0 | 1 |
+
+Each output underrun accounted for about 10 ms of fallback. All runs completed
+the same 236 live calls with nonzero role output. Normal Performer retuning
+produced 410–420 source commands, depending on live dispatch interleaving; the
+8 ms run had 416 commands. The live pattern hash is
+`d0cfce7b2b75d5b2456fe9405a085608d33dce49c5e229077d84b539f000f700`.
+Both 16 ms trials, the 8 ms trial and the final 32 ms trial retained full audio
+recipes. They match after excluding only the unused Continuous song seed, which
+regenerates on reload; that seed remains in each full report. Their input recipe
+hash is `e8f72f7147b8686be6a9d45820b778293fe1fcf6d7f13e06c5a8929a54fc1385`.
+The first three exploratory runs retained only recipe hashes. Initial trials
+updated diagnostic progress every 10 ms; the final 32 ms repeat updates once per
+second to avoid frequent React renders. Browser `outputLatency` reported 40 ms
+except for the 8 ms trial, where it reported 32 ms. No buffer policy was changed.
+
+32 ms is a reasonable provisional session choice on this setup, cutting the
+configured source lead by 96 ms; 16 ms has insufficient margin in these trials,
+and 8 ms recorded frequent late commands. This is not measured acoustic/MIDI
+latency or a multi-source, sustained-load certification. The earlier sequence
+comparison and its reliability result remain unchanged. Defaults, numerical DSP,
+timing rejection rules, quotas and frozen WIP are unchanged.
+
+Two additional attempts exposed preparation/retirement failures outside measured
+windows: `NativeClockError: Native clock ledger moved backwards/repeated/skipped`
+and `Sound host retirement failed`. The first occurred while build/test work
+was finishing, before the 128 ms source measurement; another source on that host
+had failed even though the selected Pad subsequently measured cleanly. A later
+fresh preparation also failed. Failed retirement blocked the lead selector as
+designed; an explicit document reload reconstructed the environment. These are
+unresolved lifecycle observations, not successful low-lead trials or evidence
+that relaxing clock/disposal guards would be safe.
+
+Raw results, summary, verification script and final UI screenshot are retained
+under ignored `reports/all-live-input-latency-*` and
+`reports/scripts/verifyAllLiveInputLatency.mjs`. The final page is left with 32 ms
+selected, awaiting the normal Prepare Rust audio gesture after UI refinement.
+The accepted suite passed 899 files / 7,384 tests with four skips before the final
+report-capture/progress/layout refinements; the final 91 focused tests and the
+public bundle/artifact check passed for those refinements. Public provenance checks
+passed, mixer Wasm bytes are unchanged, and all 39 WIP hashes and archive match.
+
 ## Selection and dependency spine
 
 `Generator` / `synths/all/host.js` → `audioEnvironment.js` validation →
