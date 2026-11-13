@@ -258,7 +258,8 @@
     "instrument-modulation:check": "node tools/buildInstrumentModulation.mjs --publish --check",
     "instrument-flanger:check": "node tools/buildInstrumentFlanger.mjs --publish --check",
     "instrument-distortion-cells:check": "node tools/buildInstrumentDistortionCells.mjs --publish --check",
-    "rack-outer:check": "node tools/buildRackOuter.mjs --publish --check && node tools/buildRackOuterHost.mjs --publish --check"
+    "rack-outer:check": "node tools/buildRackOuter.mjs --publish --check && node tools/buildRackOuterHost.mjs --publish --check",
+    "test:accepted": "vitest run --config tools/vitest.accepted.config.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Integrated audio engine review</title>
+  <style>
+    :root { color-scheme: dark; font: 16px/1.55 system-ui; background: #151c24; color: #edf3f9; }
+    body { margin: 32px auto; padding: 0 20px; max-width: 1040px; }
+    h1 { line-height: 1.2; } a { color: #a5d6ff; }
+    button, select { font: inherit; padding: 10px 14px; min-height: 46px; margin: 4px 4px 4px 0; border: 1px solid #789; border-radius: 6px; background: #273a4b; color: inherit; }
+    button:disabled { opacity: .45; } button:focus-visible, select:focus-visible { outline: 3px solid #a5d6ff; }
+    #status, #summary { padding: 16px; background: #0e151d; border-radius: 6px; }
+    #summary { white-space: pre-wrap; } textarea { box-sizing: border-box; width: 100%; height: 420px; background: #0e151d; color: inherit; }
+  </style>
+</head>
+<body>
+  <h1>Integrated audio engine review</h1>
+  <p>One opt-in Generator path: five Core/FM roles plus percussion, Rust role controls,
+    master trim and fade, and the bounded ordered send/sum join. Preparation happens once per page load.</p>
+  <p>Remaining Native boundaries: Instrument outer effects, private rack processed/bypass and return junctions,
+    Sweep, and final global volume. Room/Freeze lifecycle and the unfinished live actors are outside this slice.
+    Four cohorts allow source replacement but refuse an overlapping whole runtime before mutation.
+    Live notes use a 128 ms timestamp lead; late publications are reported.</p>
+  <p><a href="../synths/all/">Open the normal All workbench</a> ·
+    <a href="./owned-active-host.html">Mixed physical/CLASSIC source coverage</a> ·
+    <a href="./original-delay-tempo.html">Delay timing reference</a></p>
+  <label for="backend">Review backend</label>
+  <select id="backend"><option value="">Select a backend…</option><option value="integrated">Integrated Rust slice (opt-in)</option></select>
+  <button id="prepare" disabled>Select backend for browser reload</button>
+  <div>
+    <button id="run" disabled>Run grouped acceptance (muted)</button>
+    <button id="listen" disabled>Listen and run checks</button>
+    <button id="stop" disabled>Stop</button>
+  </div>
+  <p id="status" role="status">Select the opt-in backend to prepare it. Normal application defaults are unchanged.</p>
+  <pre id="summary">No checks run.</pre>
+  <button id="reload" disabled>Clear saved replay for next browser reload</button>
+  <button id="save-reload" disabled>Save passed scene for browser reload</button>
+  <button id="download" disabled>Download full report</button>
+  <details><summary>Full diagnostics</summary><textarea id="result" readonly aria-label="Full review diagnostics"></textarea></details>
+  <script type="module" src="./audioEngineReviewPage.js"></script>
+</body>
+</html>
