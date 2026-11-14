@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "workspace": "C:/dev/pianote/bgm",
+  "head": "325cce49c6732e4d51a500d66db680314619896c",
+  "originMain": "111d282f9eeed07d86f49194090221c0f62523b6",
+  "branch": "main",
+  "fileCount": 39,
+  "groups": {
+    "live-modulation": 13,
+    "logical-activity": 4,
+    "direct-distortion": 22
+  },
+  "archive": {
+    "path": "reports/cleanup-handoff-2026-11-12/untracked-wip.zip",
+    "bytes": 87533,
+    "sha256": "8c3200477061de6a3309aa7dd89a786b171eb402041e8df96a3981d5861bfc65",
+    "verified": true
+  },
+  "files": [
+    {
+      "path": "public/instrument-distortion-cells-live/host.json",
+      "bytes": 2241,
+      "sha256": "ba5353d449f87138c19cbeaff9dfd71e464b625359a57427efdf270b57ccb147",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "public/instrument-distortion-cells-live/processor.js",
+      "bytes": 36666,
+      "sha256": "1489d2a6cc30b00c6a81b105644ea5cc47499c2917fd9eb36b114a64fd952402",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "src/modular-audio/instrumentDistortionCellsLive.test.js",
+      "bytes": 3019,
+      "sha256": "fa1c19fff8195dc5912aff45be43db3d9e44b7bc6b544d8707d514b266b8c14e",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "src/modular-audio/instrumentDistortionCellsProcessor.js",
+      "bytes": 12541,
+      "sha256": "1013e3fdec6254cbbfd93aa402557c1f82cc5e2d020bcd7fc227068f48c2564a",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "src/modular-audio/instrumentDistortionCellsWords.js",
+      "bytes": 2024,
+      "sha256": "12613d1d4912cb8dc3eadd3e4ee45f886a166961a5d78ee9388228b0e261d01a",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "src/modular-audio/instrumentModulationConstructor.js",
+      "bytes": 4871,
+      "sha256": "6962315f8a35ff6ab4ac2bfc13aa4de9e0495afd406be0bc4e1921ba6d384a77",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/instrumentModulationConstructor.test.js",
+      "bytes": 4967,
+      "sha256": "e542f869417d40d2b197538b4927da913cee06b48a6cba46706e0a8eabd18fca",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/instrumentModulationLiveControls.test.js",
+      "bytes": 4503,
+      "sha256": "4a676eaa1cc3405df117d062dd743fc3bc1244274904b60f22ecee41798d9b7a",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/instrumentModulationLiveProcessor.js",
+      "bytes": 14100,
+      "sha256": "eac5ed7679a8a5f79bbb331e916a8acf8393b9be03c902f6fd3d0ba5b8c56b54",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/instrumentModulationLiveWords.js",
+      "bytes": 2332,
+      "sha256": "d83ec5851ee3f9bf8d8d16ca254622eba4385cf521c7c8605f1620617b12484e",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/orderedActivityCore.js",
+      "bytes": 5051,
+      "sha256": "dab95e90928f84cae09b2b381a37c51cdb59d370cd62905e642396531ab634d0",
+      "group": "logical-activity"
+    },
+    {
+      "path": "src/modular-audio/orderedActivityProcessor.js",
+      "bytes": 7830,
+      "sha256": "24272574b41d46a5d177b3dee73618e6e4dd4eade4cbc5b952b7f96e92126c4e",
+      "group": "logical-activity"
+    },
+    {
+      "path": "src/modular-audio/ownedInstrumentModulationLiveCore.js",
+      "bytes": 4662,
+      "sha256": "dad2180e2fe4dbe0b15fd37bc62fc6489b319df0ec170e4eebba206cccbb4d71",
+      "group": "live-modulation"
+    },
+    {
+      "path": "src/modular-audio/rackActivityTrimCore.js",
+      "bytes": 5807,
+      "sha256": "e02babd263e2fa86abafc07ee8a4b1b9ffd0eb193f470ac343031bf77b0d0b62",
+      "group": "logical-activity"
+    },
+    {
+      "path": "src/modular-audio/rackActivityTrimProcessor.js",
+      "bytes": 8592,
+      "sha256": "769c9a83c1d723468f887cdb18aa53abe862a6fa3b9219a85ed309254fee310b",
+      "group": "logical-activity"
+    },
+    {
+      "path": "src/nodes/distortionCellsRust.js",
+      "bytes": 18170,
+      "sha256": "012c757cba8162f09ae0f0093534e8f666f6288c8b30b37293f539c40ad45996",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "src/nodes/instrumentModulationFacade.js",
+      "bytes": 3906,
+      "sha256": "583d56da38c4d6c62882e2b9b691d33c04ad048d51d16e1f5d0a85978cfd7bbb",
+      "group": "live-modulation"
+    },
+    {
+      "path": "synth-engine/instrument-modulation-live/Cargo.lock",
+      "bytes": 178,
+      "sha256": "8f033b2f0439359b2700f490ece3fd40c79b25ca4e78a5211cf108426a7c8883",
+      "group": "live-modulation"
+    },
+    {
+      "path": "synth-engine/instrument-modulation-live/Cargo.toml",
+      "bytes": 298,
+      "sha256": "fc909bba30190c7e9bed68943f1e3841b3a68f50b7939477b5b56db3c529566d",
+      "group": "live-modulation"
+    },
+    {
+      "path": "synth-engine/instrument-modulation-live/src/allocation.rs",
+      "bytes": 1735,
+      "sha256": "9e5bc5fd2709bea323422aaf420fbf982517963518a0d2d90bd85362cb432340",
+      "group": "live-modulation"
+    },
+    {
+      "path": "synth-engine/instrument-modulation-live/src/lib.rs",
+      "bytes": 213,
+      "sha256": "ed57a0faef4f82d12491287c5389160dfa56bac2923b137cbe0aa6558fa87761",
+      "group": "live-modulation"
+    },
+    {
+      "path": "tools/buildInstrumentDistortionCellsHost.mjs",
+      "bytes": 3604,
+      "sha256": "5c77920255c7a301cb66efb3ce79a8f568669ed4e15f91540b07903b2e09e40c",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/buildInstrumentModulationLiveKernel.mjs",
+      "bytes": 4093,
+      "sha256": "3f18f1cfc59b6a57c53c0ffcfd0f2fa99f2136f7a959eb51acc370bbec1ce5dd",
+      "group": "live-modulation"
+    },
+    {
+      "path": "tools/checkInstrumentDistortionCellsFacade.mjs",
+      "bytes": 6898,
+      "sha256": "4c0cc1338ed34c46d3f2ff98645d0c7d524993bd9939252000502a3818b58ab5",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/checkInstrumentDistortionCellsProcessor.mjs",
+      "bytes": 6444,
+      "sha256": "aaf7c9d42bc842449b70a65431e76eeb42b377cfe5ccdc9e589c0bfe54e3c668",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-bank.html",
+      "bytes": 850,
+      "sha256": "55667759e11d5025e179129a83a35c6b0fd821ffdff08f8a37e476480f4ac185",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-live-cold.html",
+      "bytes": 908,
+      "sha256": "5b6e22199b89b3d7857da29375b68c763f517998c4113553c640523fef34fdaa",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-live-gap.html",
+      "bytes": 986,
+      "sha256": "aae23b08bab7e2bdfb188ab1e53509f9025625432b3880d0e9ac80f981a7a069",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-live-interleave.html",
+      "bytes": 958,
+      "sha256": "11a84a125a4ec5f400519c4299991e0858ddf0e5099a4783f3160026ad084a2c",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-live-reused.html",
+      "bytes": 976,
+      "sha256": "1503e01f8e355716fcac4baaccdb285c898c4a11daca6e98f6baeaf47b62e09a",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrument-distortion-cells-live.html",
+      "bytes": 1079,
+      "sha256": "07feacdcdfaf430bcd2528ce5c3507eaf264a8afe88f4a187d8bf1ee654a0800",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsBankReview.js",
+      "bytes": 6955,
+      "sha256": "c37e794b25aad38fc7d44498d5fbdeb186fc48e7416da3efd7b6ae58b548df6d",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsGapReview.js",
+      "bytes": 10715,
+      "sha256": "1fbec0c637a26ed6bd4441ef5a199ed0eea23135edf2a868d32c3cc3acdc96d6",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsInterleaveReview.js",
+      "bytes": 8487,
+      "sha256": "f7f497357e7bf9481d465d7949fc1cc0c0cb11bf403db5db79ff1158900d34a4",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsLiveColdReview.js",
+      "bytes": 4598,
+      "sha256": "86443d44fb871228bb278167bb628ade806523cbf312ea42d8959e021a7e1850",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsLiveReview.js",
+      "bytes": 13013,
+      "sha256": "ac10ca6ff54e06f155ca707ebdb32efc52e7b31dad3d4bbac02eec1ace0784e9",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsLiveReview.test.js",
+      "bytes": 2476,
+      "sha256": "f0cb43fbdccacde2e8939d78511adddb62ecd4a12d7e9d8ba6a2a10868065cf9",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentDistortionCellsReusedReview.js",
+      "bytes": 7407,
+      "sha256": "0c26476b3f0fa7106cc1f52616a4af78a6016e76a5f9708899b01563abcc264e",
+      "group": "direct-distortion"
+    },
+    {
+      "path": "tools/instrumentModulationLiveSource.mjs",
+      "bytes": 5578,
+      "sha256": "d1f08809fbd0041c67752b9fa939fbfd8c247e42ff5c092a8803bc566630918d",
+      "group": "live-modulation"
+    }
+  ]
+}
